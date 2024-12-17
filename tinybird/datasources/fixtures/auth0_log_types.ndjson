@@ -1,0 +1,110 @@
+{"type": "fepotpft", "description": "Failed exchange of Passwordless OTP for Access Token"}
+{"type": "fce", "description": "Failed to change user email"}
+{"type": "fd", "description": "Failed to generate delegation token"}
+{"type": "gd_auth_succeed", "description": ""}
+{"type": "srrt", "description": "Successfully revoked a refresh token"}
+{"type": "fsa", "description": "Failed Silent Auth"}
+{"type": "fcpn", "description": "Failed Change Phone Number"}
+{"type": "pwd_leak", "description": "Someone behind the IP address ip attempted to login with a leaked password"}
+{"type": "gd_send_pn", "description": "Push notification for MFA sent successfully sent"}
+{"type": "sce", "description": "Successful Change Email"}
+{"type": "feoobft", "description": "Failed exchange of Password and OOB Challenge for Access Token"}
+{"type": "wum", "description": "A warning has happened during user management related tasks"}
+{"type": "ssa", "description": "Successful Silent Auth"}
+{"type": "seacft", "description": "Successful Exchange of Authorization Code for Access Token"}
+{"type": "fpar", "description": "Failed Push Authorization Request"}
+{"type": "gd_webauthn_enrollment_failed", "description": ""}
+{"type": "ublkdu", "description": "User block setup by anomaly detection has been released"}
+{"type": "gd_otp_rate_limit_exceed", "description": "A user, during enrollment or authentication, enters an incorrect code more than the maximum allowed number of times. Ex: A user enrolling in SMS enters the 6-digit code wrong more than 10 times in a row."}
+{"type": "appi", "description": "API Peak Performance Rate is initiated"}
+{"type": "gd_send_pn_failure", "description": "Push notification for MFA failed"}
+{"type": "sepft", "description": "Successful Exchange of Password for Access Token"}
+{"type": "limit_mu", "description": "An IP address is blocked because it attempted too many failed logins without a successful login. Or an IP address is blocked because it attempted too many sign-ups, whether successful or failed."}
+{"type": "feccft", "description": "Failed exchange of Access Token for a Client Credentials Grant"}
+{"type": "gd_send_sms", "description": ""}
+{"type": "fens", "description": "Failed exchange for Native Social Login"}
+{"type": "gd_recovery_succeed", "description": ""}
+{"type": "fepft", "description": "Failed exchange of Password for Access Token"}
+{"type": "fpurh", "description": "Failed Post User Registration Hook"}
+{"type": "pla", "description": "Generated before a login and helps in monitoring the behavior of bot detection without having to enable it."}
+{"type": "sertft", "description": "Successful Exchange of Refresh Token for Access Token"}
+{"type": "f", "description": "Failed Login This is only emitted if the error is not covered by the `fp` or `fu` log types"}
+{"type": "mgmt_api_read", "description": "Successful GET request on the management API. This event will only be emitted if a secret is returned."}
+{"type": "scu", "description": "Successful Change Username"}
+{"type": "fcoa", "description": "Failed Cross-Origin Authentication"}
+{"type": "sdu", "description": "Successful User Deletion"}
+{"type": "refresh_tokens_revoked_by_session", "description": "Successfully revoked a refresh token"}
+{"type": "fcph", "description": "Failed Post Change Password Hook"}
+{"type": "gd_webauthn_challenge_failed", "description": ""}
+{"type": "fede", "description": "Failed to exchange Device Code for Access Token"}
+{"type": "gd_send_voice_failure", "description": ""}
+{"type": "fdecc", "description": "Failed Device Confirmation - User Canceled"}
+{"type": "cs", "description": "Passwordless Login Code Sent"}
+{"type": "depnote", "description": "Deprecation Notice"}
+{"type": "gd_unenroll", "description": ""}
+{"type": "s", "description": "Successful Login"}
+{"type": "api_limit", "description": "The maximum number of requests to the Authentication or Management APIs in given time was reached"}
+{"type": "oidc_backchannel_logout_failed", "description": ""}
+{"type": "gd_enrollment_complete", "description": "A first time MFA user has successfully enrolled using one of the factors"}
+{"type": "fcu", "description": "Failed to change username"}
+{"type": "gd_send_sms_failure", "description": ""}
+{"type": "fdu", "description": "Failed User Deletion"}
+{"type": "feacft", "description": "Failed to Exchange Authorization Code for Access Token"}
+{"type": "seccft", "description": "Successful Exchange of Access Token for a Client Credentials Grant"}
+{"type": "gd_send_voice", "description": ""}
+{"type": "seotpft", "description": "Successful Exchange of Password and OTP Challenge for Access Token"}
+{"type": "fn", "description": "Failed Notification"}
+{"type": "gd_update_device_account", "description": ""}
+{"type": "sd", "description": "Successful Delegation"}
+{"type": "fco", "description": "Failed due to CORS. Is the origin in the Allowed Origins list for the specified application?"}
+{"type": "cls", "description": "Passwordless Login Code/Link Sent"}
+{"type": "fcp", "description": "Failed Change Password"}
+{"type": "gd_auth_rejected", "description": "User rejected a multi-factor authentication request via push-notification"}
+{"type": "oidc_backchannel_logout_succeeded", "description": ""}
+{"type": "scp", "description": "Successful Change Password"}
+{"type": "fertft", "description": "Failed Exchange of Refresh Token for Access Token. This could occur if the refresh token is revoked or expired."}
+{"type": "fcpr", "description": "Failed Change Password Request"}
+{"type": "mfar", "description": "A user has been prompted for multi-factor authentication (MFA). When using Adaptive MFA, Auth0 includes details about the risk assessment"}
+{"type": "resource_cleanup", "description": "Emitted when resources exceeding defined limits were removed. Normally related to refresh tokens"}
+{"type": "sede", "description": "Successful Exchange of Device Code for Access Token"}
+{"type": "scoa", "description": "Successful Cross-Origin Authentication"}
+{"type": "gd_tenant_update", "description": ""}
+{"type": "scph", "description": "Successful Post Change Password Hook"}
+{"type": "gd_send_email_failure", "description": ""}
+{"type": "gd_send_email", "description": ""}
+{"type": "gd_start_enroll", "description": ""}
+{"type": "fi", "description": "Failed to accept a user invitation. This could happen if the user accepts an invitation using a different email address than provided in the invitation, or due to a system failure while provisioning the invitation."}
+{"type": "sui", "description": "Successful Users Import"}
+{"type": "fv", "description": "Failed to send verification email"}
+{"type": "seoobft", "description": "Successful Exchange of Password and OOB Challenge for Access Token"}
+{"type": "fs", "description": "Failed Signup"}
+{"type": "fdeac", "description": "Failed Device Confirmation - Device Activation Failure"}
+{"type": "gd_auth_email_verification", "description": ""}
+{"type": "gd_recovery_failed", "description": "A user entered a wrong Recovery Code when attempting to authenticate"}
+{"type": "limit_delegation", "description": "A user is temporarily prevented from logging in because of too many delegation requests"}
+{"type": "scpr", "description": "Successful Change Password Request"}
+{"type": "ferrt", "description": "Failed Exchange of Rotating Refresh Token. This could occur when reuse is detected."}
+{"type": "gd_start_enroll_failed", "description": ""}
+{"type": "fercft", "description": "Failed Exchange of Password and MFA Recovery Code for Access Token"}
+{"type": "fvr", "description": "Failed to proces verification email request"}
+{"type": "fcpro", "description": "Failed to provision a AD/LDAP connector"}
+{"type": "ss", "description": "Successful Signup"}
+{"type": "scpn", "description": "Successful Change Phone Number"}
+{"type": "limit_wc", "description": "An IP address is blocked because it reached the maximum failed login attempts into a single account."}
+{"type": "fp", "description": "Failed login due to invalid password"}
+{"type": "w", "description": "A warning has happened during a login flow"}
+{"type": "limit_sul", "description": "A user is temporarily prevented from logging in because they  reached the maximum logins per time period from the same IP address"}
+{"type": "svr", "description": "Successfully called verification email endpoint. Verification email has been queued for sending."}
+{"type": "gd_auth_failed", "description": "Multi-factor authentication failed. This could happen due to a wrong code entered for SMS/Voice/Email/TOTP factors, or a system failure."}
+{"type": "feotpft", "description": "Failed exchange of Password and OTP Challenge for Access Token"}
+{"type": "gd_start_auth", "description": ""}
+{"type": "slo", "description": "Successful Logout"}
+{"type": "fu", "description": "Failed login due to invalid username"}
+{"type": "sens", "description": "Successful Exchange - Native Social Login"}
+{"type": "session_revoked", "description": "Successfully revoked a session"}
+{"type": "sapi", "description": "Successful API Operation Only emitted by the Management API on POST, DELETE, PATCH, and PUT"}
+{"type": "fdeaz", "description": "Failed Device Confirmation - Request Failure"}
+{"type": "sv", "description": "Successfully consumed email verification link"}
+{"type": "sercft", "description": "Successful Exchange of Password and MFA Recovery Codeode for Access Token"}
+{"type": "si", "description": "Successfully accepted a user invitation"}
+{"type": "flo", "description": "Failed Logout"}

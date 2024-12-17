@@ -1,0 +1,12 @@
+TOKEN "append" APPEND
+
+# Refer to https://github.com/auth0/auth0-log-schemas
+
+TAGS "auth0"
+
+SCHEMA >
+    `type` String `json:$.type`,
+    `description` String `json:$.description`
+
+ENGINE "MergeTree"
+ENGINE_SORTING_KEY "type"
