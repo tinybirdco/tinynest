@@ -1,0 +1,17 @@
+TOKEN "append" APPEND
+
+# Refer to https://docs.withorb.com/guides/integrations-and-exports/webhooks for the `details` schema definition for each resource type
+
+TAGS "orb"
+
+
+SCHEMA >
+    `id` String `json:$.id`,
+    `type` LowCardinality(String) `json:$.type` DEFAULT 'unknown',
+    `date` DateTime64(3) `json:$.created_at` DEFAULT now(),
+    `resource_name` LowCardinality(String) `json:$.resource_name` DEFAULT 'unknown',
+    `details` JSON `json:$.properties` DEFAULT '{}'
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(date)"
+ENGINE_SORTING_KEY "type, resource_name, date"
