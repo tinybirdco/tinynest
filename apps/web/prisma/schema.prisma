@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Team {
+  id          String        @id @default(cuid())
+  name        String
+  ownerId     String        // Clerk user ID
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  members     TeamMember[]
+  invitations Invitation[]
+
+  @@index([ownerId])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String   // Clerk user ID
+  email     String
+  name      String
+  role      Role     @default(MEMBER)
+  joinedAt  DateTime @default(now())
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, email])
+  @@unique([teamId, userId])
+  @@index([userId])
+  @@index([teamId])
+}
+
+model Invitation {
+  id        String    @id @default(cuid())
+  teamId    String
+  email     String
+  role      Role      @default(MEMBER)
+  token     String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  acceptedAt DateTime?
+  team      Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, email])
+  @@index([token])
+  @@index([teamId])
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
