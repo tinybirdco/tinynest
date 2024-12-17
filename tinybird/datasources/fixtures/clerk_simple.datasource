@@ -1,0 +1,7 @@
+SCHEMA >
+    `time` DateTime64(3) `json:$.timestamp` DEFAULT now(),
+    `record` JSON `json:$`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYear(time)"
+ENGINE_SORTING_KEY "time"
