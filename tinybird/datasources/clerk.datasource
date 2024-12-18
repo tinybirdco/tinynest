@@ -1,3 +1,9 @@
+TOKEN "append" APPEND
+
+# Refer to https://clerk.com/docs/webhooks/overview#payload-structure
+
+TAGS "clerk"
+
 SCHEMA >
     `time` DateTime64(3) `json:$.timestamp` DEFAULT now(),
     `data` JSON `json:$.data`,
