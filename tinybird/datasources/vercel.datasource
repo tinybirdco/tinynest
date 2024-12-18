@@ -1,0 +1,16 @@
+TOKEN "append" APPEND
+
+# Refer to https://vercel.com/docs/observability/webhooks-overview#events for the event types and payload schema
+
+TAGS "vercel"
+
+SCHEMA >
+    `type` LowCardinality(String) `json:$.type`,
+    `id` String `json:$.id`,
+    `date` DateTime64(3) `json:$.created_at` DEFAULT now(),
+    `region` LowCardinality(String) `json:$.region` DEFAULT '',
+    `payload` JSON `json:$.payload` DEFAULT '{}'
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(date)"
+ENGINE_SORTING_KEY "type, date"
