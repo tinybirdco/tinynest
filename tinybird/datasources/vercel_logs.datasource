@@ -5,7 +5,7 @@ TOKEN "append" APPEND
 TAGS "vercel"
 
 SCHEMA >
-    `id` String `json:$.id`,
+    `id` Nullable(String) `json:$.id`,
     `message` String `json:$.message`,
     `date` DateTime64(3) `json:$.timestamp` DEFAULT now(),
     `type` LowCardinality(String) `json:$.type` DEFAULT '',
