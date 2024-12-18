@@ -1,0 +1,10 @@
+TOKEN "append" APPEND
+
+TAGS "mailgun"
+
+SCHEMA >
+    `root` JSON `json:$`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY ""
+ENGINE_SORTING_KEY "tuple()"
