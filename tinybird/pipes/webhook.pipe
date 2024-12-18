@@ -1,0 +1,11 @@
+TOKEN "webhook" READ
+
+DESCRIPTION >
+    This pipe is used to ingest webhook events into Tinybird for services that support webhooks with JSON payloads. The Pipe endpoint will receive requests, store them in tinybird.pipe_stats_rt and then materialized to their corresponding target Data Sources.
+
+    To configure the webhook use https://<tinybird-region-host>.tinybird.co/v0/pipes/webhook?token<your-tinybird-token>&service=<service-name>
+
+
+NODE default_webhook
+SQL >
+    SELECT 1
