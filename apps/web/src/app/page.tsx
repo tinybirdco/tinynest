@@ -10,6 +10,7 @@ import { listDataSources } from '@/lib/tinybird';
 
 interface AppGridItem {
   id: string;
+  ds: string;
   name: string;
   description: string;
   icon: string;
@@ -18,18 +19,21 @@ interface AppGridItem {
 const KNOWN_APPS: AppGridItem[] = [
   {
     id: 'clerk',
+    ds: 'clerk',
     name: 'Clerk',
     description: 'Authentication and user management',
     icon: '🔐'
   },
   {
     id: 'resend',
+    ds: 'resend',
     name: 'Resend',
     description: 'Email delivery service',
     icon: '✉️'
   },
   {
     id: 'auth0',
+    ds: 'auth0_logs',
     name: 'Auth0',
     description: 'Identity platform',
     icon: '🔑'
@@ -48,7 +52,6 @@ export default function Home() {
       
       setIsLoading(true);
       try {
-        console.log(token);
         const sources = await listDataSources(token);
         const installed = sources.map(s => s.name);
         setInstalledApps(installed);
@@ -86,7 +89,7 @@ export default function Home() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <>
       <h1 className="text-3xl font-bold mb-8">Your Apps</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {KNOWN_APPS.map((app) => (
@@ -101,7 +104,7 @@ export default function Home() {
                   <h2 className="text-xl font-semibold">{app.name}</h2>
                   <p className="text-gray-500">{app.description}</p>
                   <div className="mt-2">
-                    {installedApps.includes(app.id) ? (
+                    {installedApps.includes(app.ds) ? (
                       <span className="text-green-500 text-sm">Installed</span>
                     ) : (
                       <span className="text-gray-400 text-sm">Not installed</span>
@@ -113,6 +116,6 @@ export default function Home() {
           </Link>
         ))}
       </div>
-    </div>
+    </>
   );
 }

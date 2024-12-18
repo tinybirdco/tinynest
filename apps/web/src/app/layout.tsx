@@ -28,7 +28,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NuqsAdapter>{children}</NuqsAdapter>
+        <NuqsAdapter>
+          <div className="container mx-auto p-6">
+            {children}
+          </div>
+        </NuqsAdapter>
       </body>
     </html>
   );

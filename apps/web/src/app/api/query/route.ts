@@ -12,7 +12,6 @@ export async function GET(request: Request) {
   const url = new URL('https://api.tinybird.co/v0/sql');
   url.searchParams.set('q', query);
 
-  console.log(url);
   const response = await fetch(url.toString(), {
     method: 'GET',
     headers: {
@@ -22,5 +21,6 @@ export async function GET(request: Request) {
   });
 
   const data = await response.json();
+  console.log(data);
   return NextResponse.json(data);
 }
