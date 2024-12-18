@@ -1,0 +1,30 @@
+TOKEN "append" APPEND
+
+# Refer to https://vercel.com/docs/observability/log-drains/log-drains-reference for the logs schema
+
+TAGS "vercel"
+
+SCHEMA >
+    `id` String `json:$.id`,
+    `message` String `json:$.message`,
+    `date` DateTime64(3) `json:$.timestamp` DEFAULT now(),
+    `type` LowCardinality(String) `json:$.type`,
+    `request_id` Nullable(String) `json:$.requestId`,
+    `status_code` Nullable(UInt16) `json:$.statusCode`,
+    `project_id` String `json:$.projectId` DEFAULT '',
+    `project_name` Nullable(String) `json:$.projectName`,
+    `deployment_id` Nullable(String) `json:$.deploymentId`,
+    `source` LowCardinality(String) `json:$.source` DEFAULT '',
+    `host` Nullable(String) `json:$.host`,
+    `path` Nullable(String) `json:$.path`,
+    `proxy` JSON `json:$.proxy` DEFAULT '{}',
+    `level` LowCardinality(String) `json:$.level` DEFAULT '',
+    `execution_region` Nullable(String) `json:$.executionRegion`,
+    `environment` Nullable(String) `json:$.environment`,
+    `branch` Nullable(String) `json:$.branch`,
+    `build_id` Nullable(String) `json:$.buildId`,
+    `entrypoint` Nullable(String) `json:$.entrypoint`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(date)"
+ENGINE_SORTING_KEY "project_id, date"
