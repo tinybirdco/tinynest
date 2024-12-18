@@ -1,0 +1,17 @@
+TOKEN "append" APPEND
+
+# Refer to https://docs.sentry.io/organization/integrations/integration-platform/webhooks/ for the json schemas
+
+TAGS "sentry"
+
+SCHEMA >
+    `action` LowCardinality(String) `json:$.action`,
+    `actor_id` String `json:$.actor.id` DEFAULT '',
+    `actor_name` String `json:$.actor.name` DEFAULT '',
+    `actor_type` String `json:$.actor.type` DEFAULT '',
+    `data` JSON `json:$.data`,
+    `resolution_type` LowCardinality(String) `json:$.data.resolution_type` DEFAULT '',
+    `installation_uuid` String `json:$.installation.uuid` DEFAULT ''
+
+ENGINE "MergeTree"
+ENGINE_SORTING_KEY "action, actor_name"
