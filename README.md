@@ -15,6 +15,7 @@ Deploy this project to your Tinybird account and configure the webhooks for the 
 - [Orb](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-orb)
 - [Resend](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-resend)
 - [Rudderstack](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-rudderstack)
+- [Sentry](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-sentry)
 - [Vercel](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-vercel)
 - [Vercel Log Drains](https://www.tinybird.co/docs/get-data-in/guides/ingest-vercel-logdrains)
 
