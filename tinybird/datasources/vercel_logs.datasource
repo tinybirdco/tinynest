@@ -17,6 +17,7 @@ SCHEMA >
     `source` LowCardinality(String) `json:$.source` DEFAULT '',
     `host` Nullable(String) `json:$.host`,
     `path` Nullable(String) `json:$.path`,
+    `destination` Nullable(String) `json:$.destination`,
     `proxy` String `json:$.proxy` DEFAULT '',
     `level` LowCardinality(String) `json:$.level` DEFAULT '',
     `execution_region` Nullable(String) `json:$.executionRegion`,
