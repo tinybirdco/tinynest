@@ -1,0 +1,14 @@
+TOKEN "append" APPEND
+
+# Refer to https://resend.com/docs/dashboard/webhooks/event-types
+
+TAGS "resend"
+
+SCHEMA >
+    `time` DateTime64(3) `json:$.created_at` DEFAULT now(),
+    `type` String `json:$.type`,
+    `data` JSON `json:$.data`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYear(time)"
+ENGINE_SORTING_KEY "time"
