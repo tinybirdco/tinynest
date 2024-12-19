@@ -6,7 +6,7 @@ TAGS "vercel"
 
 SCHEMA >
     `id` Nullable(String) `json:$.id`,
-    `message` String `json:$.message`,
+    `message` String `json:$.message` DEFAULT '',
     `date` DateTime64(3) `json:$.timestamp` DEFAULT now(),
     `type` LowCardinality(String) `json:$.type` DEFAULT '',
     `request_id` Nullable(String) `json:$.requestId`,
