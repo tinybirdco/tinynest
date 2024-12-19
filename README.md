@@ -12,6 +12,7 @@ Deploy this project to your Tinybird account and configure the webhooks for the 
 
 - [Auth0 Log Streams](https://www.tinybird.co/docs/get-data-in/guides/ingest-auth0-logs)
 - [Clerk](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-clerk)
+- [GitLab](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-gitlab)
 - [Orb](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-orb)
 - [Resend](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-resend)
 - [Rudderstack](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-rudderstack)
