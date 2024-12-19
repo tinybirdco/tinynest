@@ -1,0 +1,21 @@
+TOKEN "append" APPEND
+
+# Refer to https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html#pipeline-events
+
+TAGS "gitlab"
+
+SCHEMA >
+  `object_kind` String `json:$.object_kind`,
+  `object_attributes` JSON `json:$.object_attributes`,
+  `merge_request` JSON `json:$.merge_request` DEFAULT '{}',
+  `user_id` UInt32 `json:$.user.id`,
+  `user` JSON `json:$.user`,
+  `project_id` UInt32 `json:$.project.id`,
+  `project` JSON `json:$.project`,
+  `commit` JSON `json:$.commit` DEFAULT '{}',
+  `pipeline_id` UInt32 `json:$.source_pipeline.pipeline_id`,
+  `source_pipeline` JSON `json:$.source_pipeline` DEFAULT '{}',
+  `builds` Array(JSON) `json:$.builds[:]` DEFAULT '[]'
+
+ENGINE "MergeTree"
+ENGINE_SORTING_KEY "project_id, pipeline_id, user_id"
