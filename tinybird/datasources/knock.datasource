@@ -1,0 +1,16 @@
+TOKEN "append" APPEND
+
+# Refer to https://docs.knock.app/developer-tools/outbound-webhooks/event-types
+
+TAGS "knock"
+
+SCHEMA >
+  `typename` String `json:$.__typename`,
+  `type` String `json:$.type`,
+  `created_at` DateTime64(3) `json:$.created_at`,
+  `data` JSON `json:$.data`,
+  `event_data` JSON `json:$.event_data`
+
+
+ENGINE "MergeTree"
+ENGINE_SORTING_KEY "type, created_at"
