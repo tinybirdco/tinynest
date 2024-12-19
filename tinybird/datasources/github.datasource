@@ -5,6 +5,6 @@ TOKEN "append" APPEND
 TAGS "github"
 
 SCHEMA >
-  `root` String `json:$`
+  `root` JSON `json:$` DEFAULT '{}'
 
 ENGINE "MergeTree"
