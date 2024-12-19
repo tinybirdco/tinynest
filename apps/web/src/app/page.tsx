@@ -4,19 +4,25 @@ import { useQueryState } from 'nuqs';
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
-import { checkToolState } from '@/lib/tinybird';
+import { checkToolState, InvalidTokenError } from '@/lib/tinybird';
 import { TOOLS, type AppGridItem, type ToolState } from '@/lib/constants';
 import TokenPrompt from '@/components/token-prompt';
 
 export default function Home() {
-  const [token] = useQueryState('token');
+  const [token, setToken] = useQueryState('token');
   const [toolStates, setToolStates] = useState<Record<string, ToolState>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>();
+  const [isValidToken, setIsValidToken] = useState(false);
 
   useEffect(() => {
     async function fetchToolStates() {
-      if (!token) return;
+      if (!token) {
+        setIsValidToken(false);
+        return;
+      }
       setIsLoading(true);
+      setError(undefined);
       try {
         const states = await Promise.all(
           Object.values(TOOLS).map(async (app) => {
@@ -25,25 +31,40 @@ export default function Home() {
           })
         );
         setToolStates(Object.fromEntries(states));
+        setIsValidToken(true);
       } catch (error) {
-        console.error('Failed to fetch tool states:', error);
+        if (error instanceof InvalidTokenError) {
+          setError('Invalid token');
+          setToken(null);
+          setIsValidToken(false);
+        } else {
+          console.error('Failed to fetch tool states:', error);
+          setError('Failed to fetch tool states');
+          setIsValidToken(false);
+        }
       } finally {
         setIsLoading(false);
       }
     }
 
     fetchToolStates();
-  }, [token]);
+  }, [token, setToken]);
+
+  if (!token || !isValidToken) {
+    return (
+      <div className="container py-6">
+        <TokenPrompt error={error} />
+      </div>
+    );
+  }
 
   return (
     <div className="container py-6">
-      <TokenPrompt />
-      {token && isLoading && (
+      {isLoading ? (
         <div className="flex items-center justify-center">
           <p className="text-lg font-semibold">Loading...</p>
         </div>
-      )}
-      {token && !isLoading && (
+      ) : (
         <div className="space-y-8">
           {/* Configured Apps */}
           {Object.values(TOOLS).some(app => toolStates[app.id] === 'configured') && (

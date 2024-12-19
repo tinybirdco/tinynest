@@ -1,5 +1,12 @@
 import { type ToolState } from './constants';
 
+export class InvalidTokenError extends Error {
+  constructor() {
+    super('Invalid token');
+    this.name = 'InvalidTokenError';
+  }
+}
+
 export interface TinybirdDataSource {
   name: string;
   description?: string;
@@ -13,10 +20,16 @@ export async function listDataSources(token: string): Promise<TinybirdDataSource
   const response = await fetch(`/api/datasources?token=${token}`);
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      throw new InvalidTokenError();
+    }
     throw new Error('Failed to fetch data sources');
   }
 
   const data = await response.json();
+  if (!data?.datasources) {
+    throw new InvalidTokenError();
+  }
   return data.datasources;
 }
 
@@ -35,6 +48,9 @@ export async function query(token: string, sql: string): Promise<QueryResult> {
   const response = await fetch(`/api/query?token=${token}&query=${encodeURIComponent(sql)}`);
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      throw new InvalidTokenError();
+    }
     throw new Error('Failed to execute query');
   }
 
@@ -52,13 +68,16 @@ export async function checkToolState(token: string, datasource: string): Promise
       return 'available';
     }
 
-    // Check if there's any data
-    const result = await query(token, `SELECT count() as count FROM ${datasource} FORMAT JSON`);
+    // Then check if it has data
+    const result = await query(token, `SELECT count(*) as count FROM ${datasource} FORMAT JSON`);
     const hasData = result.data[0]?.count > 0;
 
     return hasData ? 'configured' : 'installed';
   } catch (error) {
-    console.error('Failed to check tool state:', error);
+    if (error instanceof InvalidTokenError) {
+      throw error;
+    }
+    console.error('Error checking tool state:', error);
     return 'available';
   }
 }
@@ -79,6 +98,9 @@ export async function pipe<T = QueryResult>(
   const response = await fetch(`/api/pipes?${searchParams}`);
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      throw new InvalidTokenError();
+    }
     throw new Error('Failed to execute pipe');
   }
 

@@ -7,11 +7,12 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import Link from 'next/link'
 
-export default function TokenPrompt() {
+export default function TokenPrompt({ error }: { error?: string }) {
     const [token, setToken] = useQueryState('token')
     const [inputToken, setInputToken] = useState('')
 
     const handleSave = () => {
+        if (!inputToken.trim()) return;
         setToken(inputToken)
     }
 
@@ -26,13 +27,19 @@ export default function TokenPrompt() {
                         <p className="text-sm text-muted-foreground">
                             Enter your Tinybird admin token to continue
                         </p>
-                        <div className="flex w-full max-w-sm items-center space-x-2">
-                            <Input
-                                placeholder="tb_admin_xxxx"
-                                value={inputToken}
-                                onChange={(e) => setInputToken(e.target.value)}
-                            />
-                            <Button onClick={handleSave}>Save</Button>
+                        <div className="flex w-full max-w-sm flex-col gap-2">
+                            <div className="flex items-center space-x-2">
+                                <Input
+                                    placeholder="Enter your token"
+                                    value={inputToken}
+                                    onChange={(e) => setInputToken(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+                                />
+                                <Button onClick={handleSave}>Save</Button>
+                            </div>
+                            {error && (
+                                <p className="text-sm text-red-500">{error}</p>
+                            )}
                         </div>
                     </div>
 

@@ -2,22 +2,53 @@
 
 import { useQueryState } from 'nuqs';
 import React, { useEffect, useState } from 'react';
-import { checkToolState } from '@/lib/tinybird';
+import { checkToolState, InvalidTokenError } from '@/lib/tinybird';
 import { TOOL_IMPORTS, type ToolId, TOOLS, type ToolState } from '@/lib/constants';
+import { useRouter } from 'next/navigation';
+import TokenPrompt from '@/components/token-prompt';
 
 export default function AppPage({ params }: { params: Promise<{ id: string }> }) {
   const [token, setToken] = useQueryState('token');
   const [toolState, setToolState] = useState<ToolState>('available');
+  const [error, setError] = useState<string>();
+  const [isValidToken, setIsValidToken] = useState(false);
   const { id } = React.use(params) as { id: ToolId };
+  const router = useRouter();
 
   useEffect(() => {
     async function checkInstallation() {
-      if (!token) return;
-      const state = await checkToolState(token, TOOLS[id].ds);
-      setToolState(state);
+      if (!token) {
+        setIsValidToken(false);
+        return;
+      }
+      setError(undefined);
+      try {
+        const state = await checkToolState(token, TOOLS[id].ds);
+        setToolState(state);
+        setIsValidToken(true);
+      } catch (error) {
+        if (error instanceof InvalidTokenError) {
+          setError('Invalid token');
+          setToken(null);
+          setIsValidToken(false);
+          router.push('/');
+        } else {
+          console.error('Failed to check tool state:', error);
+          setError('Failed to check tool state');
+          setIsValidToken(false);
+        }
+      }
     }
     checkInstallation();
-  }, [token, id]);
+  }, [token, id, setToken, router]);
+
+  if (!token || !isValidToken) {
+    return (
+      <div className="container py-6">
+        <TokenPrompt error={error} />
+      </div>
+    );
+  }
 
   if (!(id in TOOLS)) {
     return <div>Tool not found</div>;
@@ -37,6 +68,9 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
           <h1 className="text-2xl font-bold">{TOOLS[id].name}</h1>
           <span className="text-sm text-muted-foreground">({toolState})</span>
         </div>
+        {error && (
+          <p className="text-sm text-red-500">{error}</p>
+        )}
         <Component />
       </div>
     </div>
