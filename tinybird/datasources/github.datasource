@@ -1,0 +1,10 @@
+TOKEN "append" APPEND
+
+# Refer to https://docs.github.com/en/webhooks/webhook-events-and-payloads
+
+TAGS "github"
+
+SCHEMA >
+  `root` String `json:$`
+
+ENGINE "MergeTree"
