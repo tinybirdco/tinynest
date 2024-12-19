@@ -8,8 +8,8 @@ SCHEMA >
   `typename` String `json:$.__typename`,
   `type` String `json:$.type`,
   `created_at` DateTime64(3) `json:$.created_at`,
-  `data` JSON `json:$.data`,
-  `event_data` JSON `json:$.event_data`
+  `data` JSON `json:$.data` DEFAULT '{}',
+  `event_data` JSON `json:$.event_data` DEFAULT '{}'
 
 
 ENGINE "MergeTree"
