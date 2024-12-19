@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useQueryState } from 'nuqs';
 import { Button } from '@/components/ui/button';
@@ -37,8 +37,55 @@ const KNOWN_APPS: AppGridItem[] = [
     name: 'Auth0',
     description: 'Identity platform',
     icon: '🔑'
+  },
+  {
+    id: 'vercel',
+    ds: 'vercel_logs',
+    name: 'Vercel Logs',
+    description: 'Deployment and serverless logs',
+    icon: '📊'
+  },
+  {
+    id: 'gitlab',
+    ds: 'gitlab',
+    name: 'Gitlab',
+    description: 'Source code management',
+    icon: '🦊'
+  },
+  {
+    id: 'orb',
+    ds: 'orb',
+    name: 'Orb',
+    description: 'Usage-based billing',
+    icon: '💰'
   }
 ];
+
+function AppCard({ app, isInstalled, token }: { app: AppGridItem; isInstalled: boolean; token?: string }) {
+  return (
+    <Link 
+      key={app.id} 
+      href={`/${app.id}${token ? `?token=${token}` : ''}`}
+    >
+      <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+        <div className="flex items-center gap-4">
+          <div className="text-4xl">{app.icon}</div>
+          <div>
+            <h2 className="text-xl font-semibold">{app.name}</h2>
+            <p className="text-gray-500">{app.description}</p>
+            <div className="mt-2">
+              {isInstalled ? (
+                <span className="text-green-500 text-sm">Installed</span>
+              ) : (
+                <span className="text-gray-400 text-sm">Not installed</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </Card>
+    </Link>
+  );
+}
 
 export default function Home() {
   const [token, setToken] = useQueryState('token');
@@ -88,34 +135,32 @@ export default function Home() {
     );
   }
 
+  const installedAppsList = KNOWN_APPS.filter(app => installedApps.includes(app.ds));
+  const uninstalledAppsList = KNOWN_APPS.filter(app => !installedApps.includes(app.ds));
+
   return (
-    <>
-      <h1 className="text-3xl font-bold mb-8">Your Apps</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {KNOWN_APPS.map((app) => (
-          <Link 
-            key={app.id} 
-            href={`/${app.id}${token ? `?token=${token}` : ''}`}
-          >
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
-              <div className="flex items-center gap-4">
-                <div className="text-4xl">{app.icon}</div>
-                <div>
-                  <h2 className="text-xl font-semibold">{app.name}</h2>
-                  <p className="text-gray-500">{app.description}</p>
-                  <div className="mt-2">
-                    {installedApps.includes(app.ds) ? (
-                      <span className="text-green-500 text-sm">Installed</span>
-                    ) : (
-                      <span className="text-gray-400 text-sm">Not installed</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </Link>
-        ))}
-      </div>
-    </>
+    <div className="space-y-8">
+      {installedAppsList.length > 0 && (
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Installed Apps</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {installedAppsList.map((app) => (
+              <AppCard key={app.id} app={app} isInstalled={true} token={token} />
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {uninstalledAppsList.length > 0 && (
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Available Apps</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {uninstalledAppsList.map((app) => (
+              <AppCard key={app.id} app={app} isInstalled={false} token={token} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
