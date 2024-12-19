@@ -31,9 +31,9 @@ SCHEMA >
   `repository_name` String `json:$.repository.name`,
   `repository` JSON `json:$.repository` DEFAULT '{}',
   `project` JSON `json:$.project` DEFAULT '{}',
-  `runner` JSON `json:$.runner` DEFAULT '{}',
+  `runner` String `json:$.runner` DEFAULT '',
   `environment` String `json:$.environment` DEFAULT '',
-  `source_pipeline` JSON `json:$.source_pipeline` DEFAULT '{}'
+  `source_pipeline` String `json:$.source_pipeline` DEFAULT ''
 
 
 ENGINE "MergeTree"
