@@ -1,0 +1,10 @@
+TOKEN "orb_churn_subs_endpoint_read_9832" READ
+
+NODE ep
+SQL >
+
+    SELECT count() as subs FROM orb
+    where type == 'subscription.ended'
+    and date >= now() - interval 30 day
+
+
