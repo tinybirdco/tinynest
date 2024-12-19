@@ -14,6 +14,7 @@ Deploy this project to your Tinybird account and configure the webhooks for the 
 - [Clerk](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-clerk)
 - [GitLab](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-gitlab)
 - [GitHub](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-github)
+- [Knock](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-knock)
 - [Orb](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-orb)
 - [PagerDuty](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-pagerduty)
 - [Resend](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-resend)
