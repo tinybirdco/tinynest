@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { checkToolState, InvalidTokenError } from '@/lib/tinybird';
 import { TOOLS, type AppGridItem, type ToolState } from '@/lib/constants';
 import TokenPrompt from '@/components/token-prompt';
+import { SectionHeader } from '@/components/section-header';
 
 export default function Home() {
   const [token, setToken] = useQueryState('token');
@@ -69,7 +70,10 @@ export default function Home() {
           {/* Configured Apps */}
           {Object.values(TOOLS).some(app => toolStates[app.id] === 'configured') && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold">Configured Apps</h2>
+              <SectionHeader
+                title="Configured Apps"
+                tooltip="These apps are fully set up and have data. They're ready to use!"
+              />
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {Object.values(TOOLS)
                   .filter(app => toolStates[app.id] === 'configured')
@@ -88,7 +92,10 @@ export default function Home() {
           {/* Installed Apps */}
           {Object.values(TOOLS).some(app => toolStates[app.id] === 'installed') && (
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold">Installed Apps</h2>
+              <SectionHeader
+                title="Installed Apps"
+                tooltip="Your Tinybird Workspace has the Data Sources installed, but you're not receiving data. Click an app to learn how to add data."
+              />
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {Object.values(TOOLS)
                   .filter(app => toolStates[app.id] === 'installed')
@@ -106,7 +113,10 @@ export default function Home() {
 
           {/* Available Apps */}
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Available Apps</h2>
+            <SectionHeader
+              title="Available Apps"
+              tooltip="Your Tinybird Workspace doesn't have the Data Sources installed yet. Click an app to learn how to install it."
+            />
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {Object.values(TOOLS)
                 .filter(app => !toolStates[app.id] || toolStates[app.id] === 'available')
@@ -126,12 +136,12 @@ export default function Home() {
   );
 }
 
-function AppCard({ 
-  app, 
-  state, 
-  token 
-}: { 
-  app: AppGridItem; 
+function AppCard({
+  app,
+  state,
+  token
+}: {
+  app: AppGridItem;
   state: ToolState;
   token?: string;
 }) {
