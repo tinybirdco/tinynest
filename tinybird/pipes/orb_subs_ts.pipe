@@ -1,0 +1,12 @@
+TOKEN "orb_subs_ts_endpoint_read_1978" READ
+
+NODE ep
+SQL >
+
+    SELECT toStartOfDay(date)::Date as day, count() as invoices
+    FROM orb
+    where type == 'subscription.started' and date >= now() - interval 30 day
+    group by day
+    order by day
+
+
