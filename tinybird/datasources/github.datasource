@@ -5,6 +5,8 @@ TOKEN "append" APPEND
 TAGS "github"
 
 SCHEMA >
-  `root` JSON `json:$` DEFAULT '{}'
+  'ingest_timestamp' DateTime `json:$.time` DEFAULT now(),
+  'record' JSON `json:$`
 
 ENGINE "MergeTree"
+ENGINE_SORTING_KEY "ingest_timestamp"
