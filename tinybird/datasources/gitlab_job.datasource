@@ -10,7 +10,7 @@ SCHEMA >
   `tag` Boolean `json:$.tag` DEFAULT 'false',
   `before_sha` String `json:$.before_sha` DEFAULT '',
   `sha` String `json:$.sha` DEFAULT '',
-  `build_id` String `json:$.build_id` DEFAULT '',
+  `build_id` Nullable(String) `json:$.build_id` DEFAULT '',
   `build_name` String `json:$.build_name` DEFAULT '',
   `build_stage` String `json:$.build_stage` DEFAULT '',
   `build_status` String `json:$.build_status` DEFAULT '',
@@ -32,7 +32,7 @@ SCHEMA >
   `repository` JSON `json:$.repository` DEFAULT '{}',
   `project` JSON `json:$.project` DEFAULT '{}',
   `runner` JSON `json:$.runner` DEFAULT '{}',
-  `environment` JSON `json:$.environment` DEFAULT '{}',
+  `environment` String `json:$.environment` DEFAULT '',
   `source_pipeline` JSON `json:$.source_pipeline` DEFAULT '{}'
 
 
