@@ -87,20 +87,6 @@ export default function Auth0Dashboard() {
             <div className="grid gap-4 md:grid-cols-2">
                 <DauChart data={dauData} />
                 <AuthMechChart data={authMechData} />
-                <Card className="col-span-1">
-                    <CardHeader>
-                        <CardTitle>Something else</CardTitle>
-                    </CardHeader>
-                    <CardContent className="h-[300px]">
-                    </CardContent>
-                </Card>
-                <Card className="col-span-1">
-                    <CardHeader>
-                        <CardTitle>Something else</CardTitle>
-                    </CardHeader>
-                    <CardContent className="h-[300px]">
-                    </CardContent>
-                </Card>
             </div>
         </div>
     )

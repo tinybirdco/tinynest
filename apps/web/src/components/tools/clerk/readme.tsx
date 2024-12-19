@@ -1,5 +1,6 @@
 "use client"
 
+import { SquareArrowOutUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 
@@ -9,7 +10,6 @@ export default function ClerkReadme() {
     return (
         <div>
             <div>
-                <h1 className="text-2xl font-bold">Clerk Analytics</h1>
                 <Link
                     href={token ? `/?token=${token}` : '/'}
                     className="text-sm text-muted-foreground hover:text-primary"
@@ -17,12 +17,18 @@ export default function ClerkReadme() {
                     ← Back to Apps
                 </Link>
             </div>
-            <pre>
-                <code>
-                    1. do something
-                    2. do something else
-                </code>
-            </pre>
+            <div className='prose'>
+                <p className='mt-8'>You haven't configured Clerk yet.</p>
+                <h2 className="text-xl font-bold">Configure Clerk</h2>
+                <ol>
+                    <li>
+                        Clone the <Link href='https://github.com/tinybirdco/tinynest'>Tinynest repo</Link>
+                    </li>
+                    <li>
+                        Use the Tinybird CLI to push the Clerk
+                    </li>
+                </ol>
+            </div>
         </div>
     )
 }

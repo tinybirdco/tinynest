@@ -8,26 +8,20 @@ import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { listDataSources } from '@/lib/tinybird';
 import { TOOLS, type AppGridItem } from '@/lib/constants';
+import TokenPrompt from '@/components/token-prompt';
 
 function AppCard({ app, isInstalled, token }: { app: AppGridItem; isInstalled: boolean; token?: string }) {
   return (
-    <Link 
-      key={app.id} 
+    <Link
+      key={app.id}
       href={`/${app.id}${token ? `?token=${token}` : ''}`}
     >
-      <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+      <Card className={`p-4 hover:bg-accent ${isInstalled ? 'border-primary' : ''}`}>
         <div className="flex items-center gap-4">
-          <div className="text-4xl">{app.icon}</div>
+          <div className="text-2xl">{app.icon}</div>
           <div>
-            <h2 className="text-xl font-semibold">{app.name}</h2>
-            <p className="text-gray-500">{app.description}</p>
-            <div className="mt-2">
-              {isInstalled ? (
-                <span className="text-green-500 text-sm">Installed</span>
-              ) : (
-                <span className="text-gray-400 text-sm">Not installed</span>
-              )}
-            </div>
+            <h3 className="font-semibold">{app.name}</h3>
+            <p className="text-sm text-muted-foreground">{app.description}</p>
           </div>
         </div>
       </Card>
@@ -36,20 +30,17 @@ function AppCard({ app, isInstalled, token }: { app: AppGridItem; isInstalled: b
 }
 
 export default function Home() {
-  const [token, setToken] = useQueryState('token');
-  const [inputToken, setInputToken] = useState(token || '');
+  const [token] = useQueryState('token');
   const [installedApps, setInstalledApps] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     async function fetchDataSources() {
       if (!token) return;
-      
       setIsLoading(true);
       try {
         const sources = await listDataSources(token);
-        const installed = sources.map(s => s.name);
-        setInstalledApps(installed);
+        setInstalledApps(sources.map(source => source.name));
       } catch (error) {
         console.error('Failed to fetch data sources:', error);
       } finally {
@@ -60,52 +51,48 @@ export default function Home() {
     fetchDataSources();
   }, [token]);
 
-  const handleSaveToken = () => {
-    setToken(inputToken);
-  };
-
-  if (!token) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <Card className="w-full max-w-md p-6 space-y-4">
-          <h1 className="text-2xl font-bold">Welcome to TinyNest</h1>
-          <p className="text-gray-500">Please enter your Tinybird token to continue</p>
-          <div className="flex gap-2">
-            <Input
-              value={inputToken}
-              onChange={(e) => setInputToken(e.target.value)}
-              placeholder="Enter your Tinybird token"
-            />
-            <Button onClick={handleSaveToken}>Save</Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  const installedAppsList = Object.values(TOOLS).filter(app => installedApps.includes(app.ds));
-  const uninstalledAppsList = Object.values(TOOLS).filter(app => !installedApps.includes(app.ds));
-
   return (
-    <div className="space-y-8">
-      {installedAppsList.length > 0 && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Installed Apps</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {installedAppsList.map((app) => (
-              <AppCard key={app.id} app={app} isInstalled={true} token={token} />
-            ))}
-          </div>
+    <div className="container py-6">
+      <TokenPrompt />
+      {token && isLoading && (
+        <div className="flex items-center justify-center">
+          <p className="text-lg font-semibold">Loading...</p>
         </div>
       )}
-      
-      {uninstalledAppsList.length > 0 && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Available Apps</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {uninstalledAppsList.map((app) => (
-              <AppCard key={app.id} app={app} isInstalled={false} token={token} />
-            ))}
+      {token && !isLoading && (
+        <div className="space-y-8">
+          {installedApps.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Installed Apps</h2>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {Object.values(TOOLS)
+                  .filter(app => installedApps.includes(app.ds))
+                  .map(app => (
+                    <AppCard
+                      key={app.id}
+                      app={app}
+                      isInstalled={true}
+                      token={token}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Available Apps</h2>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {Object.values(TOOLS)
+                .filter(app => !installedApps.includes(app.ds))
+                .map(app => (
+                  <AppCard
+                    key={app.id}
+                    app={app}
+                    isInstalled={false}
+                    token={token}
+                  />
+                ))}
+            </div>
           </div>
         </div>
       )}

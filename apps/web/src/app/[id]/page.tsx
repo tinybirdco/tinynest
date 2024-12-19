@@ -14,7 +14,7 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
     async function checkInstallation() {
       if (!token) return;
       const sources = await listDataSources(token);
-      setIsInstalled(sources.some(source => source.name === id));
+      setIsInstalled(sources.some(source => source.name === TOOLS[id].ds));
     }
     checkInstallation();
   }, [token, id]);

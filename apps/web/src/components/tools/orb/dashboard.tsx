@@ -100,14 +100,6 @@ export default function OrbDashboard() {
             {/* Charts Grid */}
             <div className="grid gap-4 md:grid-cols-2">
                 <SubsChart data={subsTimeSeriesData} />
-                <Card className="col-span-1">
-                    <CardHeader>
-                        <CardTitle>Revenue</CardTitle>
-                    </CardHeader>
-                    <CardContent className="h-[300px]">
-                        {/* Revenue chart will go here when we have the data */}
-                    </CardContent>
-                </Card>
             </div>
         </div>
     )

@@ -17,12 +17,15 @@ export default function VercelLogsReadme() {
                     ← Back to Apps
                 </Link>
             </div>
-            <pre>
-                <code>
-                    1. do something
-                    2. do something else
-                </code>
-            </pre>
+            <div>
+                <h2 className="text-xl font-bold mt-8">README</h2>
+                <pre>
+                    <code>
+                        1. do something
+                        2. do something else
+                    </code>
+                </pre>
+            </div>
         </div>
     )
 }
