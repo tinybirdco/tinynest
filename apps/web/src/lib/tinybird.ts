@@ -1,3 +1,5 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 import { type ToolState } from './constants';
 
 export class InvalidTokenError extends Error {
@@ -35,7 +37,7 @@ export async function listDataSources(token: string): Promise<TinybirdDataSource
 
 export interface QueryResult {
   meta: Array<{ name: string; type: string }>;
-  data: Array<Record<string, unknown>>;
+  data: Array<Record<string, any>>;
   rows: number;
   statistics: {
     elapsed: number;

@@ -8,8 +8,15 @@ import { checkToolState, InvalidTokenError } from '@/lib/tinybird';
 import { TOOLS, type AppGridItem, type ToolState } from '@/lib/constants';
 import TokenPrompt from '@/components/token-prompt';
 import { SectionHeader } from '@/components/section-header';
+import { Suspense } from 'react';
 
-export default function Home() {
+export default function Page() {
+  <Suspense>
+    <Home />
+  </Suspense>
+}
+
+function Home() {
   const [token, setToken] = useQueryState('token');
   const [toolStates, setToolStates] = useState<Record<string, ToolState>>({});
   const [isLoading, setIsLoading] = useState(false);
