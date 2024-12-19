@@ -3,13 +3,13 @@
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 
-export default function ClerkReadme() {
+export default function GitlabReadme() {
     const [token] = useQueryState('token')
 
     return (
         <div>
             <div>
-                <h1 className="text-2xl font-bold">Clerk Analytics</h1>
+                <h1 className="text-2xl font-bold">Gitlab Analytics</h1>
                 <Link
                     href={token ? `/?token=${token}` : '/'}
                     className="text-sm text-muted-foreground hover:text-primary"

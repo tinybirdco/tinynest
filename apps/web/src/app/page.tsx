@@ -7,59 +7,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { listDataSources } from '@/lib/tinybird';
-
-interface AppGridItem {
-  id: string;
-  ds: string;
-  name: string;
-  description: string;
-  icon: string;
-}
-
-const KNOWN_APPS: AppGridItem[] = [
-  {
-    id: 'clerk',
-    ds: 'clerk',
-    name: 'Clerk',
-    description: 'Authentication and user management',
-    icon: '🔐'
-  },
-  {
-    id: 'resend',
-    ds: 'resend',
-    name: 'Resend',
-    description: 'Email delivery service',
-    icon: '✉️'
-  },
-  {
-    id: 'auth0',
-    ds: 'auth0_logs',
-    name: 'Auth0',
-    description: 'Identity platform',
-    icon: '🔑'
-  },
-  {
-    id: 'vercel',
-    ds: 'vercel_logs',
-    name: 'Vercel Logs',
-    description: 'Deployment and serverless logs',
-    icon: '📊'
-  },
-  {
-    id: 'gitlab',
-    ds: 'gitlab',
-    name: 'Gitlab',
-    description: 'Source code management',
-    icon: '🦊'
-  },
-  {
-    id: 'orb',
-    ds: 'orb',
-    name: 'Orb',
-    description: 'Usage-based billing',
-    icon: '💰'
-  }
-];
+import { TOOLS, type AppGridItem } from '@/lib/constants';
 
 function AppCard({ app, isInstalled, token }: { app: AppGridItem; isInstalled: boolean; token?: string }) {
   return (
@@ -135,8 +83,8 @@ export default function Home() {
     );
   }
 
-  const installedAppsList = KNOWN_APPS.filter(app => installedApps.includes(app.ds));
-  const uninstalledAppsList = KNOWN_APPS.filter(app => !installedApps.includes(app.ds));
+  const installedAppsList = Object.values(TOOLS).filter(app => installedApps.includes(app.ds));
+  const uninstalledAppsList = Object.values(TOOLS).filter(app => !installedApps.includes(app.ds));
 
   return (
     <div className="space-y-8">

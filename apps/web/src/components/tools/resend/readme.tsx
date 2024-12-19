@@ -1,10 +1,22 @@
 "use client"
 
+import Link from 'next/link'
+import { useQueryState } from 'nuqs'
 
-export default function ClerkDashboard() {
+export default function ResendReadme() {
+    const [token] = useQueryState('token')
+
     return (
         <div>
-            <h1>Readme</h1>
+            <div>
+                <h1 className="text-2xl font-bold">Resend Analytics</h1>
+                <Link
+                    href={token ? `/?token=${token}` : '/'}
+                    className="text-sm text-muted-foreground hover:text-primary"
+                >
+                    ← Back to Apps
+                </Link>
+            </div>
             <pre>
                 <code>
                     1. do something
