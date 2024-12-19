@@ -11,7 +11,7 @@ SCHEMA >
   `after` String `json:$.after`,
   `ref` String `json:$.ref`,
   `ref_protected` Boolean `json:$.ref_protected`,
-  `checkout_sha` String `json:$.checkout_sha`,
+  `checkout_sha` String `json:$.checkout_sha` DEFAULT '',
   `user_id` UInt32 `json:$.user_id`,
   `user_name` String `json:$.user_name`,
   `user_username` String `json:$.user_username`,
