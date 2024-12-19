@@ -1,0 +1,10 @@
+TOKEN "orb_invoices_paid_endpoint_read_0069" READ
+
+NODE ep
+SQL >
+
+    SELECT count() as invoices FROM orb
+    where type == 'invoice.payment_succeeded'
+    and date >= now() - interval 30 day
+
+

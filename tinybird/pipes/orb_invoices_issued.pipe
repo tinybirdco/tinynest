@@ -1,0 +1,10 @@
+TOKEN "orb_invoices_issued_endpoint_read_5668" READ
+
+NODE ep
+SQL >
+
+    SELECT count() as invoices FROM orb
+    where type == 'invoice.issued'
+    and date >= now() - interval 30 day
+
+

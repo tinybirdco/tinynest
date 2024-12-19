@@ -1,0 +1,12 @@
+TOKEN "auth0_mech_usage_endpoint_read_8624" READ
+
+NODE ep
+SQL >
+
+    SELECT splitByChar('|', user_id)[1] as mech, count() as logins
+    FROM auth0_logs
+    where type == 's' and date >= now() - interval 30 days
+    group by mech
+    order by logins desc
+
+
