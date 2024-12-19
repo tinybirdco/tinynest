@@ -15,7 +15,7 @@ SCHEMA >
   `repository_name` String `json:$.repository.name`,  
   `repository` JSON `json:$.repository`,
   `assignees` Array(JSON) `json:$.assignees[:]` DEFAULT '[]',
-  `assignee` JSON `json:$.assignee` DEFAULT '{}',
+  `assignee` String `json:$.assignee` DEFAULT '',
   `labels` Array(JSON) `json:$.labels[:]` DEFAULT '[]',
   `changes` JSON `json:$.changes` DEFAULT '{}'
 
