@@ -4,31 +4,46 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { query } from '@/lib/tinybird'
+import { pipe } from '@/lib/tinybird'
 import MetricCard from './metric'
+import { DauChart } from './dau-chart'
+import { AuthMechChart } from './auth-mech-chart'
+
+interface DauDataPoint {
+    day: string
+    active: number
+}
+
+interface AuthMechData {
+    mech: string
+    logins: number
+}
 
 export default function Auth0Dashboard() {
     const [token] = useQueryState('token')
-    const [totalUsers, setTotalUsers] = useState<number>(0)
-    const [activeUsers, setActiveUsers] = useState<number>(0)
+    const [monthlySignUps, setMonthlySignUps] = useState<number>(0)
+    const [monthlyMau, setMonthlyMau] = useState<number>(0)
     const [conversionRate, setConversionRate] = useState<number>(0)
+    const [dauData, setDauData] = useState<DauDataPoint[]>([])
+    const [authMechData, setAuthMechData] = useState<AuthMechData[]>([])
 
     useEffect(() => {
         async function fetchMetrics() {
             if (!token) return
 
             try {
-                const [totalResult, activeResult] = await Promise.all([
-                    query(token, "SELECT count() as total FROM auth0_logs WHERE type = 'ss' FORMAT JSON"),
-                    query(token, "SELECT count(DISTINCT user_id) as active FROM auth0_logs where type == 's' and date >= now() - interval 30 days FORMAT JSON")
+                const [monthlySignUpsResult, monthlyMauResult, dauResult, authMechResult] = await Promise.all([
+                    pipe(token, 'auth0_signups'),
+                    pipe(token, 'auth0_mau'),
+                    pipe<{ data: DauDataPoint[] }>(token, 'auth0_dau_ts'),
+                    pipe<{ data: AuthMechData[] }>(token, 'auth0_mech_usage')
                 ])
 
-                const total = totalResult.data[0]?.total || 0
-                const active = activeResult.data[0]?.active || 0
-
-                setTotalUsers(total)
-                setActiveUsers(active)
-                setConversionRate(total > 0 ? Math.round((active / total) * 100) : 0)
+                setMonthlySignUps(monthlySignUpsResult.data[0]?.total || 0)
+                setMonthlyMau(monthlyMauResult.data[0]?.active || 0)
+                setConversionRate(0)
+                setDauData(dauResult.data)
+                setAuthMechData(authMechResult.data)
             } catch (error) {
                 console.error('Failed to fetch metrics:', error)
             }
@@ -52,13 +67,13 @@ export default function Auth0Dashboard() {
             {/* Metrics Row */}
             <div className="grid gap-4 md:grid-cols-3">
                 <MetricCard
-                    title="Total Users"
-                    value={totalUsers.toLocaleString()}
-                    description="Total registered users"
+                    title="Monthly Sign Ups"
+                    value={monthlySignUps.toLocaleString()}
+                    description="New users signed up in the last 30 days"
                 />
                 <MetricCard
-                    title="Active Users (30d)"
-                    value={activeUsers.toLocaleString()}
+                    title="Monthly Active Users"
+                    value={monthlyMau.toLocaleString()}
                     description="Users active in the last 30 days"
                 />
                 <MetricCard
@@ -70,36 +85,20 @@ export default function Auth0Dashboard() {
 
             {/* Charts Grid */}
             <div className="grid gap-4 md:grid-cols-2">
+                <DauChart data={dauData} />
+                <AuthMechChart data={authMechData} />
                 <Card className="col-span-1">
                     <CardHeader>
-                        <CardTitle>User Growth</CardTitle>
+                        <CardTitle>Something else</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px]">
-                        {/* User Growth Chart will go here */}
                     </CardContent>
                 </Card>
                 <Card className="col-span-1">
                     <CardHeader>
-                        <CardTitle>Daily Active Users</CardTitle>
+                        <CardTitle>Something else</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px]">
-                        {/* DAU Chart will go here */}
-                    </CardContent>
-                </Card>
-                <Card className="col-span-1">
-                    <CardHeader>
-                        <CardTitle>User Actions</CardTitle>
-                    </CardHeader>
-                    <CardContent className="h-[300px]">
-                        {/* User Actions Chart will go here */}
-                    </CardContent>
-                </Card>
-                <Card className="col-span-1">
-                    <CardHeader>
-                        <CardTitle>Session Duration</CardTitle>
-                    </CardHeader>
-                    <CardContent className="h-[300px]">
-                        {/* Session Duration Chart will go here */}
                     </CardContent>
                 </Card>
             </div>

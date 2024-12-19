@@ -39,3 +39,26 @@ export async function query(token: string, sql: string): Promise<QueryResult> {
   const data = await response.json();
   return data;
 }
+
+export async function pipe<T = QueryResult>(
+  token: string, 
+  pipeName: string, 
+  params?: Record<string, string | number | boolean>
+): Promise<T> {
+  const searchParams = new URLSearchParams({ token, pipe: pipeName });
+  
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      searchParams.append(key, String(value));
+    });
+  }
+
+  const response = await fetch(`/api/pipes?${searchParams}`);
+
+  if (!response.ok) {
+    throw new Error('Failed to execute pipe');
+  }
+
+  const data = await response.json();
+  return data;
+}
