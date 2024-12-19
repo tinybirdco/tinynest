@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const token = searchParams.get("token");
   const pipeName = searchParams.get("pipe");
-  
+
   if (!token || !pipeName) {
     return NextResponse.json(
       { error: "Missing required parameters" },
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   }
 
   const url = new URL(`${TINYBIRD_API_URL}/${pipeName}.json`);
-  
+
   // Forward all query parameters except token and pipe
   searchParams.forEach((value, key) => {
     if (key !== "token" && key !== "pipe") {
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch data from Tinybird" },
+      { error: "Failed to fetch data from Tinybird: " + error },
       { status: 500 }
     );
   }
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   }
 
   const url = new URL(`${TINYBIRD_API_URL}/${pipe}.json`);
-  
+
   // Add all params as query parameters
   Object.entries(params).forEach(([key, value]) => {
     url.searchParams.append(key, String(value));
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch data from Tinybird" },
+      { error: "Failed to fetch data from Tinybird: " + error },
       { status: 500 }
     );
   }
