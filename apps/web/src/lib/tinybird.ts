@@ -35,7 +35,7 @@ export async function listDataSources(token: string): Promise<TinybirdDataSource
 
 export interface QueryResult {
   meta: Array<{ name: string; type: string }>;
-  data: Array<Record<string, any>>;
+  data: Array<Record<string, unknown>>;
   rows: number;
   statistics: {
     elapsed: number;
