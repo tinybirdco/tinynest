@@ -9,7 +9,7 @@ SCHEMA >
   `type` String `json:$.type`,
   `created_at` DateTime64(3) `json:$.created_at`,
   `data` JSON `json:$.data` DEFAULT '{}',
-  `event_data` JSON `json:$.event_data` DEFAULT '{}'
+  `event_data` String `json:$.event_data` DEFAULT ''
 
 
 ENGINE "MergeTree"
