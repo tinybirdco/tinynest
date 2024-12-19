@@ -13,7 +13,7 @@ SCHEMA >
   `project_id` UInt32 `json:$.project.id`,
   `project` JSON `json:$.project`,
   `commit` JSON `json:$.commit` DEFAULT '{}',
-  `pipeline_id` UInt32 `json:$.source_pipeline.pipeline_id`,
+  `pipeline_id` UInt32 `json:$.source_pipeline.pipeline_id` DEFAULT 0,
   `source_pipeline` String `json:$.source_pipeline` DEFAULT '',
   `builds` Array(JSON) `json:$.builds[:]` DEFAULT '[]'
 
