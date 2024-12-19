@@ -1,3 +1,5 @@
+import { type ToolState } from './constants';
+
 export interface TinybirdDataSource {
   name: string;
   description?: string;
@@ -38,6 +40,27 @@ export async function query(token: string, sql: string): Promise<QueryResult> {
 
   const data = await response.json();
   return data;
+}
+
+export async function checkToolState(token: string, datasource: string): Promise<ToolState> {
+  try {
+    // First check if data source exists
+    const sources = await listDataSources(token);
+    const exists = sources.some(source => source.name === datasource);
+    
+    if (!exists) {
+      return 'available';
+    }
+
+    // Check if there's any data
+    const result = await query(token, `SELECT count() as count FROM ${datasource} FORMAT JSON`);
+    const hasData = result.data[0]?.count > 0;
+
+    return hasData ? 'configured' : 'installed';
+  } catch (error) {
+    console.error('Failed to check tool state:', error);
+    return 'available';
+  }
 }
 
 export async function pipe<T = QueryResult>(

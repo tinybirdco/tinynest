@@ -1,13 +1,14 @@
 import dynamic from 'next/dynamic';
 
-export type AppGridItem = {
+export type ToolState = 'available' | 'installed' | 'configured';
+
+export interface AppGridItem {
     id: string;
     ds: string;
     name: string;
     description: string;
     icon: string;
 }
-
 
 export const TOOLS: Record<string, AppGridItem> = {
     clerk: {

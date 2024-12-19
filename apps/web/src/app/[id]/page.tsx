@@ -2,19 +2,19 @@
 
 import { useQueryState } from 'nuqs';
 import React, { useEffect, useState } from 'react';
-import { listDataSources } from '@/lib/tinybird';
-import { TOOL_IMPORTS, type ToolId, TOOLS } from '@/lib/constants';
+import { checkToolState } from '@/lib/tinybird';
+import { TOOL_IMPORTS, type ToolId, TOOLS, type ToolState } from '@/lib/constants';
 
 export default function AppPage({ params }: { params: Promise<{ id: string }> }) {
   const [token, setToken] = useQueryState('token');
-  const [isInstalled, setIsInstalled] = useState(false);
+  const [toolState, setToolState] = useState<ToolState>('available');
   const { id } = React.use(params) as { id: ToolId };
 
   useEffect(() => {
     async function checkInstallation() {
       if (!token) return;
-      const sources = await listDataSources(token);
-      setIsInstalled(sources.some(source => source.name === TOOLS[id].ds));
+      const state = await checkToolState(token, TOOLS[id].ds);
+      setToolState(state);
     }
     checkInstallation();
   }, [token, id]);
@@ -27,12 +27,16 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
     return <div>Tool not implemented</div>;
   }
 
-  const Component = isInstalled ? tool_comps.Dashboard : tool_comps.Readme;
+  // Only show Dashboard if tool is configured or installed
+  const Component = toolState === 'available' ? tool_comps.Readme : tool_comps.Dashboard;
 
   return (
     <div className="container py-6">
       <div className="flex flex-col gap-6">
-        <h1 className="text-2xl font-bold">{TOOLS[id].name}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">{TOOLS[id].name}</h1>
+          <span className="text-sm text-muted-foreground">({toolState})</span>
+        </div>
         <Component />
       </div>
     </div>
