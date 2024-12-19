@@ -10,13 +10,13 @@ import TokenPrompt from '@/components/token-prompt';
 import { SectionHeader } from '@/components/section-header';
 import { Suspense } from 'react';
 
-export default function Page() {
+export default function Home() {
   <Suspense>
-    <Home />
+    <Page />
   </Suspense>
 }
 
-function Home() {
+function Page() {
   const [token, setToken] = useQueryState('token');
   const [toolStates, setToolStates] = useState<Record<string, ToolState>>({});
   const [isLoading, setIsLoading] = useState(false);
