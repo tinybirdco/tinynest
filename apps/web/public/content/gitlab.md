@@ -46,7 +46,7 @@ https://api.tinybird.co/v0/events?name=gitlab_work_item
 1. Select **Add custom header** and add 'Authorization' as **Header name** and paste the token you created in Tinybird as **Header value**.
 
 ```
-Bearer {% user("userToken") %}
+Bearer <TOKEN> %}
 ```
 
 8. You're done. You can select **Test** to check if the webhook is working.
