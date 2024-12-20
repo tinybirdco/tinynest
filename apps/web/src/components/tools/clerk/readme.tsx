@@ -1,24 +1,19 @@
-"use client"
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Markdown } from '@/components/markdown';
+import { getMarkdownContent } from '@/lib/markdown';
 
 export default function ClerkReadme() {
+  const [content, setContent] = useState('');
 
-    return (
-        <div>
-            <div>
-                <h1 className="text-2xl font-bold">Clerk Analytics</h1>
-            </div>
-            <div className='prose'>
-                <p className='mt-8'>You haven&apos;t configured Clerk yet.</p>
-                <h2 className="text-xl font-bold">Configure Clerk</h2>
-                <ol>
-                    <li>
-                        Clone the 
-                    </li>
-                    <li>
-                        Use the Tinybird CLI to push the Clerk
-                    </li>
-                </ol>
-            </div>
-        </div>
-    )
+  useEffect(() => {
+    getMarkdownContent('clerk').then(setContent);
+  }, []);
+
+  return (
+    <div className="container max-w-4xl mx-auto py-8">
+      <Markdown content={content} />
+    </div>
+  );
 }

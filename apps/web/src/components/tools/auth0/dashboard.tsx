@@ -52,10 +52,6 @@ export default function Auth0Dashboard() {
 
     return (
         <div className="space-y-8">
-            <div>
-                <h1 className="text-2xl font-bold">Auth0 Analytics</h1>
-            </div>
-
             {/* Metrics Row */}
             <div className="grid gap-4 md:grid-cols-3">
                 <MetricCard

@@ -1,21 +1,19 @@
-"use client"
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Markdown } from '@/components/markdown';
+import { getMarkdownContent } from '@/lib/markdown';
 
 export default function OrbReadme() {
+  const [content, setContent] = useState('');
 
-    return (
-        <div>
-            <div>
-                <h1 className="text-2xl font-bold">Orb Analytics</h1>
-            </div>
-            <div>
-                <h2 className="text-xl font-bold mt-8">README</h2>
-                <pre>
-                    <code>
-                        1. do something
-                        2. do something else
-                    </code>
-                </pre>
-            </div>
-        </div>
-    )
+  useEffect(() => {
+    getMarkdownContent('orb').then(setContent);
+  }, []);
+
+  return (
+    <div className="container max-w-4xl mx-auto py-8">
+      <Markdown content={content} />
+    </div>
+  );
 }
