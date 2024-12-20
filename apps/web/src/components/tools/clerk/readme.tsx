@@ -1,6 +1,5 @@
 "use client"
 
-import { SquareArrowOutUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 
@@ -18,7 +17,7 @@ export default function ClerkReadme() {
                 </Link>
             </div>
             <div className='prose'>
-                <p className='mt-8'>You haven't configured Clerk yet.</p>
+                <p className='mt-8'>You haven&apos;t configured Clerk yet.</p>
                 <h2 className="text-xl font-bold">Configure Clerk</h2>
                 <ol>
                     <li>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryState } from 'nuqs';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { checkToolState, InvalidTokenError } from '@/lib/tinybird';
@@ -9,7 +9,7 @@ import { TOOLS, type AppGridItem, type ToolState } from '@/lib/constants';
 import TokenPrompt from '@/components/token-prompt';
 import { SectionHeader } from '@/components/section-header';
 
-export default function Home() {
+function HomeContent() {
   const [token, setToken] = useQueryState('token');
   const [toolStates, setToolStates] = useState<Record<string, ToolState>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -169,5 +169,13 @@ function AppCard({
         </div>
       </Card>
     </Link>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
   );
 }

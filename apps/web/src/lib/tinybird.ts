@@ -1,3 +1,5 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 import { type ToolState } from './constants';
 
 export class InvalidTokenError extends Error {
