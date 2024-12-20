@@ -50,7 +50,10 @@ export function Sidebar({ activeAppId }: { activeAppId?: string }) {
   return (
     <Suspense fallback={
       <div className="w-64 border-r h-screen">
-        <div className="h-full px-4 py-6">
+        <div className="p-4 border-b">
+          <div className="text-xl font-bold">tinynest</div>
+        </div>
+        <div className="h-[calc(100vh-65px)] px-4 py-6">
           <div className="flex items-center justify-center">
             <p className="text-sm font-semibold">Loading...</p>
           </div>
@@ -102,7 +105,15 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
 
   return (
     <div className="w-64 border-r h-screen">
-      <ScrollArea className="h-full px-4 py-6">
+      <div className="p-4 border-b">
+        <Link 
+          href={token ? `/?token=${token}` : '/'}
+          className="text-xl font-bold hover:text-primary transition-colors"
+        >
+          tinynest
+        </Link>
+      </div>
+      <ScrollArea className="h-[calc(100vh-65px)] px-4 py-6">
         {isLoading ? (
           <div className="flex items-center justify-center">
             <p className="text-sm font-semibold">Loading...</p>
