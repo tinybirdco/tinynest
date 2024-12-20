@@ -1,0 +1,25 @@
+TOKEN "append" APPEND
+
+# Refer to https://mailgun-docs.redoc.ly/docs/mailgun/user-manual/events/#event-structure
+
+TAGS "mailgun"
+
+SCHEMA >
+    `date` DateTime `json:$.record.event-data.timestamp`,
+    `event` LowCardinality(String) `json:$.record.event-data.event`,
+    `message_id` String `json:$.record.event-data.message.headers.message-id` DEFAULT '',
+    `recipient` String `json:$.record.event-data.recipient`,
+    `recipient_domain` String `json:$.record.event-data.recipient-domain`,
+    `tags` Array(String) `json:$.record.event-data.tags`,
+    `log_level` LowCardinality(String) `json:$.record.event-data.log-level`,
+    `city` String `json:$.record.event-data.geolocation.city` DEFAULT '',
+    `country` String `json:$.record.event-data.geolocation.country` DEFAULT '',
+    `region` String `json:$.record.event-data.geolocation.region` DEFAULT '',
+    `client_info` JSON `json:$.record.event-data.client-info` DEFAULT '{}',
+    `delivery_status` JSON `json:$.record.event-data.delivery-status` DEFAULT '{}',
+    `envelope` JSON `json:$.record.event-data.envelope` DEFAULT '{}',
+    `user_variables` JSON `json:$.record.event-data.user-variables` DEFAULT '{}'
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
+ENGINE_SORTING_KEY "event, timestamp"
