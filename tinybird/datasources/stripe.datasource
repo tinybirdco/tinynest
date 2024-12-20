@@ -2,17 +2,18 @@ TOKEN "append" APPEND
 
 # Refer to https://docs.stripe.com/api/events/object for the event schemas
 
-TAGS "sentry"
+TAGS "stripe"
 
 SCHEMA >
     `id` String `json:$.id`,
     `object` LowCardinality(String) `json:$.object`,
-    `api_version` LowCardinality(String) `json:$.api_version`,
+    `api_version` LowCardinality(String) `json:$.api_version` DEFAULT '',
     `created` DateTime `json:$.created`,
     `type` LowCardinality(String) `json:$.type`,
     `livemode` Bool `json:$.livemode`,
     `data` JSON `json:$.data` DEFAULT '{}',
-    `request` JSON `json:$.request` DEFAULT '{}'
+    `request` JSON `json:$.request` DEFAULT '{}',
+    `account` String `json:$.account` DEFAULT ''
 
 ENGINE "MergeTree"
 ENGINE_PARTITION_KEY "toYYYYMM(created)"
