@@ -8,7 +8,7 @@ SCHEMA >
     `id` String `json:$.id`,
     `object` LowCardinality(String) `json:$.object`,
     `api_version` LowCardinality(String) `json:$.api_version` DEFAULT '',
-    `created` DateTime `json:$.created`,
+    `date` DateTime `json:$.created`,
     `type` LowCardinality(String) `json:$.type`,
     `livemode` Bool `json:$.livemode`,
     `data` JSON `json:$.data` DEFAULT '{}',
@@ -16,5 +16,5 @@ SCHEMA >
     `account` String `json:$.account` DEFAULT ''
 
 ENGINE "MergeTree"
-ENGINE_PARTITION_KEY "toYYYYMM(created)"
-ENGINE_SORTING_KEY "type, created"
+ENGINE_PARTITION_KEY "toYYYYMM(date)"
+ENGINE_SORTING_KEY "type, date"
