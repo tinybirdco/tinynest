@@ -55,10 +55,6 @@ export default function ClerkDashboard() {
 
     return (
         <div className="space-y-8">
-            <div>
-                <h1 className="text-2xl font-bold">Clerk Analytics</h1>
-            </div>
-
             {/* Metrics Row */}
             <div className="grid gap-4 md:grid-cols-3">
                 <MetricCard

@@ -23,10 +23,6 @@ export default function GitlabDashboard() {
 
     return (
         <div className="space-y-8">
-            <div>
-                <h1 className="text-2xl font-bold">Gitlab Analytics</h1>
-            </div>
-
             {/* Metrics Row */}
             <div className="grid gap-4 md:grid-cols-3">
             </div>

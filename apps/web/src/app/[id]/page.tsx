@@ -59,7 +59,7 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
   }
 
   // Only show Dashboard if tool is configured or installed
-  const Component = toolState === 'available' ? tool_comps.Readme : tool_comps.Dashboard;
+  const Component = toolState === 'configured' ? tool_comps.Dashboard : tool_comps.Readme;
 
   return (
     <div className="py-6">

@@ -1,18 +1,19 @@
-"use client"
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Markdown } from '@/components/markdown';
+import { getMarkdownContent } from '@/lib/markdown';
 
 export default function Auth0Readme() {
+  const [content, setContent] = useState('');
 
-    return (
-        <div>
-            <div>
-                <h1 className="text-2xl font-bold">Auth0 Analytics</h1>
-            </div>
-            <pre>
-                <code>
-                    1. do something
-                    2. do something else
-                </code>
-            </pre>
-        </div>
-    )
+  useEffect(() => {
+    getMarkdownContent('auth0').then(setContent);
+  }, []);
+
+  return (
+    <div className="container max-w-4xl mx-auto py-8">
+      <Markdown content={content} />
+    </div>
+  );
 }
