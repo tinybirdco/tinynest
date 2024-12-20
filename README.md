@@ -15,6 +15,7 @@ Deploy this project to your Tinybird account and configure the webhooks for the 
 - [GitLab](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-gitlab)
 - [GitHub](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-github)
 - [Knock](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-knock)
+- [Mailgun](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-mailgun)
 - [Orb](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-orb)
 - [PagerDuty](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-pagerduty)
 - [Resend](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-resend)
