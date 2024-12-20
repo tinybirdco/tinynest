@@ -44,7 +44,7 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
 
   if (!token || !isValidToken) {
     return (
-      <div className="container py-6">
+      <div className="py-6">
         <TokenPrompt error={error} />
       </div>
     );
@@ -62,7 +62,7 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
   const Component = toolState === 'available' ? tool_comps.Readme : tool_comps.Dashboard;
 
   return (
-    <div className="container py-6">
+    <div className="py-6">
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">{TOOLS[id].name}</h1>

@@ -1,21 +1,11 @@
 "use client"
 
-import Link from 'next/link'
-import { useQueryState } from 'nuqs'
-
 export default function VercelLogsReadme() {
-    const [token] = useQueryState('token')
 
     return (
         <div>
             <div>
                 <h1 className="text-2xl font-bold">Vercel Logs</h1>
-                <Link
-                    href={token ? `/?token=${token}` : '/'}
-                    className="text-sm text-muted-foreground hover:text-primary"
-                >
-                    ← Back to Apps
-                </Link>
             </div>
             <div>
                 <h2 className="text-xl font-bold mt-8">README</h2>
