@@ -2,7 +2,6 @@
 
 import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { pipe } from '@/lib/tinybird'
 import MetricCard from '../auth0/metric'
 import { SubsChart } from './subs-chart'
@@ -64,12 +63,6 @@ export default function OrbDashboard() {
         <div className="space-y-8">
             <div>
                 <h1 className="text-2xl font-bold">Orb Analytics</h1>
-                <Link
-                    href={token ? `/?token=${token}` : '/'}
-                    className="text-sm text-muted-foreground hover:text-primary"
-                >
-                    ← Back to Apps
-                </Link>
             </div>
 
             {/* Metrics Row */}
