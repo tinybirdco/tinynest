@@ -1,5 +1,8 @@
-DESCRIPTION >
-    Stripe Setup Intent Events Data Source - Time series data for tracking Stripe events
+TOKEN "append" APPEND
+
+# Refer to https://docs.stripe.com/api/events/object for the event schemas
+
+TAGS "sentry"
 
 SCHEMA >
     `id` String `json:$.id`,
@@ -14,4 +17,3 @@ SCHEMA >
 ENGINE "MergeTree"
 ENGINE_PARTITION_KEY "toYYYYMM(created)"
 ENGINE_SORTING_KEY "type, created"
-ENGINE_SETTINGS "index_granularity=8192"
