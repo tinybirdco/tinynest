@@ -1,0 +1,17 @@
+DESCRIPTION >
+    Stripe Setup Intent Events Data Source - Time series data for tracking Stripe events
+
+SCHEMA >
+    `id` String `json:$.id`,
+    `object` LowCardinality(String) `json:$.object`,
+    `api_version` LowCardinality(String) `json:$.api_version`,
+    `created` DateTime `json:$.created`,
+    `type` LowCardinality(String) `json:$.type`,
+    `livemode` Bool `json:$.livemode`,
+    `data` JSON `json:$.data` DEFAULT '{}',
+    `request` JSON `json:$.request` DEFAULT '{}'
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(created)"
+ENGINE_SORTING_KEY "type, created"
+ENGINE_SETTINGS "index_granularity=8192"
