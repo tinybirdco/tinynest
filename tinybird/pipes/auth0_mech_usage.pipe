@@ -5,7 +5,7 @@ TAGS "auth0"
 NODE ep
 SQL >
 
-    SELECT splitByChar('|', event.data.user_id)[1] as mech, count() as logins
+    SELECT splitByChar('|', event.data.user_id::String)[1] as mech, count() as logins
     FROM auth0
     where event_type == 's' and event_time >= now() - interval 30 days
     group by mech
