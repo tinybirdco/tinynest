@@ -1,0 +1,14 @@
+TOKEN "append" APPEND
+
+# Refer to https://github.com/auth0/auth0-log-schemas and https://auth0.com/docs/deploy-monitor/logs/log-event-type-codes for the type codes
+
+TAGS "auth0"
+
+SCHEMA >
+    `event_time` DateTime64(3) `json:$.tinybirdIngestTime` DEFAULT now(),
+    `event_type` String `json:$.data.type` DEFAULT 'unknown',
+    `event` JSON `json:$` DEFAULT '{}'
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
+ENGINE_SORTING_KEY "event_time"

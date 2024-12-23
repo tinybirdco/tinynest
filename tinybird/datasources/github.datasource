@@ -5,8 +5,10 @@ TOKEN "append" APPEND
 TAGS "github"
 
 SCHEMA >
-  `ingest_timestamp` DateTime `json:$.time` DEFAULT now(),
-  `record` JSON `json:$`
+  `event_time` DateTime `json:$.tinybirdIngestTime` DEFAULT now(),
+  `event_type` String `json:$.type` DEFAULT 'unknown',
+  `event` JSON `json:$` DEFAULT '{}',
 
 ENGINE "MergeTree"
-ENGINE_SORTING_KEY "ingest_timestamp"
+ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
+ENGINE_SORTING_KEY "event_time"

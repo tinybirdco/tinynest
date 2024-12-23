@@ -5,16 +5,10 @@ TOKEN "append" APPEND
 TAGS "stripe"
 
 SCHEMA >
-    `id` String `json:$.id`,
-    `object` LowCardinality(String) `json:$.object`,
-    `api_version` LowCardinality(String) `json:$.api_version` DEFAULT '',
-    `date` DateTime `json:$.created`,
-    `type` LowCardinality(String) `json:$.type`,
-    `livemode` Bool `json:$.livemode`,
-    `data` JSON `json:$.data` DEFAULT '{}',
-    `request` JSON `json:$.request` DEFAULT '{}',
-    `account` String `json:$.account` DEFAULT ''
+  `event_time` DateTime `json:$.tinybirdIngestTime` DEFAULT now(),
+  `event_type` String `json:$.type` DEFAULT 'unknown',
+  `event` JSON `json:$` DEFAULT '{}',
 
 ENGINE "MergeTree"
-ENGINE_PARTITION_KEY "toYYYYMM(date)"
-ENGINE_SORTING_KEY "type, date"
+ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
+ENGINE_SORTING_KEY "event_time"

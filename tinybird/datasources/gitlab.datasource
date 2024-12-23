@@ -1,12 +1,12 @@
 TOKEN "append" APPEND
 
-# Refer to https://vercel.com/docs/observability/webhooks-overview#events for the event types and payload schema
+# Refer to https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html
 
-TAGS "vercel"
+TAGS "gitlab"
 
 SCHEMA >
   `event_time` DateTime `json:$.tinybirdIngestTime` DEFAULT now(),
-  `event_type` String `json:$.type` DEFAULT 'unknown',
+  `event_type` String `json:$.object_kind` DEFAULT 'unknown',
   `event` JSON `json:$` DEFAULT '{}',
 
 ENGINE "MergeTree"

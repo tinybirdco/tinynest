@@ -5,10 +5,10 @@ TOKEN "append" APPEND
 TAGS "resend"
 
 SCHEMA >
-    `time` DateTime64(3) `json:$.created_at` DEFAULT now(),
-    `type` String `json:$.type`,
-    `data` JSON `json:$.data`
+  `event_time` DateTime `json:$.tinybirdIngestTime` DEFAULT now(),
+  `event_type` String `json:$.type` DEFAULT 'unknown',
+  `event` JSON `json:$` DEFAULT '{}',
 
 ENGINE "MergeTree"
-ENGINE_PARTITION_KEY "toYear(time)"
-ENGINE_SORTING_KEY "time"
+ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
+ENGINE_SORTING_KEY "event_time"

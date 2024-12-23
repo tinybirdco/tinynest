@@ -5,12 +5,10 @@ TOKEN "append" APPEND
 TAGS "knock"
 
 SCHEMA >
-  `typename` String `json:$.__typename`,
-  `type` String `json:$.type`,
-  `created_at` DateTime64(3) `json:$.created_at`,
-  `data` JSON `json:$.data` DEFAULT '{}',
-  `event_data` String `json:$.event_data` DEFAULT ''
-
+  `event_time` DateTime `json:$.tinybirdIngestTime` DEFAULT now(),
+  `event_type` String `json:$.type` DEFAULT 'unknown',
+  `event` JSON `json:$` DEFAULT '{}',
 
 ENGINE "MergeTree"
-ENGINE_SORTING_KEY "type, created_at"
+ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
+ENGINE_SORTING_KEY "event_time"
