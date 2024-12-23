@@ -5,9 +5,21 @@ TOKEN "append" APPEND
 TAGS "mailgun"
 
 SCHEMA >
-    `date` DateTime `json:$.timestamp` DEFAULT now(),
-    `record` JSON `json:$` DEFAULT '{}'
+    `date` DateTime `json:$.event-data.timestamp` DEFAULT now(),
+    `event` LowCardinality(String) `json:$.event-data.event` DEFAULT '',
+    `message_id` String `json:$.event-data.message.headers.message-id` DEFAULT '',
+    `recipient` String `json:$.event-data.recipient` DEFAULT '',
+    `recipient_domain` String `json:$.event-data.recipient-domain` DEFAULT '',
+    `tags` Array(String) `json:$.event-data.tags[:]` DEFAULT [],
+    `log_level` LowCardinality(String) `json:$.event-data.log-level` DEFAULT '',
+    `city` String `json:$.event-data.geolocation.city` DEFAULT '',
+    `country` String `json:$.event-data.geolocation.country` DEFAULT '',
+    `region` String `json:$.event-data.geolocation.region` DEFAULT '',
+    `client_info` JSON `json:$.event-data.client-info` DEFAULT '{}',
+    `delivery_status` JSON `json:$.event-data.delivery-status` DEFAULT '{}',
+    `envelope` JSON `json:$.event-data.envelope` DEFAULT '{}',
+    `user_variables` JSON `json:$.event-data.user-variables` DEFAULT '{}'
 
 ENGINE "MergeTree"
 ENGINE_PARTITION_KEY "toYYYYMM(date)"
-ENGINE_SORTING_KEY "date"
+ENGINE_SORTING_KEY "event, date"
