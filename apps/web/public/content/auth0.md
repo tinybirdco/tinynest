@@ -25,7 +25,7 @@ Before you connect Auth0 Logs Streams to Tinybird, ensure:
    
 2. Select **Create Stream**.
 
-3. In Tinybird, create a Data Source, called `auth0_logs` in this example, with the following schema:
+3. In Tinybird, create a Data Source, called `auth0` in this example, with the following schema:
 
 ```tb {% title = 'Data Source schema for Auth0 logs streams %}
 SCHEMA >
@@ -66,7 +66,7 @@ Using the [JSON Data Type](/sql-reference/data-types/json) you can store the sem
 5. Back in Auth0, paste the Events API URL in your Webhook Endpoint URL. Use the query parameter `name` to match the name of the Data Source you created in Tinybird. For example: 
 
 ```
-https://api.tinybird.co/v0/events?name=auth0_logs&token=TOKEN
+https://api.tinybird.co/v0/events?name=auth0&token=TOKEN
 ```
 
 Content Type is `application/json` and Content Format is `JSON Lines`.
@@ -75,7 +75,7 @@ Content Type is `application/json` and Content Format is `JSON Lines`.
 
 2. You're done. Any of the Auth0 Log Streams events you selected is automatically sent to Tinybird through the [Events API](https://tinybird.co/docs/get-data-in/ingest-apis/events-api).
 
-You can check the status of the integration from the **Health** tab in the created webhook or from the **Log** tab in the Tinybird `auth0_logs` Data Source. 
+You can check the status of the integration from the **Health** tab in the created webhook or from the **Log** tab in the Tinybird `auth0` Data Source. 
     
 ## See also
 

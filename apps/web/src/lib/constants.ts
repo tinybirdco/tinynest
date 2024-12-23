@@ -27,7 +27,7 @@ export const TOOLS: Record<string, AppGridItem> = {
     },
     auth0: {
         id: 'auth0',
-        ds: 'auth0_logs',
+        ds: 'auth0',
         name: 'Auth0',
         description: 'Identity platform',
         icon: '🔑'
