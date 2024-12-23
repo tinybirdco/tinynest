@@ -5,8 +5,8 @@ TOKEN "append" APPEND
 TAGS "mailgun"
 
 SCHEMA >
-    `date` DateTime `json:$.record.event-data.timestamp`,
-    `event` LowCardinality(String) `json:$.record.event-data.event`,
+    `date` DateTime `json:$.record.event-data.timestamp` DEFAULT now(),
+    `event` LowCardinality(String) `json:$.record.event-data.event` DEFAULT '',
     `message_id` String `json:$.record.event-data.message.headers.message-id` DEFAULT '',
     `recipient` String `json:$.record.event-data.recipient` DEFAULT '',
     `recipient_domain` String `json:$.record.event-data.recipient-domain` DEFAULT '',
