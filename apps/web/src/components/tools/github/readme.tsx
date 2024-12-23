@@ -8,7 +8,7 @@ export default function GithubReadme() {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    getMarkdownContent('resend').then(setContent);
+    getMarkdownContent('github').then(setContent);
   }, []);
 
   return (

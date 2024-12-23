@@ -8,7 +8,7 @@ export default function StripeReadme() {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    getMarkdownContent('resend').then(setContent);
+    getMarkdownContent('stripe').then(setContent);
   }, []);
 
   return (

@@ -8,7 +8,7 @@ export default function SentryReadme() {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    getMarkdownContent('resend').then(setContent);
+    getMarkdownContent('sentry').then(setContent);
   }, []);
 
   return (

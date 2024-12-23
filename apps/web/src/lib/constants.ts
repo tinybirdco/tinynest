@@ -136,6 +136,34 @@ export const TOOL_IMPORTS = {
         Dashboard: dynamic(() => import('@/components/tools/vercel_logs/dashboard')),
         Readme: dynamic(() => import('@/components/tools/vercel_logs/readme')),
     },
+    vercel: {
+        Dashboard: dynamic(() => import('@/components/tools/vercel/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/vercel/readme')),
+    },
+    github: {
+        Dashboard: dynamic(() => import('@/components/tools/github/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/github/readme')),
+    },
+    mailgun: {
+        Dashboard: dynamic(() => import('@/components/tools/mailgun/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/mailgun/readme')),
+    },
+    stripe: {
+        Dashboard: dynamic(() => import('@/components/tools/stripe/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/stripe/readme')),
+    },
+    sentry: {
+        Dashboard: dynamic(() => import('@/components/tools/sentry/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/sentry/readme')),
+    },
+    knock: {
+        Dashboard: dynamic(() => import('@/components/tools/knock/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/knock/readme')),
+    },
+    pagerduty: {
+        Dashboard: dynamic(() => import('@/components/tools/pagerduty/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/pagerduty/readme')),
+    },
 } as const;
 
 export type ToolId = keyof typeof TOOL_IMPORTS;

@@ -8,7 +8,7 @@ export default function PagerdutyReadme() {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    getMarkdownContent('resend').then(setContent);
+    getMarkdownContent('pagerduty').then(setContent);
   }, []);
 
   return (

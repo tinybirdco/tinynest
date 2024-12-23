@@ -8,7 +8,7 @@ export default function KnockReadme() {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    getMarkdownContent('resend').then(setContent);
+    getMarkdownContent('knock').then(setContent);
   }, []);
 
   return (

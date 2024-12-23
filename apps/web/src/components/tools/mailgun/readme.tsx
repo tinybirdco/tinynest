@@ -8,7 +8,7 @@ export default function MailgunReadme() {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    getMarkdownContent('resend').then(setContent);
+    getMarkdownContent('mailgun').then(setContent);
   }, []);
 
   return (

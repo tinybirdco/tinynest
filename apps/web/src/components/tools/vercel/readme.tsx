@@ -8,7 +8,7 @@ export default function VercelReadme() {
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    getMarkdownContent('vercel_logs').then(setContent);
+    getMarkdownContent('vercel').then(setContent);
   }, []);
 
   return (
