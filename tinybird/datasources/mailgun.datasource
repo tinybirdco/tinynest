@@ -7,7 +7,7 @@ TAGS "mailgun"
 SCHEMA >
   `event_time` DateTime `json:$.tinybirdIngestTime` DEFAULT now(),
   `event_type` String `json:$.event` DEFAULT 'unknown',
-  `event` JSON `json:$` DEFAULT '{}',
+  `event` JSON `json:$` DEFAULT '{}'
 
 ENGINE "MergeTree"
 ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
