@@ -1,18 +1,10 @@
-DESCRIPTION >
-	Successful Sign Ups
+TOKEN "read" READ
 
-## Current
-How many successful sign ups in previous 30 days?
-
-## Future
-MV to rollup sign ups per month, dynamic month selection
-
-
-TOKEN "auth0_signups_endpoint_read_1686" READ
+TAGS "auth0"
 
 NODE ep
 SQL >
 
-    SELECT count() as total FROM auth0_logs WHERE type = 'ss' and date >= now() - interval 30 days
+    SELECT count() as total FROM auth0 WHERE event_type = 'ss' and event_time >= now() - interval 30 days
 
 

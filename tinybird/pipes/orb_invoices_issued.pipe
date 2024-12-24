@@ -1,10 +1,12 @@
-TOKEN "orb_invoices_issued_endpoint_read_5668" READ
+TOKEN "read" READ
+
+TAGS "orb"
 
 NODE ep
 SQL >
 
     SELECT count() as invoices FROM orb
-    where type == 'invoice.issued'
-    and date >= now() - interval 30 day
+    where event_type == 'invoice.issued'
+    and event_time >= now() - interval 30 day
 
 

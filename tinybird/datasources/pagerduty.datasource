@@ -1,18 +1,14 @@
 TOKEN "append" APPEND
 
-# Refer to https://developer.pagerduty.com/docs/webhooks-overview#webhook-payload for the `data` schema definition for each event type
+# Refer to https://developer.pagerduty.com/docs/webhooks-overview#webhook-payload
 
 TAGS "pagerduty"
 
 SCHEMA >
-    `event_id` String `json:$.event.id`,
-    `event_type` String `json:$.event.event_type`,
-    `resource_type` String `json:$.event.resource_type`,
-    `occurred_at` DateTime64(3) `json:$.event.occurred_at`,
-    `agent` JSON `json:$.event.agent` DEFAULT '{}',
-    `client` JSON `json:$.event.client` DEFAULT '{}',
-    `data` JSON `json:$.event.data` DEFAULT '{}'
-    
+  `event_time` DateTime `json:$.tinybirdIngestTime` DEFAULT now(),
+  `event_type` String `json:$.event.event_type` DEFAULT 'unknown',
+  `event` JSON `json:$` DEFAULT '{}'
+
 ENGINE "MergeTree"
-ENGINE_PARTITION_KEY "toYYYYMM(occurred_at)"
-ENGINE_SORTING_KEY "resource_type, event_type, occurred_at"
+ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
+ENGINE_SORTING_KEY "event_time"

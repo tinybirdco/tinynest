@@ -1,12 +1,12 @@
 TOKEN "append" APPEND
 
-# Refer to https://docs.stripe.com/api/events/object for the event schemas
+# Refer to https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html
 
-TAGS "stripe"
+TAGS "gitlab"
 
 SCHEMA >
   `event_time` DateTime `json:$.tinybirdIngestTime` DEFAULT now(),
-  `event_type` String `json:$.type` DEFAULT 'unknown',
+  `event_type` String `json:$.object_kind` DEFAULT 'unknown',
   `event` JSON `json:$` DEFAULT '{}'
 
 ENGINE "MergeTree"

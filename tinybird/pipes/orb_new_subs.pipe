@@ -1,10 +1,12 @@
-TOKEN "orb_new_subs_endpoint_read_5693" READ
+TOKEN "read" READ
+
+TAGS "orb"
 
 NODE ep
 SQL >
 
     SELECT count() as subs FROM orb
-    where type == 'subscription.started'
-    and date >= now() - interval 30 day
+    where event_type == 'subscription.started'
+    and event_time >= now() - interval 30 day
 
 

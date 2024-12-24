@@ -1,20 +1,12 @@
-DESCRIPTION >
-	Monthly Active Users
+TOKEN "read" READ
 
-## Current
-How many successful sign ins in previous 30 days?
-
-## Future
-MV to rollup sign ins per month, dynamic month selection
-
-
-TOKEN "auth0_mau_endpoint_read_0827" READ
+TAGS "auth0"
 
 NODE ep
 SQL >
 
-    SELECT count(DISTINCT user_id) as active
-    FROM auth0_logs
-    where type == 's' and date >= now() - interval 30 days
+    SELECT count(DISTINCT event.data.user_id) as active
+    FROM auth0
+    where event_type == 's' and event_time >= now() - interval 30 days
 
 

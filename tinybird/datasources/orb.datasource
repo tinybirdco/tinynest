@@ -4,14 +4,11 @@ TOKEN "append" APPEND
 
 TAGS "orb"
 
-
 SCHEMA >
-    `id` String `json:$.id`,
-    `type` LowCardinality(String) `json:$.type` DEFAULT 'unknown',
-    `date` DateTime64(3) `json:$.created_at` DEFAULT now(),
-    `resource_name` LowCardinality(String) `json:$.resource_name` DEFAULT 'unknown',
-    `details` JSON `json:$.properties` DEFAULT '{}'
+  `event_time` DateTime `json:$.tinybirdIngestTime` DEFAULT now(),
+  `event_type` String `json:$.type` DEFAULT 'unknown',
+  `event` JSON `json:$` DEFAULT '{}'
 
 ENGINE "MergeTree"
-ENGINE_PARTITION_KEY "toYYYYMM(date)"
-ENGINE_SORTING_KEY "type, resource_name, date"
+ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
+ENGINE_SORTING_KEY "event_time"

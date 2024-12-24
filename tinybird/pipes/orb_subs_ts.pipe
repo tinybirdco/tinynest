@@ -1,11 +1,13 @@
-TOKEN "orb_subs_ts_endpoint_read_1978" READ
+TOKEN "read" READ
+
+TAGS "orb"
 
 NODE ep
 SQL >
 
-    SELECT toStartOfDay(date)::Date as day, count() as invoices
+    SELECT toStartOfDay(event_time)::Date as day, count() as invoices
     FROM orb
-    where type == 'subscription.started' and date >= now() - interval 30 day
+    where event_type == 'subscription.started' and event_time >= now() - interval 30 day
     group by day
     order by day
 

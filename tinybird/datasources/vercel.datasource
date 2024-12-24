@@ -5,12 +5,10 @@ TOKEN "append" APPEND
 TAGS "vercel"
 
 SCHEMA >
-    `type` LowCardinality(String) `json:$.type`,
-    `id` String `json:$.id`,
-    `date` DateTime64(3) `json:$.created_at` DEFAULT now(),
-    `region` LowCardinality(String) `json:$.region` DEFAULT '',
-    `payload` JSON `json:$.payload` DEFAULT '{}'
+  `event_time` DateTime `json:$.tinybirdIngestTime` DEFAULT now(),
+  `event_type` String `json:$.type` DEFAULT 'unknown',
+  `event` JSON `json:$` DEFAULT '{}'
 
 ENGINE "MergeTree"
-ENGINE_PARTITION_KEY "toYYYYMM(date)"
-ENGINE_SORTING_KEY "type, date"
+ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
+ENGINE_SORTING_KEY "event_time"

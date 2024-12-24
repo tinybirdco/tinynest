@@ -5,10 +5,10 @@ TOKEN "append" APPEND
 TAGS "sentry"
 
 SCHEMA >
-    `action` LowCardinality(String) `json:$.action` DEFAULT 'unknown',
-    `actor` JSON `json:$.actor` DEFAULT '{}',
-    `data` JSON `json:$.data` DEFAULT '{}',
-    `installation` JSON `json:$.installation` DEFAULT '{}'
+  `event_time` DateTime `json:$.tinybirdIngestTime` DEFAULT now(),
+  `event_type` String `json:$.action` DEFAULT 'unknown',
+  `event` JSON `json:$` DEFAULT '{}'
 
 ENGINE "MergeTree"
-ENGINE_SORTING_KEY "action"
+ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
+ENGINE_SORTING_KEY "event_time"

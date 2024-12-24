@@ -11,6 +11,22 @@ export interface AppGridItem {
 }
 
 export const TOOLS: Record<string, AppGridItem> = {
+    // Mail
+    resend: {
+        id: 'resend',
+        ds: 'resend',
+        name: 'Resend',
+        description: 'Email delivery service',
+        icon: '📨'
+    },
+    mailgun: {
+        id: 'mailgun',
+        ds: 'mailgun',
+        name: 'Mailgun',
+        description: 'Email delivery service',
+        icon: '📨'
+    },
+    // Auth
     clerk: {
         id: 'clerk',
         ds: 'clerk',
@@ -18,27 +34,29 @@ export const TOOLS: Record<string, AppGridItem> = {
         description: 'Authentication and user management',
         icon: '🔐'
     },
-    resend: {
-        id: 'resend',
-        ds: 'resend',
-        name: 'Resend',
-        description: 'Email delivery service',
-        icon: '✉️'
-    },
     auth0: {
         id: 'auth0',
-        ds: 'auth0_logs',
+        ds: 'auth0',
         name: 'Auth0',
         description: 'Identity platform',
-        icon: '🔑'
+        icon: '🔐'
     },
+    // Hosting
     vercel_logs: {
         id: 'vercel_logs',
         ds: 'vercel_logs',
         name: 'Vercel Logs',
         description: 'Deployment and serverless logs',
-        icon: '📊'
+        icon: '🧱'
     },
+    vercel: {
+        id: 'vercel',
+        ds: 'vercel',
+        name: 'Vercel',
+        description: 'Deployment and serverless',
+        icon: '🧱'
+    },
+    // VCS
     gitlab: {
         id: 'gitlab',
         ds: 'gitlab',
@@ -46,13 +64,51 @@ export const TOOLS: Record<string, AppGridItem> = {
         description: 'Source code management',
         icon: '🦊'
     },
+    github: {
+        id: 'github',
+        ds: 'github',
+        name: 'Github',
+        description: 'Source code management',
+        icon: '🦊'
+    },
+    // Payment & billing
     orb: {
         id: 'orb',
         ds: 'orb',
         name: 'Orb',
         description: 'Usage-based billing',
         icon: '💰'
-    }
+    },
+    stripe: {
+        id: 'stripe',
+        ds: 'stripe',
+        name: 'Stripe',
+        description: 'Payment processing',
+        icon: '💰'
+    },
+    // Notifications
+    knock: {
+        id: 'knock',
+        ds: 'knock',
+        name: 'Knock',
+        description: 'Push notifications',
+        icon: '🔔'
+    },
+    pagerduty: {
+        id: 'pagerduty',
+        ds: 'pagerduty',
+        name: 'Pagerduty',
+        description: 'Notifications',
+        icon: '🔔'
+    },
+    // Logging
+    sentry: {
+        id: 'sentry',
+        ds: 'sentry',
+        name: 'Sentry',
+        description: 'Error logging',
+        icon: '👀'
+    },
 };
 
 export const TOOL_IMPORTS = {
@@ -79,6 +135,34 @@ export const TOOL_IMPORTS = {
     vercel_logs: {
         Dashboard: dynamic(() => import('@/components/tools/vercel_logs/dashboard')),
         Readme: dynamic(() => import('@/components/tools/vercel_logs/readme')),
+    },
+    vercel: {
+        Dashboard: dynamic(() => import('@/components/tools/vercel/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/vercel/readme')),
+    },
+    github: {
+        Dashboard: dynamic(() => import('@/components/tools/github/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/github/readme')),
+    },
+    mailgun: {
+        Dashboard: dynamic(() => import('@/components/tools/mailgun/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/mailgun/readme')),
+    },
+    stripe: {
+        Dashboard: dynamic(() => import('@/components/tools/stripe/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/stripe/readme')),
+    },
+    sentry: {
+        Dashboard: dynamic(() => import('@/components/tools/sentry/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/sentry/readme')),
+    },
+    knock: {
+        Dashboard: dynamic(() => import('@/components/tools/knock/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/knock/readme')),
+    },
+    pagerduty: {
+        Dashboard: dynamic(() => import('@/components/tools/pagerduty/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/pagerduty/readme')),
     },
 } as const;
 

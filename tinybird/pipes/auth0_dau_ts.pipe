@@ -1,22 +1,13 @@
-DESCRIPTION >
-	Daily Active Users - time series
+TOKEN "read" READ
 
-## Current
-How many successful sign ins in previous 30 days, daily, over time
-
-## Future
-MV to rollup sign ins per day, dynamic range selection
-variable granularity selection, e.g. per day, per week, etc.
-
-
-TOKEN "auth0_dau_ts_endpoint_read_3455" READ
+TAGS "auth0"
 
 NODE ep
 SQL >
 
-    SELECT toStartOfDay(date)::Date as day, count(DISTINCT user_id) as active
-    FROM auth0_logs
-    where type == 's' and date >= now() - interval 30 days
+    SELECT toStartOfDay(event_time)::Date as day, count(DISTINCT event.data.user_id) as active
+    FROM auth0
+    where event_type == 's' and event_time >= now() - interval 30 days
     group by day
     order by day
 

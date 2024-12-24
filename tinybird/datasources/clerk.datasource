@@ -5,12 +5,10 @@ TOKEN "append" APPEND
 TAGS "clerk"
 
 SCHEMA >
-    `time` DateTime64(3) `json:$.timestamp` DEFAULT now(),
-    `data` JSON `json:$.data`,
-    `event_attributes` JSON `json:$.event_attributes`,
-    `object` String `json:$.object`,
-    `type` String `json:$.type`
+    `event_time` DateTime64(3) `json:$.tinybirdIngestTime` DEFAULT now(),
+    `event_type` String `json:$.type` DEFAULT 'unknown',
+    `event` JSON `json:$` DEFAULT '{}'
 
 ENGINE "MergeTree"
-ENGINE_PARTITION_KEY "toYear(time)"
-ENGINE_SORTING_KEY "time"
+ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
+ENGINE_SORTING_KEY "event_time"
