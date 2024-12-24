@@ -7,7 +7,8 @@ TAGS "auth0"
 SCHEMA >
     `event_time` DateTime64(3) `json:$.tinybirdIngestTime` DEFAULT now(),
     `event_type` String `json:$.data.type` DEFAULT 'unknown',
-    `event` JSON `json:$` DEFAULT '{}'
+    `event` JSON `json:$` DEFAULT '{}',
+    `test` JSON `json:$` DEFAULT '{}'
 
 ENGINE "MergeTree"
 ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
