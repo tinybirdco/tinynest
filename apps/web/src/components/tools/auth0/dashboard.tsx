@@ -97,7 +97,7 @@ export default function Auth0Dashboard() {
                         token, 
                         'auth0_applications'
                     ),
-                    pipe<{ data: Array<{ id: string, connection_name: string }> }>(
+                    pipe<{ data: Array<{ connection_id: string, connection_name: string }> }>(
                         token, 
                         'auth0_connections'
                     )
@@ -112,7 +112,6 @@ export default function Auth0Dashboard() {
     }, [token])
 
     useEffect(() => {
-        let mounted = true
 
         async function fetchMetrics() {
             if (!token) return
