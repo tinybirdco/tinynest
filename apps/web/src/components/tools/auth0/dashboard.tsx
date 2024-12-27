@@ -9,7 +9,7 @@ import { AuthMechChart, AuthMechDataPoint } from './auth-mech-chart'
 import { DailySignupsChart, DailySignupsDataPoint } from './daily-signups-chart'
 import { DailyLoginFailsChart, DailyLoginFailsDataPoint } from './daily-login-fails-chart'
 import { DateRangePicker, DateRange } from '@/components/ui/date-range-picker'
-import { startOfDay, endOfDay } from 'date-fns'
+import { startOfDay, endOfDay, format } from 'date-fns'
 
 interface ConversionData {
     new_signups: number
@@ -79,9 +79,9 @@ export default function Auth0Dashboard() {
         async function fetchMetrics() {
             if (!token) return
 
-            const fromDate = dateRange.from.toISOString()
-            const toDate = dateRange.to.toISOString()
-            const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+            const fromDate = format(dateRange.from, "yyyy-MM-dd HH:mm:ss")
+            const toDate = format(dateRange.to, "yyyy-MM-dd HH:mm:ss")
+            const thirtyDaysAgo = format(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd HH:mm:ss")
 
             try {
                 const [

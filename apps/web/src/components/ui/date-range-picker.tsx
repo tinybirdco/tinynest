@@ -34,14 +34,12 @@ export function DateRangePicker({
   className,
   initialDateRange,
 }: DateRangePickerProps) {
+  const [dateRange, setDateRange] = useState<DateRange>(initialDateRange)
   const [isOpen, setIsOpen] = useState(false)
-  const [dateRange, setDateRange] = useState<DateRange>(
-    initialDateRange || {
-      from: subDays(new Date(), 7),
-      to: new Date(),
-    }
-  )
+  const [tempDate, setTempDate] = useState<Date | null>(null)
   const [compareLastPeriod, setCompareLastPeriod] = useState(false)
+  const [fromInput, setFromInput] = useState(format(initialDateRange.from, "yyyy-MM-dd HH:mm:ss"))
+  const [toInput, setToInput] = useState(format(initialDateRange.to, "yyyy-MM-dd HH:mm:ss"))
 
   const handleRangeSelect = (range: DateRange | undefined) => {
     if (range?.from && range?.to) {
@@ -61,21 +59,27 @@ export function DateRangePicker({
   }
 
   const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDate = new Date(e.target.value.replace('UTC ', ''))
-    if (!isNaN(newDate.getTime())) {
-      setDateRange(prev => ({ 
-        ...prev, 
-        from: startOfDay(newDate)
+    const value = e.target.value
+    setFromInput(value)
+    
+    const date = new Date(value)
+    if (!isNaN(date.getTime())) {
+      setDateRange(prev => ({
+        ...prev,
+        from: startOfDay(date)
       }))
     }
   }
 
   const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDate = new Date(e.target.value.replace('UTC ', ''))
-    if (!isNaN(newDate.getTime())) {
-      setDateRange(prev => ({ 
-        ...prev, 
-        to: endOfDay(newDate)
+    const value = e.target.value
+    setToInput(value)
+    
+    const date = new Date(value)
+    if (!isNaN(date.getTime())) {
+      setDateRange(prev => ({
+        ...prev,
+        to: endOfDay(date)
       }))
     }
   }
@@ -126,12 +130,14 @@ export function DateRangePicker({
               <div className="space-y-2">
                 <div>
                   <Label className="text-sm">From</Label>
-                  <div className="mt-1">
+                  <div className="flex items-center">
+                    <span className="mr-2 text-sm text-muted-foreground">UTC</span>
                     <Input
                       type="text"
-                      value={`UTC ${format(dateRange.from, "yyyy-MM-dd HH:mm:ss")}`}
+                      value={fromInput}
                       onChange={handleFromChange}
                       className="rounded-md text-sm"
+                      placeholder="YYYY-MM-DD HH:mm:ss"
                     />
                   </div>
                 </div>
@@ -139,22 +145,26 @@ export function DateRangePicker({
                 <div>
                   <div className="flex justify-between items-center">
                     <Label className="text-sm">To</Label>
-                    <div className="flex-1 text-right">
-                      <Button
-                        variant="link"
-                        className="h-auto p-0 text-xs text-black hover:text-black/80"
-                        onClick={() => setDateRange({ ...dateRange, to: new Date() })}
-                      >
-                        Set to latest
-                      </Button>
-                    </div>
+                    <Button
+                      variant="link"
+                      className="h-auto p-0 text-xs text-black hover:text-black/80"
+                      onClick={() => {
+                        const now = new Date()
+                        setToInput(format(now, "yyyy-MM-dd HH:mm:ss"))
+                        setDateRange(prev => ({ ...prev, to: now }))
+                      }}
+                    >
+                      Set to latest
+                    </Button>
                   </div>
-                  <div className="mt-1">
+                  <div className="flex items-center">
+                    <span className="mr-2 text-sm text-muted-foreground">UTC</span>
                     <Input
                       type="text"
-                      value={`UTC ${format(dateRange.to, "yyyy-MM-dd HH:mm:ss")}`}
+                      value={toInput}
                       onChange={handleToChange}
                       className="rounded-md text-sm"
+                      placeholder="YYYY-MM-DD HH:mm:ss"
                     />
                   </div>
                 </div>
