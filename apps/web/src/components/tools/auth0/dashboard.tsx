@@ -15,8 +15,32 @@ interface ConversionData {
     conversion_rate: number
 }
 
+interface SummaryMetrics {
+    total_users: number
+    total_applications: number
+    total_apis: number
+    total_connections: number
+}
+
+interface UsersResult {
+    data: {
+        total_users: number
+        total_signups: number
+        total_active_users: number
+        total_failed_users: number
+        first_seen: string
+        last_seen: string
+    }[]
+}
+
 export default function Auth0Dashboard() {
     const [token] = useQueryState('token')
+    const [summaryMetrics, setSummaryMetrics] = useState<SummaryMetrics>({
+        total_users: 0,
+        total_applications: 0,
+        total_apis: 0,
+        total_connections: 0
+    })
     const [monthlySignUps, setMonthlySignUps] = useState<number>(0)
     const [monthlyMau, setMonthlyMau] = useState<number>(0)
     const [conversionRate, setConversionRate] = useState<number>(0)
@@ -31,7 +55,23 @@ export default function Auth0Dashboard() {
             if (!token) return
 
             try {
-                const [monthlySignUpsResult, monthlyMauResult, dauResult, authMechResult, conversionResult, dailySignupsResult, dailyLoginFailsResult] = await Promise.all([
+                const [
+                    usersResult,
+                    applicationsResult,
+                    apisResult,
+                    connectionsResult,
+                    monthlySignUpsResult,
+                    monthlyMauResult,
+                    dauResult,
+                    authMechResult,
+                    conversionResult,
+                    dailySignupsResult,
+                    dailyLoginFailsResult
+                ] = await Promise.all([
+                    pipe<UsersResult>(token, 'auth0_users_total'),
+                    pipe(token, 'auth0_applications'),
+                    pipe(token, 'auth0_apis'),
+                    pipe(token, 'auth0_connections'),
                     pipe(token, 'auth0_signups'),
                     pipe(token, 'auth0_mau'),
                     pipe<{ data: DauDataPoint[] }>(token, 'auth0_dau_ts'),
@@ -41,6 +81,12 @@ export default function Auth0Dashboard() {
                     pipe<{ data: DailyLoginFailsDataPoint[] }>(token, 'auth0_daily_login_fails')
                 ])
 
+                setSummaryMetrics({
+                    total_users: usersResult?.data?.[0]?.total_users || 0,
+                    total_applications: applicationsResult?.data?.length || 0,
+                    total_apis: apisResult?.data?.length || 0,
+                    total_connections: connectionsResult?.data?.length || 0
+                })
                 setMonthlySignUps(monthlySignUpsResult.data[0]?.total || 0)
                 setMonthlyMau(monthlyMauResult.data[0]?.active || 0)
                 setConversionRate(conversionResult.data[0]?.conversion_rate || 0)
@@ -58,6 +104,26 @@ export default function Auth0Dashboard() {
 
     return (
         <div className="space-y-8">
+            {/* Summary Card */}
+            <div className="grid grid-cols-4 gap-4 p-6 rounded-lg border bg-card text-card-foreground shadow-sm">
+                <div>
+                    <p className="text-sm font-medium text-muted-foreground">Total Users</p>
+                    <p className="text-2xl font-bold">{summaryMetrics.total_users.toLocaleString()}</p>
+                </div>
+                <div>
+                    <p className="text-sm font-medium text-muted-foreground">Applications</p>
+                    <p className="text-2xl font-bold">{summaryMetrics.total_applications.toLocaleString()}</p>
+                </div>
+                <div>
+                    <p className="text-sm font-medium text-muted-foreground">APIs</p>
+                    <p className="text-2xl font-bold">{summaryMetrics.total_apis.toLocaleString()}</p>
+                </div>
+                <div>
+                    <p className="text-sm font-medium text-muted-foreground">Connections</p>
+                    <p className="text-2xl font-bold">{summaryMetrics.total_connections.toLocaleString()}</p>
+                </div>
+            </div>
+
             {/* Metrics Row */}
             <div className="grid gap-4 md:grid-cols-3">
                 <MetricCard
