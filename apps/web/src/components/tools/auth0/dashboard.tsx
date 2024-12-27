@@ -20,6 +20,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { UserRetentionChart, UserRetentionDataPoint } from './user-retention-chart'
 
 interface ConversionData {
     new_signups: number
@@ -89,6 +90,7 @@ export default function Auth0Dashboard() {
     const [applications, setApplications] = useState<Array<{ client_id: string, client_name: string }>>([])
     const [connections, setConnections] = useState<Array<{ connection_id: string, connection_name: string }>>([])
     const [timeRange, setTimeRange] = useState<'hourly' | 'daily' | 'monthly'>('daily')
+    const [userRetentionData, setUserRetentionData] = useState<UserRetentionDataPoint[]>([])
 
     useEffect(() => {
         async function fetchInitialData() {
@@ -147,6 +149,7 @@ export default function Auth0Dashboard() {
                     monthlySignupsResult,
                     monthlyActiveUsersResult,
                     conversionRateResult,
+                    userRetentionTimeSeriesResult,
                     dauResult,
                     dauComparisonResult,
                     authMechResult,
@@ -164,6 +167,7 @@ export default function Auth0Dashboard() {
                     pipe(token, 'auth0_signups', thirtyDayParams),
                     pipe(token, 'auth0_mau', thirtyDayParams),
                     pipe<ConversionRateResult>(token, 'auth0_conversion_rate', thirtyDayParams),
+                    pipe<{ data: UserRetentionDataPoint[] }>(token, 'auth0_user_retention_ts', params),
                     pipe<{ data: DauDataPoint[] }>(token, 'auth0_dau_ts', params),
                     dateRange.compareMode ? pipe<{ data: DauDataPoint[] }>(token, 'auth0_dau_ts', {
                         ...params,
@@ -189,6 +193,7 @@ export default function Auth0Dashboard() {
                 setAuthMechData(authMechResult?.data ?? [])
                 setDailySignupsData(dailySignupsResult?.data ?? [])
                 setDailyLoginFailsData(dailyLoginFailsResult?.data ?? [])
+                setUserRetentionData(userRetentionTimeSeriesResult?.data ?? [])
             } catch (error) {
                 console.error('Failed to fetch metrics:', error)
             }
@@ -272,9 +277,9 @@ export default function Auth0Dashboard() {
                     description="Users active in the last 30 days"
                 />
                 <MetricCard
-                    title="Conversion Rate"
+                    title="New Signups Rate"
                     value={`${summaryMetrics.conversion_rate}%`}
-                    description="New users who became active in the last 30 days"
+                    description="New users compared to total users"
                 />
             </div>
 
@@ -316,21 +321,33 @@ export default function Auth0Dashboard() {
                     data={dauData} 
                     comparisonData={dateRange.compareMode ? dauComparisonData : undefined}
                     timeRange={timeRange}
+                    className="h-[300px]"
                 />
             </div>
             <div className="grid gap-4 md:grid-cols-1 xl:grid-cols-2">
-                <AuthMechChart data={authMechData} />
+                <UserRetentionChart 
+                    data={userRetentionData}
+                    timeRange={timeRange}
+                    className="h-[300px]"
+                />
                 <DailySignupsChart 
                     data={dailySignupsData}
                     timeRange={timeRange}
+                    className="h-[300px]"
                 />
             </div>
-            <div className="grid gap-4 grid-cols-1">
+            <div className="grid gap-4 md:grid-cols-1 xl:grid-cols-2">
                 <DailyLoginFailsChart 
                     data={dailyLoginFailsData}
                     timeRange={timeRange}
+                    className="h-[300px]"
+                />
+                <AuthMechChart 
+                    data={authMechData}
+                    className="h-[300px]"
                 />
             </div>
+            
         </div>
     )
 }

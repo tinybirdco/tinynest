@@ -1,5 +1,3 @@
-"use client"
-
 import {
     Card,
     CardContent,
@@ -8,36 +6,34 @@ import {
 } from "@/components/ui/card"
 import {
     ChartContainer,
-    ChartTooltip,
     ChartConfig,
-    ChartTooltipContent
 } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid } from "recharts"
 import { format } from "date-fns"
 
-export interface DailyLoginFailsDataPoint {
+export interface UserRetentionDataPoint {
     day: string
-    fails: number
+    user_retention: number
 }
 
-export interface DailyLoginFailsChartData {
-    data: DailyLoginFailsDataPoint[]
+export interface UserRetentionChartData {
+    data: UserRetentionDataPoint[]
     timeRange: 'hourly' | 'daily' | 'monthly'
     className?: string
 }
 
 const chartConfig = {
-    fails: {
+    conversion: {
         color: "hsl(var(--primary))",
-        label: "Login Fails",
+        label: "User Retention",
     },
 } satisfies ChartConfig
 
-export function DailyLoginFailsChart({ data, timeRange, className }: DailyLoginFailsChartData) {
+export function UserRetentionChart({ data, timeRange, className }: UserRetentionChartData) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Login Failures</CardTitle>
+                <CardTitle>User Retention</CardTitle>
             </CardHeader>
             <CardContent className="">
                 <ChartContainer config={chartConfig} className={`w-full ${className}`}>
@@ -53,6 +49,7 @@ export function DailyLoginFailsChart({ data, timeRange, className }: DailyLoginF
                         <CartesianGrid 
                             horizontal={true}
                             vertical={false}
+                            strokeDasharray="3 3"
                             className="stroke-muted"
                         />
                         <XAxis
@@ -77,8 +74,9 @@ export function DailyLoginFailsChart({ data, timeRange, className }: DailyLoginF
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
+                            tickFormatter={(value) => `${value}%`}
                             label={{
-                                value: "Login Failures",
+                                value: "User Retention",
                                 angle: -90,
                                 position: "left",
                                 offset: 32
@@ -86,7 +84,7 @@ export function DailyLoginFailsChart({ data, timeRange, className }: DailyLoginF
                         />
                         <Line
                             type="monotone"
-                            dataKey="fails"
+                            dataKey="user_retention"
                             strokeWidth={2}
                             dot={false}
                             style={{
@@ -98,4 +96,4 @@ export function DailyLoginFailsChart({ data, timeRange, className }: DailyLoginF
             </CardContent>
         </Card>
     )
-}
+} 

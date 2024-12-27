@@ -12,7 +12,7 @@ import {
     ChartConfig,
     ChartTooltipContent
 } from "@/components/ui/chart"
-import { Line, LineChart, XAxis, YAxis } from "recharts"
+import { Line, LineChart, XAxis, YAxis, CartesianGrid } from "recharts"
 import { format } from "date-fns"
 
 export interface DailySignupsDataPoint {
@@ -23,6 +23,7 @@ export interface DailySignupsDataPoint {
 export interface DailySignupsChartData {
     data: DailySignupsDataPoint[]
     timeRange: 'hourly' | 'daily' | 'monthly'
+    className?: string
 }
 
 const chartConfig = {
@@ -32,14 +33,14 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function DailySignupsChart({ data, timeRange }: DailySignupsChartData) {
+export function DailySignupsChart({ data, timeRange, className }: DailySignupsChartData) {
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Signups</CardTitle>
             </CardHeader>
             <CardContent className="">
-                <ChartContainer config={chartConfig} className="h-[400px] w-full">
+                <ChartContainer config={chartConfig} className={`w-full ${className}`}>
                     <LineChart
                         data={data}
                         margin={{
@@ -49,6 +50,11 @@ export function DailySignupsChart({ data, timeRange }: DailySignupsChartData) {
                             bottom: 32
                         }}
                     >
+                        <CartesianGrid 
+                            horizontal={true}
+                            vertical={false}
+                            className="stroke-muted"
+                        />
                         <XAxis
                             dataKey="day"
                             tickLine={false}
@@ -86,10 +92,7 @@ export function DailySignupsChart({ data, timeRange }: DailySignupsChartData) {
                             type="monotone"
                             dataKey="signups"
                             strokeWidth={2}
-                            activeDot={{
-                                r: 4,
-                                style: { fill: "hsl(var(--primary))" },
-                            }}
+                            dot={false}
                             style={{
                                 stroke: "hsl(var(--primary))",
                             }}

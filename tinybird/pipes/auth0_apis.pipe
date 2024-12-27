@@ -1,5 +1,7 @@
 TOKEN "read" READ
 
+TAGS "auth0"
+
 NODE get_apis
 SQL >
     %
