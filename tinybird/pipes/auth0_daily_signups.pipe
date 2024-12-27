@@ -1,0 +1,14 @@
+TOKEN "read" READ
+
+TAGS "auth0"
+
+NODE ep
+SQL >
+
+    SELECT toDate(toStartOfDay(event_time)) as day, count() as signups
+    FROM auth0
+    WHERE event_type = 'ss' and event_time >= now() - interval 30 days
+    GROUP BY day
+    order by day asc
+
+
