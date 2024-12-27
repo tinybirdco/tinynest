@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { pipe } from '@/lib/tinybird'
 import MetricCard from './metric'
 import { DauChart, DauDataPoint } from './dau-chart'
@@ -102,6 +102,17 @@ export default function Auth0Dashboard() {
     const [timeRange, setTimeRange] = useState<'hourly' | 'daily' | 'monthly'>('daily')
     const [userRetentionData, setUserRetentionData] = useState<UserRetentionDataPoint[]>([])
     const [logs, setLogs] = useState<LogEntry[]>([])
+    const [logsPage, setLogsPage] = useState(0)
+    const [isLoading, setIsLoading] = useState(false)
+    const [logsFilters, setLogsFilters] = useState({
+        eventType: 'all',
+        connection: 'all',
+        clientName: 'all'
+    })
+    const [logsDateRange, setLogsDateRange] = useState<DateRange>({
+        from: startOfDay(new Date(new Date().setDate(new Date().getDate() - 7))),
+        to: endOfDay(new Date())
+    })
 
     useEffect(() => {
         async function fetchInitialData() {
@@ -131,27 +142,27 @@ export default function Auth0Dashboard() {
 
         async function fetchMetrics() {
             if (!token) return
-
-            const fromDate = format(dateRange.from, "yyyy-MM-dd HH:mm:ss")
-            const toDate = format(dateRange.to, "yyyy-MM-dd HH:mm:ss")
-            const thirtyDaysAgo = format(subDays(new Date(), 30), "yyyy-MM-dd HH:mm:ss")
-
-            const params = {
-                date_from: fromDate,
-                date_to: toDate,
-                time_range: timeRange,
-                ...(selectedApp !== 'all' && { client_id: selectedApp }),
-                ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
-            }
-
-            const thirtyDayParams = {
-                date_from: thirtyDaysAgo,
-                time_range: timeRange,
-                ...(selectedApp !== 'all' && { client_id: selectedApp }),
-                ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
-            }
-
+            setIsLoading(true)
             try {
+                const fromDate = format(dateRange.from, "yyyy-MM-dd HH:mm:ss")
+                const toDate = format(dateRange.to, "yyyy-MM-dd HH:mm:ss")
+                const thirtyDaysAgo = format(subDays(new Date(), 30), "yyyy-MM-dd HH:mm:ss")
+
+                const params = {
+                    date_from: fromDate,
+                    date_to: toDate,
+                    time_range: timeRange,
+                    ...(selectedApp !== 'all' && { client_id: selectedApp }),
+                    ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
+                }
+
+                const thirtyDayParams = {
+                    date_from: thirtyDaysAgo,
+                    time_range: timeRange,
+                    ...(selectedApp !== 'all' && { client_id: selectedApp }),
+                    ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
+                }
+
                 const [
                     usersResult,
                     applicationsResult,
@@ -190,10 +201,12 @@ export default function Auth0Dashboard() {
                     pipe<{ data: DailySignupsDataPoint[] }>(token, 'auth0_daily_signups', params),
                     pipe<{ data: DailyLoginFailsDataPoint[] }>(token, 'auth0_daily_login_fails', params),
                     pipe<{ data: LogEntry[] }>(token, 'auth0_logs', {
-                        date_from: fromDate,
-                        date_to: toDate,
-                        ...(selectedApp !== 'all' && { client_id: selectedApp }),
-                        ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
+                        page: logsPage,
+                        date_from: format(logsDateRange.from, "yyyy-MM-dd HH:mm:ss"),
+                        date_to: format(logsDateRange.to, "yyyy-MM-dd HH:mm:ss"),
+                        ...(logsFilters.eventType !== 'all' && { event_type: logsFilters.eventType }),
+                        ...(logsFilters.connection !== 'all' && { connection: logsFilters.connection }),
+                        ...(logsFilters.clientName !== 'all' && { client_name: logsFilters.clientName })
                     })
                 ])
 
@@ -215,6 +228,8 @@ export default function Auth0Dashboard() {
                 setLogs(logsResult?.data ?? [])
             } catch (error) {
                 console.error('Failed to fetch metrics:', error)
+            } finally {
+                setIsLoading(false)
             }
         }
 
@@ -222,7 +237,31 @@ export default function Auth0Dashboard() {
         return () => {
             mounted = false
         }
-    }, [token, dateRange.from, dateRange.to, dateRange.compareMode, selectedApp, selectedConnection, timeRange])
+    }, [token, dateRange.from, dateRange.to, dateRange.compareMode, selectedApp, selectedConnection, timeRange, logsPage])
+
+    const fetchLogs = useCallback(async () => {
+        if (!token || !logsDateRange?.from || !logsDateRange?.to) return
+        setIsLoading(true)
+        try {
+            const logsResult = await pipe<{ data: LogEntry[] }>(token, 'auth0_logs', {
+                page: logsPage,
+                date_from: format(new Date(logsDateRange.from), "yyyy-MM-dd HH:mm:ss"),
+                date_to: format(new Date(logsDateRange.to), "yyyy-MM-dd HH:mm:ss"),
+                ...(logsFilters.eventType !== 'all' && { event_type: logsFilters.eventType }),
+                ...(logsFilters.connection !== 'all' && { connection: logsFilters.connection }),
+                ...(logsFilters.clientName !== 'all' && { client_name: logsFilters.clientName })
+            })
+            setLogs(logsResult?.data ?? [])
+        } catch (error) {
+            console.error('Failed to fetch logs:', error)
+        } finally {
+            setIsLoading(false)
+        }
+    }, [token, logsPage, logsDateRange, logsFilters])
+
+    useEffect(() => {
+        fetchLogs()
+    }, [logsPage, logsDateRange, logsFilters, fetchLogs])
 
     return (
         <div className="space-y-8">
@@ -366,12 +405,30 @@ export default function Auth0Dashboard() {
                     className="h-[300px]"
                 />
             </div>
+            <Separator className="my-6" />
             <Card>
                 <CardHeader>
                     <CardTitle>Logs</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <LogsTable data={logs} />
+                    <LogsTable 
+                        data={logs} 
+                        page={logsPage}
+                        dateRange={logsDateRange}
+                        isLoading={isLoading}
+                        connections={connections}
+                        applications={applications}
+                        onPageChange={(newPage) => {
+                            setLogsPage(newPage)
+                        }}
+                        onFiltersChange={(filters) => {
+                            if (filters.dateRange) setLogsDateRange(filters.dateRange)
+                            if (filters.eventType) setLogsFilters(prev => ({ ...prev, eventType: filters.eventType }))
+                            if (filters.connection) setLogsFilters(prev => ({ ...prev, connection: filters.connection }))
+                            if (filters.clientName) setLogsFilters(prev => ({ ...prev, clientName: filters.clientName }))
+                            setLogsPage(0)
+                        }}
+                    />
                 </CardContent>
             </Card>
             
