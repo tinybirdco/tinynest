@@ -18,9 +18,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { UserRetentionChart, UserRetentionDataPoint } from './user-retention-chart'
+import { LogsTable } from './logs-table'
 
 interface ConversionData {
     new_signups: number
@@ -66,6 +67,15 @@ interface ConversionRateResult {
     data: { conversion_rate: number }[]
 }
 
+interface LogEntry {
+  timestamp: string
+  type: string
+  description: string
+  id: string
+  connection: string
+  application: string
+}
+
 export default function Auth0Dashboard() {
     const [token] = useQueryState('token')
     const [dateRange, setDateRange] = useState<DateRange>({
@@ -91,6 +101,7 @@ export default function Auth0Dashboard() {
     const [connections, setConnections] = useState<Array<{ connection_id: string, connection_name: string }>>([])
     const [timeRange, setTimeRange] = useState<'hourly' | 'daily' | 'monthly'>('daily')
     const [userRetentionData, setUserRetentionData] = useState<UserRetentionDataPoint[]>([])
+    const [logs, setLogs] = useState<LogEntry[]>([])
 
     useEffect(() => {
         async function fetchInitialData() {
@@ -154,7 +165,8 @@ export default function Auth0Dashboard() {
                     dauComparisonResult,
                     authMechResult,
                     dailySignupsResult,
-                    dailyLoginFailsResult
+                    dailyLoginFailsResult,
+                    logsResult
                 ] = await Promise.all([
                     pipe<UsersResult>(token, 'auth0_users_total', selectedApp !== 'all' || selectedConnection !== 'all' ? {
                         time_range: timeRange,
@@ -176,7 +188,13 @@ export default function Auth0Dashboard() {
                     }) : Promise.resolve({ data: [] }),
                     pipe<{ data: AuthMechDataPoint[] }>(token, 'auth0_mech_usage', params),
                     pipe<{ data: DailySignupsDataPoint[] }>(token, 'auth0_daily_signups', params),
-                    pipe<{ data: DailyLoginFailsDataPoint[] }>(token, 'auth0_daily_login_fails', params)
+                    pipe<{ data: DailyLoginFailsDataPoint[] }>(token, 'auth0_daily_login_fails', params),
+                    pipe<{ data: LogEntry[] }>(token, 'auth0_logs', {
+                        date_from: fromDate,
+                        date_to: toDate,
+                        ...(selectedApp !== 'all' && { client_id: selectedApp }),
+                        ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
+                    })
                 ])
 
                 setSummaryMetrics({
@@ -194,6 +212,7 @@ export default function Auth0Dashboard() {
                 setDailySignupsData(dailySignupsResult?.data ?? [])
                 setDailyLoginFailsData(dailyLoginFailsResult?.data ?? [])
                 setUserRetentionData(userRetentionTimeSeriesResult?.data ?? [])
+                setLogs(logsResult?.data ?? [])
             } catch (error) {
                 console.error('Failed to fetch metrics:', error)
             }
@@ -347,6 +366,14 @@ export default function Auth0Dashboard() {
                     className="h-[300px]"
                 />
             </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Logs</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <LogsTable data={logs} />
+                </CardContent>
+            </Card>
             
         </div>
     )
