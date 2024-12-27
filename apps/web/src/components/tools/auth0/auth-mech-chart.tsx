@@ -14,13 +14,13 @@ import {
 } from "@/components/ui/chart"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 
-interface AuthMechData {
+export interface AuthMechDataPoint {
     mech: string
     logins: number
 }
 
-interface AuthMechChartProps {
-    data: AuthMechData[]
+export interface AuthMechChartData {
+    data: AuthMechDataPoint[]
 }
 
 const chartConfig = {
@@ -30,7 +30,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function AuthMechChart({ data }: AuthMechChartProps) {
+export function AuthMechChart({ data }: AuthMechChartData) {
     // Sort data by number of logins in descending order
     const sortedData = [...data].sort((a, b) => b.logins - a.logins)
 
@@ -45,7 +45,7 @@ export function AuthMechChart({ data }: AuthMechChartProps) {
                         data={sortedData}
                         layout="vertical"
                         margin={{
-                            left: 80,
+                            left: 24,
                             right: 12,
                             top: 12,
                             bottom: 12,

@@ -14,30 +14,30 @@ import {
 } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis } from "recharts"
 
-export interface DauDataPoint {
+export interface DailySignupsDataPoint {
     day: string
-    active: number
+    signups: number
 }
 
-export interface DauChartData {
-    data: DauDataPoint[]
+export interface DailySignupsChartData {
+    data: DailySignupsDataPoint[]
 }
 
 const chartConfig = {
-    active: {
+    signups: {
         color: "hsl(var(--primary))",
-        label: "Active Users",
+        label: "Signups",
     },
 } satisfies ChartConfig
 
-export function DauChart({ data }: DauChartData) {
+export function DailySignupsChart({ data }: DailySignupsChartData) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Daily Active Users</CardTitle>
+                <CardTitle>Daily Signups</CardTitle>
             </CardHeader>
             <CardContent className="">
-                <ChartContainer config={chartConfig} className="h-[400px] w-full">
+                <ChartContainer config={chartConfig} >
                     <LineChart
                         data={data}
                         margin={{
@@ -65,7 +65,7 @@ export function DauChart({ data }: DauChartData) {
                             axisLine={false}
                             tickMargin={8}
                             label={{
-                                value: "Active Users",
+                                value: "Signups",
                                 angle: -90,
                                 position: "left",
                                 offset: 32
@@ -77,7 +77,7 @@ export function DauChart({ data }: DauChartData) {
                         />
                         <Line
                             type="monotone"
-                            dataKey="active"
+                            dataKey="signups"
                             strokeWidth={2}
                             activeDot={{
                                 r: 4,

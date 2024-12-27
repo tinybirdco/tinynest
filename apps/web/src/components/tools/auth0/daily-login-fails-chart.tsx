@@ -14,27 +14,27 @@ import {
 } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis } from "recharts"
 
-export interface DauDataPoint {
+export interface DailyLoginFailsDataPoint {
     day: string
-    active: number
+    fails: number
 }
 
-export interface DauChartData {
-    data: DauDataPoint[]
+export interface DailyLoginFailsChartData {
+    data: DailyLoginFailsDataPoint[]
 }
 
 const chartConfig = {
-    active: {
+    fails: {
         color: "hsl(var(--primary))",
-        label: "Active Users",
+        label: "Login Fails",
     },
 } satisfies ChartConfig
 
-export function DauChart({ data }: DauChartData) {
+export function DailyLoginFailsChart({ data }: DailyLoginFailsChartData) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Daily Active Users</CardTitle>
+                <CardTitle>Daily Login Fails</CardTitle>
             </CardHeader>
             <CardContent className="">
                 <ChartContainer config={chartConfig} className="h-[400px] w-full">
@@ -65,7 +65,7 @@ export function DauChart({ data }: DauChartData) {
                             axisLine={false}
                             tickMargin={8}
                             label={{
-                                value: "Active Users",
+                                value: "Login Fails",
                                 angle: -90,
                                 position: "left",
                                 offset: 32
@@ -77,7 +77,7 @@ export function DauChart({ data }: DauChartData) {
                         />
                         <Line
                             type="monotone"
-                            dataKey="active"
+                            dataKey="fails"
                             strokeWidth={2}
                             activeDot={{
                                 r: 4,

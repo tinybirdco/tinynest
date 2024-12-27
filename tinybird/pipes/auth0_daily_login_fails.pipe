@@ -1,0 +1,14 @@
+TOKEN "read" READ
+
+TAGS "auth0"
+
+NODE ep
+SQL >
+
+    SELECT toDate(toStartOfDay(event_time)) as day, count() as fails
+    FROM auth0
+    where event_type == 'f' and event_time >= now() - interval 30 days
+    group by day 
+    order by day asc
+
+
