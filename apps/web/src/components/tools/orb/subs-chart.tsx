@@ -12,14 +12,14 @@ import {
     ChartConfig,
     ChartTooltipContent
 } from "@/components/ui/chart"
-import { Line, LineChart, XAxis } from "recharts"
+import { Line, LineChart, XAxis, YAxis } from "recharts"
 
-interface SubsDataPoint {
+export interface SubsDataPoint {
     day: string
     invoices: number
 }
 
-interface SubsChartProps {
+export interface SubsChartProps {
     data: SubsDataPoint[]
 }
 
@@ -37,7 +37,7 @@ export function SubsChart({ data }: SubsChartProps) {
                 <CardTitle>New Subscriptions</CardTitle>
             </CardHeader>
             <CardContent>
-                <ChartContainer config={chartConfig}>
+                <ChartContainer config={chartConfig} className="h-[400px] w-full">
                     <LineChart
                         data={data}
                         margin={{
@@ -50,8 +50,22 @@ export function SubsChart({ data }: SubsChartProps) {
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
-                            interval="equidistantPreserveStart"
-                            tickFormatter={(value) => value.split('-')[2]}
+                            // interval="equidistantPreserveStart"
+                            label={{
+                                value: "Day of Month",
+                                position: "bottom",
+                                offset: 0
+                            }}
+                        />
+                        <YAxis
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                            label={{
+                                value: "Subscriptions",
+                                angle: -90,
+                                position: "left",
+                            }}
                         />
                         <ChartTooltip
                             cursor={false}

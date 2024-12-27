@@ -4,12 +4,9 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { pipe } from '@/lib/tinybird'
 import MetricCard from '../auth0/metric'
-import { SubsChart } from './subs-chart'
-
-interface SubsDataPoint {
-    day: string
-    invoices: number
-}
+import { SubsChart, SubsDataPoint } from './subs-chart'
+import { SubsByPlanChart, SubsByPlanDataPoint } from './sub-by-plan-chart'
+import { SubsByPlanTsChart, SubsByPlanTsDataPoint } from './sub-by-plan-ts-chart'
 
 export default function OrbDashboard() {
     const [token] = useQueryState('token')
@@ -18,6 +15,8 @@ export default function OrbDashboard() {
     const [issuedInvoices, setIssuedInvoices] = useState<number>(0)
     const [paidInvoices, setPaidInvoices] = useState<number>(0)
     const [subsTimeSeriesData, setSubsTimeSeriesData] = useState<SubsDataPoint[]>([])
+    const [subsByPlanData, setSubsByPlanData] = useState<SubsByPlanDataPoint[]>([])
+    const [subsByPlanTsData, setSubsByPlanTsData] = useState<SubsByPlanTsDataPoint[]>([])
 
     useEffect(() => {
         async function fetchMetrics() {
@@ -29,13 +28,17 @@ export default function OrbDashboard() {
                     churnedSubsResult,
                     issuedInvoicesResult,
                     paidInvoicesResult,
-                    subsTimeSeriesResult
+                    subsTimeSeriesResult,
+                    subsByPlanResult,
+                    subsByPlanTsResult
                 ] = await Promise.all([
                     pipe(token, 'orb_new_subs'),
                     pipe(token, 'orb_churn_subs'),
                     pipe(token, 'orb_invoices_issued'),
                     pipe(token, 'orb_invoices_paid'),
-                    pipe<{ data: SubsDataPoint[] }>(token, 'orb_subs_ts')
+                    pipe<{ data: SubsDataPoint[] }>(token, 'orb_subs_ts'),
+                    pipe<{ data: SubsByPlanDataPoint[] }>(token, 'orb_subs_created_by_plan'),
+                    pipe<{ data: SubsByPlanTsDataPoint[] }>(token, 'orb_daily_subs_created_by_plan')
                 ])
 
                 setNewSubs(newSubsResult.data[0]?.subs || 0)
@@ -43,6 +46,8 @@ export default function OrbDashboard() {
                 setIssuedInvoices(issuedInvoicesResult.data[0]?.invoices || 0)
                 setPaidInvoices(paidInvoicesResult.data[0]?.invoices || 0)
                 setSubsTimeSeriesData(subsTimeSeriesResult.data)
+                setSubsByPlanData(subsByPlanResult.data)
+                setSubsByPlanTsData(subsByPlanTsResult.data)
             } catch (error) {
                 console.error('Failed to fetch metrics:', error)
             }
@@ -51,11 +56,11 @@ export default function OrbDashboard() {
         fetchMetrics()
     }, [token])
 
-    const churnRate = newSubs > 0 
-        ? Math.round((churnedSubs / newSubs) * 100) 
+    const churnRate = newSubs > 0
+        ? Math.round((churnedSubs / newSubs) * 100)
         : 0
 
-    const invoicePaymentRate = issuedInvoices > 0 
+    const invoicePaymentRate = issuedInvoices > 0
         ? Math.round((paidInvoices / issuedInvoices) * 100)
         : 0
 
@@ -86,8 +91,13 @@ export default function OrbDashboard() {
             </div>
 
             {/* Charts Grid */}
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 grid-cols-1">
                 <SubsChart data={subsTimeSeriesData} />
+
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+                <SubsByPlanTsChart data={subsByPlanTsData} />
+                <SubsByPlanChart data={subsByPlanData} />
             </div>
         </div>
     )

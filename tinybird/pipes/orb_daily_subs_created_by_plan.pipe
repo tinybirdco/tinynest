@@ -1,0 +1,14 @@
+TOKEN "read" READ
+
+TAGS "orb"
+
+NODE ep
+SQL >
+
+    SELECT toDate(toStartOfDay(event_time)) as day, event.subscription.plan.name as plan, count() as subs
+    FROM orb
+    where event_type == 'subscription.created' and event_time >= now() - interval 30 day
+    group by day, plan
+    order by day, subs asc
+
+
