@@ -10,11 +10,9 @@ import { CalendarIcon } from 'lucide-react'
 import { Checkbox } from './checkbox'
 import { Label } from './label'
 import { Input } from "./input"
+import { DateRange } from "react-day-picker"
 
-export interface DateRange {
-  from: Date
-  to: Date
-}
+export type { DateRange }
 
 interface DateRangePickerProps {
   onChange?: (range: DateRange) => void
@@ -59,7 +57,7 @@ export function DateRangePicker({
       const newDate = range.to;
       setDateRange({
         from: dateRange.from,
-        to: endOfDay(newDate)
+        to: newDate ? endOfDay(newDate) : undefined
       });
       return;
     }

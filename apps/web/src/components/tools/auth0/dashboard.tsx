@@ -9,7 +9,7 @@ import { AuthMechChart, AuthMechDataPoint } from './auth-mech-chart'
 import { DailySignupsChart, DailySignupsDataPoint } from './daily-signups-chart'
 import { DailyLoginFailsChart, DailyLoginFailsDataPoint } from './daily-login-fails-chart'
 import { DateRangePicker, DateRange } from '@/components/ui/date-range-picker'
-import { startOfDay, endOfDay, format, subDays } from 'date-fns'
+import { startOfDay, endOfDay, format } from 'date-fns'
 import {
   Select,
   SelectContent,
@@ -33,21 +33,13 @@ interface SummaryMetrics {
     conversion_rate: number
 }
 
-interface UsersResult {
-    data: { total_users: number }[]
-}
-
-interface ConversionRateResult {
-    data: { conversion_rate: number }[]
-}
-
 interface LogEntry {
-  timestamp: string
-  type: string
-  description: string
-  id: string
-  connection: string
-  application: string
+    event_time: string
+    event_type: string
+    description: string
+    id: string
+    connection: string
+    application: string
 }
 
 export default function Auth0Dashboard() {
@@ -117,20 +109,12 @@ export default function Auth0Dashboard() {
             if (!token) return
             setIsLoading(true)
             try {
-                const fromDate = format(dateRange.from, "yyyy-MM-dd HH:mm:ss")
-                const toDate = format(dateRange.to, "yyyy-MM-dd HH:mm:ss")
-                const thirtyDaysAgo = format(subDays(new Date(), 30), "yyyy-MM-dd HH:mm:ss")
+                const fromDate = dateRange.from ? format(dateRange.from, "yyyy-MM-dd HH:mm:ss") : format(new Date(), "yyyy-MM-dd HH:mm:ss")
+                const toDate = dateRange.to ? format(dateRange.to, "yyyy-MM-dd HH:mm:ss") : format(new Date(), "yyyy-MM-dd HH:mm:ss")
 
                 const params = {
                     date_from: fromDate,
                     date_to: toDate,
-                    time_range: timeRange,
-                    ...(selectedApp !== 'all' && { client_id: selectedApp }),
-                    ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
-                }
-
-                const thirtyDayParams = {
-                    date_from: thirtyDaysAgo,
                     time_range: timeRange,
                     ...(selectedApp !== 'all' && { client_id: selectedApp }),
                     ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
@@ -151,31 +135,21 @@ export default function Auth0Dashboard() {
                     dailyLoginFailsResult,
                     logsResult
                 ] = await Promise.all([
-                    pipe<UsersResult>(token, 'auth0_users_total', selectedApp !== 'all' || selectedConnection !== 'all' ? {
-                        time_range: timeRange,
-                        ...(selectedApp !== 'all' && { client_id: selectedApp }),
-                        ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
-                    } : undefined),
-                    pipe(token, 'auth0_applications'),
-                    pipe(token, 'auth0_apis'),
-                    pipe(token, 'auth0_connections'),
-                    pipe(token, 'auth0_signups', thirtyDayParams),
-                    pipe(token, 'auth0_mau', thirtyDayParams),
-                    pipe<ConversionRateResult>(token, 'auth0_conversion_rate', thirtyDayParams),
+                    pipe(token, 'auth0_users_total', params),
+                    pipe(token, 'auth0_applications', params),
+                    pipe(token, 'auth0_apis', params),
+                    pipe(token, 'auth0_connections', params),
+                    pipe(token, 'auth0_signups', params),
+                    pipe(token, 'auth0_mau', params),
+                    pipe(token, 'auth0_conversion_rate', params),
                     pipe<{ data: UserRetentionDataPoint[] }>(token, 'auth0_user_retention_ts', params),
                     pipe<{ data: DauDataPoint[] }>(token, 'auth0_dau_ts', params),
-                    dateRange.compareMode ? pipe<{ data: DauDataPoint[] }>(token, 'auth0_dau_ts', {
-                        ...params,
-                        date_from: comparisonFromDate,
-                        date_to: comparisonToDate
-                    }) : Promise.resolve({ data: [] }),
                     pipe<{ data: AuthMechDataPoint[] }>(token, 'auth0_mech_usage', params),
                     pipe<{ data: DailySignupsDataPoint[] }>(token, 'auth0_daily_signups', params),
                     pipe<{ data: DailyLoginFailsDataPoint[] }>(token, 'auth0_daily_login_fails', params),
                     pipe<{ data: LogEntry[] }>(token, 'auth0_logs', {
+                        ...params,
                         page: logsPage,
-                        date_from: format(logsDateRange.from, "yyyy-MM-dd HH:mm:ss"),
-                        date_to: format(logsDateRange.to, "yyyy-MM-dd HH:mm:ss"),
                         ...(logsFilters.eventType !== 'all' && { event_type: logsFilters.eventType }),
                         ...(logsFilters.connection !== 'all' && { connection: logsFilters.connection }),
                         ...(logsFilters.clientName !== 'all' && { client_name: logsFilters.clientName })
@@ -206,10 +180,7 @@ export default function Auth0Dashboard() {
         }
 
         fetchMetrics()
-        return () => {
-            mounted = false
-        }
-    }, [token, dateRange.from, dateRange.to, dateRange.compareMode, selectedApp, selectedConnection, timeRange, logsPage])
+    }, [token, dateRange.from, dateRange.to, selectedApp, selectedConnection, timeRange, logsPage])
 
     const fetchLogs = useCallback(async () => {
         if (!token || !logsDateRange?.from || !logsDateRange?.to) return
@@ -349,7 +320,6 @@ export default function Auth0Dashboard() {
             <div className="grid gap-4 grid-cols-1">
                 <DauChart 
                     data={dauData} 
-                    comparisonData={dateRange.compareMode ? dauComparisonData : undefined}
                     timeRange={timeRange}
                     className="h-[300px]"
                 />
@@ -395,9 +365,9 @@ export default function Auth0Dashboard() {
                         }}
                         onFiltersChange={(filters) => {
                             if (filters.dateRange) setLogsDateRange(filters.dateRange)
-                            if (filters.eventType) setLogsFilters(prev => ({ ...prev, eventType: filters.eventType }))
-                            if (filters.connection) setLogsFilters(prev => ({ ...prev, connection: filters.connection }))
-                            if (filters.clientName) setLogsFilters(prev => ({ ...prev, clientName: filters.clientName }))
+                            if (filters.eventType) setLogsFilters(prev => ({ ...prev, eventType: filters.eventType as string }))
+                            if (filters.connection) setLogsFilters(prev => ({ ...prev, connection: filters.connection as string }))
+                            if (filters.clientName) setLogsFilters(prev => ({ ...prev, clientName: filters.clientName as string }))
                             setLogsPage(0)
                         }}
                     />
