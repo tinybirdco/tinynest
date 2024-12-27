@@ -4,9 +4,14 @@ TAGS "auth0"
 
 NODE ep
 SQL >
-
+    %
     SELECT count(DISTINCT event.data.user_id) as active
     FROM auth0
     where event_type == 's' and event_time >= now() - interval 30 days
-
+    {% if defined(client_id) and client_id != 'all' %}
+        AND event.data.client_id::String = {{String(client_id)}}
+    {% end %}
+    {% if defined(connection_id) and connection_id != 'all' %}
+        AND event.data.connection_id::String = {{String(connection_id)}}
+    {% end %}
 

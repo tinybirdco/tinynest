@@ -9,7 +9,16 @@ import { AuthMechChart, AuthMechDataPoint } from './auth-mech-chart'
 import { DailySignupsChart, DailySignupsDataPoint } from './daily-signups-chart'
 import { DailyLoginFailsChart, DailyLoginFailsDataPoint } from './daily-login-fails-chart'
 import { DateRangePicker, DateRange } from '@/components/ui/date-range-picker'
-import { startOfDay, endOfDay, format } from 'date-fns'
+import { startOfDay, endOfDay, format, subDays } from 'date-fns'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface ConversionData {
     new_signups: number
@@ -74,14 +83,56 @@ export default function Auth0Dashboard() {
     const [authMechData, setAuthMechData] = useState<AuthMechDataPoint[]>([])
     const [dailySignupsData, setDailySignupsData] = useState<DailySignupsDataPoint[]>([])
     const [dailyLoginFailsData, setDailyLoginFailsData] = useState<DailyLoginFailsDataPoint[]>([])
+    const [selectedApp, setSelectedApp] = useState<string>('all')
+    const [selectedConnection, setSelectedConnection] = useState<string>('all')
+    const [applications, setApplications] = useState<Array<{ client_id: string, client_name: string }>>([])
+    const [connections, setConnections] = useState<Array<{ connection_id: string, connection_name: string }>>([])
 
     useEffect(() => {
+        async function fetchInitialData() {
+            if (!token) return
+            try {
+                const [appsResult, connsResult] = await Promise.all([
+                    pipe<{ data: Array<{ client_id: string, client_name: string }> }>(
+                        token, 
+                        'auth0_applications'
+                    ),
+                    pipe<{ data: Array<{ id: string, connection_name: string }> }>(
+                        token, 
+                        'auth0_connections'
+                    )
+                ])
+                setApplications(appsResult.data ?? [])
+                setConnections(connsResult.data ?? [])
+            } catch (error) {
+                console.error('Failed to fetch initial data:', error)
+            }
+        }
+        fetchInitialData()
+    }, [token])
+
+    useEffect(() => {
+        let mounted = true
+
         async function fetchMetrics() {
             if (!token) return
 
             const fromDate = format(dateRange.from, "yyyy-MM-dd HH:mm:ss")
             const toDate = format(dateRange.to, "yyyy-MM-dd HH:mm:ss")
-            const thirtyDaysAgo = format(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd HH:mm:ss")
+            const thirtyDaysAgo = format(subDays(new Date(), 30), "yyyy-MM-dd HH:mm:ss")
+
+            const params = {
+                date_from: fromDate,
+                date_to: toDate,
+                ...(selectedApp !== 'all' && { client_id: selectedApp }),
+                ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
+            }
+
+            const thirtyDayParams = {
+                date_from: thirtyDaysAgo,
+                ...(selectedApp !== 'all' && { client_id: selectedApp }),
+                ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
+            }
 
             try {
                 const [
@@ -93,39 +144,30 @@ export default function Auth0Dashboard() {
                     monthlyActiveUsersResult,
                     conversionRateResult,
                     dauResult,
+                    dauComparisonResult,
                     authMechResult,
                     dailySignupsResult,
                     dailyLoginFailsResult
                 ] = await Promise.all([
-                    pipe<UsersResult>(token, 'auth0_users_total'),
+                    pipe<UsersResult>(token, 'auth0_users_total', selectedApp !== 'all' || selectedConnection !== 'all' ? {
+                        ...(selectedApp !== 'all' && { client_id: selectedApp }),
+                        ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
+                    } : undefined),
                     pipe(token, 'auth0_applications'),
                     pipe(token, 'auth0_apis'),
                     pipe(token, 'auth0_connections'),
-                    pipe(token, 'auth0_signups', {
-                        date_from: thirtyDaysAgo
-                    }),
-                    pipe(token, 'auth0_mau', {
-                        date_from: thirtyDaysAgo
-                    }),
-                    pipe<ConversionRateResult>(token, 'auth0_conversion_rate', {
-                        date_from: thirtyDaysAgo
-                    }),
-                    pipe<{ data: DauDataPoint[] }>(token, 'auth0_dau_ts', {
-                        date_from: fromDate,
-                        date_to: toDate
-                    }),
-                    pipe<{ data: AuthMechDataPoint[] }>(token, 'auth0_mech_usage', {
-                        date_from: fromDate,
-                        date_to: toDate
-                    }),
-                    pipe<{ data: DailySignupsDataPoint[] }>(token, 'auth0_daily_signups', {
-                        date_from: fromDate,
-                        date_to: toDate
-                    }),
-                    pipe<{ data: DailyLoginFailsDataPoint[] }>(token, 'auth0_daily_login_fails', {
-                        date_from: fromDate,
-                        date_to: toDate
-                    })
+                    pipe(token, 'auth0_signups', thirtyDayParams),
+                    pipe(token, 'auth0_mau', thirtyDayParams),
+                    pipe<ConversionRateResult>(token, 'auth0_conversion_rate', thirtyDayParams),
+                    pipe<{ data: DauDataPoint[] }>(token, 'auth0_dau_ts', params),
+                    dateRange.compareMode ? pipe<{ data: DauDataPoint[] }>(token, 'auth0_dau_ts', {
+                        ...params,
+                        date_from: comparisonFromDate,
+                        date_to: comparisonToDate
+                    }) : Promise.resolve({ data: [] }),
+                    pipe<{ data: AuthMechDataPoint[] }>(token, 'auth0_mech_usage', params),
+                    pipe<{ data: DailySignupsDataPoint[] }>(token, 'auth0_daily_signups', params),
+                    pipe<{ data: DailyLoginFailsDataPoint[] }>(token, 'auth0_daily_login_fails', params)
                 ])
 
                 setSummaryMetrics({
@@ -148,29 +190,69 @@ export default function Auth0Dashboard() {
         }
 
         fetchMetrics()
-    }, [token, dateRange])
+        return () => {
+            mounted = false
+        }
+    }, [token, dateRange.from, dateRange.to, dateRange.compareMode, selectedApp, selectedConnection])
 
     return (
         <div className="space-y-8">
-            {/* Top row - Total metrics */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <MetricCard
-                    title="Total Users"
-                    value={summaryMetrics.total_users}
-                />
-                <MetricCard
-                    title="Applications"
-                    value={summaryMetrics.total_applications}
-                />
-                <MetricCard
-                    title="APIs"
-                    value={summaryMetrics.total_apis}
-                />
-                <MetricCard
-                    title="Connections"
-                    value={summaryMetrics.total_connections}
-                />
+            <div className="flex justify-between items-center gap-4">
+                <div className="flex gap-2">
+                    <Select value={selectedApp} onValueChange={setSelectedApp}>
+                        <SelectTrigger className="w-[200px]">
+                            <SelectValue placeholder="Select application" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Applications</SelectItem>
+                            {applications.map((app) => (
+                                <SelectItem key={app.client_id} value={app.client_id}>
+                                    {app.client_name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    <Select value={selectedConnection} onValueChange={setSelectedConnection}>
+                        <SelectTrigger className="w-[200px]">
+                            <SelectValue placeholder="Select connection" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Connections</SelectItem>
+                            {connections.map((conn) => (
+                                <SelectItem key={conn.connection_id} value={conn.connection_id}>
+                                    {conn.connection_name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
+
+            {/* Top row - Total metrics */}
+            <Card>
+                <CardContent className="pt-6">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                        <div className="flex flex-col">
+                            <span className="text-sm font-medium">Total Users</span>
+                            <span className="text-2xl font-bold">{summaryMetrics.total_users}</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-medium">Applications</span>
+                            <span className="text-2xl font-bold">{summaryMetrics.total_applications}</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-medium">APIs</span>
+                            <span className="text-2xl font-bold">{summaryMetrics.total_apis}</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-medium">Connections</span>
+                            <span className="text-2xl font-bold">{summaryMetrics.total_connections}</span>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
 
             {/* Second row - Monthly metrics */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -191,13 +273,19 @@ export default function Auth0Dashboard() {
                 />
             </div>
 
-            {/* Date Range Picker */}
+            <Separator className="my-6" />
+
             <div className="flex justify-end">
                 <DateRangePicker
                     initialDateRange={dateRange}
                     onChange={(newRange) => setDateRange(newRange)}
                 />
             </div>
+
+            <DauChart 
+                data={dauData} 
+                comparisonData={dateRange.compareMode ? dauComparisonData : undefined} 
+            />
 
             {/* Charts Grid */}
             <div className="grid gap-4 grid-cols-1">

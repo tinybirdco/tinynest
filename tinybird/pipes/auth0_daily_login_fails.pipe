@@ -10,6 +10,12 @@ SQL >
     where event_type == 'f'
     AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    {% if defined(client_id) and client_id != 'all' %}
+        AND event.data.client_id::String = {{String(client_id)}}
+    {% end %}
+    {% if defined(connection_id) and connection_id != 'all' %}
+        AND event.data.connection_id::String = {{String(connection_id)}}
+    {% end %}
     group by day 
     order by day asc
 

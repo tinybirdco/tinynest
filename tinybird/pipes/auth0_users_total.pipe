@@ -2,7 +2,7 @@ TOKEN "read" READ
 
 NODE get_total_users
 SQL >
-
+    %
     SELECT 
         count(DISTINCT event.data.user_id::String) as total_users,
         countIf(DISTINCT event.data.user_id::String, event_type = 'ss') as total_signups,
@@ -14,3 +14,9 @@ SQL >
     WHERE 
         event.data.user_id::String != ''
         AND event.data.user_id::String != 'undefined' 
+    {% if defined(client_id) and client_id != 'all' %}
+        AND event.data.client_id::String = {{String(client_id)}}
+    {% end %}
+    {% if defined(connection_id) and connection_id != 'all' %}
+        AND event.data.connection_id::String = {{String(connection_id)}}
+    {% end %}

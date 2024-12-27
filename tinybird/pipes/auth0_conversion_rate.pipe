@@ -2,7 +2,7 @@ TOKEN "read" READ
 
 NODE get_conversion
 SQL >
-
+    %
     SELECT
         count(DISTINCT signups.user_id) as new_signups,
         count(DISTINCT logins.user_id) as active_new_users,
@@ -14,11 +14,23 @@ SQL >
             SELECT event.data.user_id as user_id
             FROM auth0
             WHERE event_type = 'ss' AND event_time >= now() - interval 30 days
+            {% if defined(client_id) and client_id != 'all' %}
+                AND event.data.client_id::String = {{String(client_id)}}
+            {% end %}
+            {% if defined(connection_id) and connection_id != 'all' %}
+                AND event.data.connection_id::String = {{String(connection_id)}}
+            {% end %}
         ) signups
     LEFT JOIN
         (
             SELECT event.data.user_id as user_id
             FROM auth0
             WHERE event_type = 'sl' AND event_time >= now() - interval 30 days
+            {% if defined(client_id) and client_id != 'all' %}
+                AND event.data.client_id::String = {{String(client_id)}}
+            {% end %}
+            {% if defined(connection_id) and connection_id != 'all' %}
+                AND event.data.connection_id::String = {{String(connection_id)}}
+            {% end %}
         ) logins
         ON signups.user_id = logins.user_id

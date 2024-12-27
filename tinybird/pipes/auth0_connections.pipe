@@ -2,7 +2,7 @@ TOKEN "read" READ
 
 NODE get_connections
 SQL >
-
+    %
     SELECT 
         event.data.connection::String as connection_name,
         event.data.connection_id::String as connection_id,
@@ -18,6 +18,9 @@ SQL >
     WHERE 
         event.data.connection::String != ''
         AND event.data.strategy::String != ''
+        {% if defined(client_id) and client_id != 'all' %}
+            AND event.data.client_id::String = {{String(client_id)}}
+        {% end %}
     GROUP BY 
         event.data.connection::String,
         event.data.connection_id::String,
