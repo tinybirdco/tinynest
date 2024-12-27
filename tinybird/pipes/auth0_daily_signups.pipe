@@ -5,7 +5,15 @@ TAGS "auth0"
 NODE ep
 SQL >
     %
-    SELECT toDate(toStartOfDay(event_time)) as day, count() as signups
+    SELECT
+        {% if defined(time_range) and time_range == 'hourly' %}
+            toStartOfHour(event_time)::DateTime as day,
+        {% elif defined(time_range) and time_range == 'monthly' %}  
+            toStartOfMonth(event_time)::Date as day,
+        {% else %}
+            toStartOfDay(event_time)::Date as day,
+        {% end %}
+        count() as signups
     FROM auth0
     WHERE event_type = 'ss'
     AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}

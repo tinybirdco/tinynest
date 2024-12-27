@@ -5,7 +5,15 @@ TAGS "auth0"
 NODE ep
 SQL >
     %
-    SELECT toStartOfDay(event_time)::Date as day, count(DISTINCT event.data.user_id) as active
+    SELECT
+        {% if defined(time_range) and time_range == 'hourly' %}
+            toStartOfHour(event_time)::DateTime as day,
+        {% elif defined(time_range) and time_range == 'monthly' %}  
+            toStartOfMonth(event_time)::Date as day,
+        {% else %}
+            toStartOfDay(event_time)::Date as day,
+        {% end %}
+        count(DISTINCT event.data.user_id) as active
     FROM auth0
     WHERE event_type == 's' 
     AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}

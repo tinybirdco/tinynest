@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 interface ConversionData {
     new_signups: number
@@ -87,6 +88,7 @@ export default function Auth0Dashboard() {
     const [selectedConnection, setSelectedConnection] = useState<string>('all')
     const [applications, setApplications] = useState<Array<{ client_id: string, client_name: string }>>([])
     const [connections, setConnections] = useState<Array<{ connection_id: string, connection_name: string }>>([])
+    const [timeRange, setTimeRange] = useState<'hourly' | 'daily' | 'monthly'>('daily')
 
     useEffect(() => {
         async function fetchInitialData() {
@@ -124,12 +126,14 @@ export default function Auth0Dashboard() {
             const params = {
                 date_from: fromDate,
                 date_to: toDate,
+                time_range: timeRange,
                 ...(selectedApp !== 'all' && { client_id: selectedApp }),
                 ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
             }
 
             const thirtyDayParams = {
                 date_from: thirtyDaysAgo,
+                time_range: timeRange,
                 ...(selectedApp !== 'all' && { client_id: selectedApp }),
                 ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
             }
@@ -150,6 +154,7 @@ export default function Auth0Dashboard() {
                     dailyLoginFailsResult
                 ] = await Promise.all([
                     pipe<UsersResult>(token, 'auth0_users_total', selectedApp !== 'all' || selectedConnection !== 'all' ? {
+                        time_range: timeRange,
                         ...(selectedApp !== 'all' && { client_id: selectedApp }),
                         ...(selectedConnection !== 'all' && { connection_id: selectedConnection })
                     } : undefined),
@@ -193,7 +198,7 @@ export default function Auth0Dashboard() {
         return () => {
             mounted = false
         }
-    }, [token, dateRange.from, dateRange.to, dateRange.compareMode, selectedApp, selectedConnection])
+    }, [token, dateRange.from, dateRange.to, dateRange.compareMode, selectedApp, selectedConnection, timeRange])
 
     return (
         <div className="space-y-8">
@@ -275,17 +280,35 @@ export default function Auth0Dashboard() {
 
             <Separator className="my-6" />
 
-            <div className="flex justify-end">
+            <div className="flex justify-end items-center gap-4">
+                <div className="flex items-center gap-2">
+                    <Button 
+                        variant={timeRange === 'hourly' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTimeRange('hourly')}
+                    >
+                        Hourly
+                    </Button>
+                    <Button 
+                        variant={timeRange === 'daily' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTimeRange('daily')}
+                    >
+                        Daily
+                    </Button>
+                    <Button 
+                        variant={timeRange === 'monthly' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setTimeRange('monthly')}
+                    >
+                        Monthly
+                    </Button>
+                </div>
                 <DateRangePicker
                     initialDateRange={dateRange}
                     onChange={(newRange) => setDateRange(newRange)}
                 />
             </div>
-
-            <DauChart 
-                data={dauData} 
-                comparisonData={dateRange.compareMode ? dauComparisonData : undefined} 
-            />
 
             {/* Charts Grid */}
             <div className="grid gap-4 grid-cols-1">
