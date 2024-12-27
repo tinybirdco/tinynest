@@ -12,7 +12,7 @@ import {
     ChartConfig,
     ChartTooltipContent
 } from "@/components/ui/chart"
-import { Line, LineChart, XAxis } from "recharts"
+import { Line, LineChart, XAxis, YAxis } from "recharts"
 
 interface DauDataPoint {
     day: string
@@ -41,8 +41,10 @@ export function DauChart({ data }: DauChartData) {
                     <LineChart
                         data={data}
                         margin={{
-                            left: 12,
+                            left: 48,
                             right: 12,
+                            top: 12,
+                            bottom: 32
                         }}
                     >
                         <XAxis
@@ -52,37 +54,27 @@ export function DauChart({ data }: DauChartData) {
                             tickMargin={8}
                             interval="equidistantPreserveStart"
                             tickFormatter={(value) => value.split('-')[2]}
+                            label={{
+                                value: "Day of Month",
+                                position: "bottom",
+                                offset: 20
+                            }}
+                        />
+                        <YAxis
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                            label={{
+                                value: "Active Users",
+                                angle: -90,
+                                position: "left",
+                                offset: 32
+                            }}
                         />
                         <ChartTooltip
                             cursor={false}
                             content={<ChartTooltipContent indicator="dot" />}
                         />
-                        {/* <ChartTooltip content={({ payload }) => {
-                            if (!payload?.length) return null
-
-                            return (
-                                <div className="rounded-lg border bg-background p-2 shadow-sm">
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="flex flex-col">
-                                            <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                                Date
-                                            </span>
-                                            <span className="font-bold text-muted-foreground">
-                                                {payload[0].payload.day}
-                                            </span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                                Active Users
-                                            </span>
-                                            <span className="font-bold">
-                                                {payload[0].value}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )
-                        }} /> */}
                         <Line
                             type="monotone"
                             dataKey="active"

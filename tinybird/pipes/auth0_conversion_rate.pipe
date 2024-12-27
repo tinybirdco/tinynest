@@ -1,0 +1,24 @@
+TOKEN "read" READ
+
+NODE get_conversion
+SQL >
+
+    SELECT
+        count(DISTINCT signups.user_id) as new_signups,
+        count(DISTINCT logins.user_id) as active_new_users,
+        ROUND(
+            count(DISTINCT logins.user_id) / count(DISTINCT signups.user_id) * 100, 1
+        ) as conversion_rate
+    FROM
+        (
+            SELECT event.data.user_id as user_id
+            FROM auth0
+            WHERE event_type = 'ss' AND event_time >= now() - interval 30 days
+        ) signups
+    LEFT JOIN
+        (
+            SELECT event.data.user_id as user_id
+            FROM auth0
+            WHERE event_type = 'sl' AND event_time >= now() - interval 30 days
+        ) logins
+        ON signups.user_id = logins.user_id

@@ -17,6 +17,12 @@ interface AuthMechData {
     logins: number
 }
 
+interface ConversionData {
+    new_signups: number
+    active_new_users: number
+    conversion_rate: number
+}
+
 export default function Auth0Dashboard() {
     const [token] = useQueryState('token')
     const [monthlySignUps, setMonthlySignUps] = useState<number>(0)
@@ -30,16 +36,17 @@ export default function Auth0Dashboard() {
             if (!token) return
 
             try {
-                const [monthlySignUpsResult, monthlyMauResult, dauResult, authMechResult] = await Promise.all([
+                const [monthlySignUpsResult, monthlyMauResult, dauResult, authMechResult, conversionResult] = await Promise.all([
                     pipe(token, 'auth0_signups'),
                     pipe(token, 'auth0_mau'),
                     pipe<{ data: DauDataPoint[] }>(token, 'auth0_dau_ts'),
-                    pipe<{ data: AuthMechData[] }>(token, 'auth0_mech_usage')
+                    pipe<{ data: AuthMechData[] }>(token, 'auth0_mech_usage'),
+                    pipe<{ data: ConversionData[] }>(token, 'auth0_conversion_rate')
                 ])
 
                 setMonthlySignUps(monthlySignUpsResult.data[0]?.total || 0)
                 setMonthlyMau(monthlyMauResult.data[0]?.active || 0)
-                setConversionRate(0)
+                setConversionRate(conversionResult.data[0]?.conversion_rate || 0)
                 setDauData(dauResult.data)
                 setAuthMechData(authMechResult.data)
             } catch (error) {
@@ -67,7 +74,7 @@ export default function Auth0Dashboard() {
                 <MetricCard
                     title="Conversion Rate"
                     value={`${conversionRate}%`}
-                    description="Active users / Total users"
+                    description="New users who became active in the last 30 days"
                 />
             </div>
 
