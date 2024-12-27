@@ -1,0 +1,31 @@
+TOKEN "read" READ
+
+NODE get_connections
+SQL >
+
+    SELECT 
+        event.data.connection::String as connection_name,
+        event.data.connection_id::String as connection_id,
+        event.data.strategy::String as strategy,
+        event.data.strategy_type::String as strategy_type,
+        count() as total_events,
+        countIf(event_type = 'ss') as successful_signups,
+        countIf(event_type = 's') as successful_logins,
+        countIf(event_type = 'f') as failed_attempts,
+        min(event_time) as first_seen,
+        max(event_time) as last_seen
+    FROM auth0
+    WHERE 
+        event.data.connection::String != ''
+        AND event.data.strategy::String != ''
+    GROUP BY 
+        event.data.connection::String,
+        event.data.connection_id::String,
+        event.data.strategy::String,
+        event.data.strategy_type::String
+    HAVING 
+        successful_signups > 0 OR 
+        successful_logins > 0 OR 
+        failed_attempts > 0
+    ORDER BY 
+        total_events DESC

@@ -1,0 +1,20 @@
+TOKEN "read" READ
+
+NODE get_applications
+SQL >
+
+    SELECT 
+        event.data.client_id::String as client_id,
+        event.data.client_name::String as client_name,
+        count() as total_events,
+        min(event_time) as first_seen,
+        max(event_time) as last_seen
+    FROM auth0
+    WHERE 
+        event.data.client_id::String != ''
+        AND event.data.client_name::String != ''
+    GROUP BY 
+        event.data.client_id::String,
+        event.data.client_name::String
+    ORDER BY 
+        total_events DESC

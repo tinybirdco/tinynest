@@ -1,0 +1,18 @@
+TOKEN "read" READ
+
+NODE get_apis
+SQL >
+
+    SELECT 
+        event.data.audience::String as api_identifier,
+        count() as total_events,
+        min(event_time) as first_seen,
+        max(event_time) as last_seen
+    FROM auth0
+    WHERE 
+        event.data.audience::String != ''
+        AND event_type IN ('seccft', 'sertft')  -- Token issuance events
+    GROUP BY 
+        event.data.audience::String
+    ORDER BY 
+        total_events DESC
