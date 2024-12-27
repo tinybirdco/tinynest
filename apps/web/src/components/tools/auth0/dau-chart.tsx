@@ -34,7 +34,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function DauChart({ data, comparisonData, timeRange, className }: DauChartData) {
+export function DauChart({ data, timeRange, className }: DauChartData) {
     return (
         <Card>
             <CardHeader>

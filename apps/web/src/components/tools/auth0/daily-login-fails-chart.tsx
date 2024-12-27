@@ -8,9 +8,7 @@ import {
 } from "@/components/ui/card"
 import {
     ChartContainer,
-    ChartTooltip,
-    ChartConfig,
-    ChartTooltipContent
+    ChartConfig
 } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid } from "recharts"
 import { format } from "date-fns"

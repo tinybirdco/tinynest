@@ -39,7 +39,7 @@ export function DateRangePicker({
     to: endOfDay(new Date())
   })
   const [isOpen, setIsOpen] = useState(false)
-  const [tempFrom, setTempFrom] = useState<Date | null>(null)
+
   const [compareLastPeriod, setCompareLastPeriod] = useState(false)
 
   const handleRangeSelect = (range: DateRange | undefined) => {

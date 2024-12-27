@@ -23,12 +23,6 @@ import { Button } from "@/components/ui/button"
 import { UserRetentionChart, UserRetentionDataPoint } from './user-retention-chart'
 import { LogsTable } from './logs-table'
 
-interface ConversionData {
-    new_signups: number
-    active_new_users: number
-    conversion_rate: number
-}
-
 interface SummaryMetrics {
     total_users: number
     total_applications: number
@@ -41,26 +35,6 @@ interface SummaryMetrics {
 
 interface UsersResult {
     data: { total_users: number }[]
-}
-
-interface ApplicationsResult {
-    data: { total_applications: number }[]
-}
-
-interface ApisResult {
-    data: { total_apis: number }[]
-}
-
-interface ConnectionsResult {
-    data: { total_connections: number }[]
-}
-
-interface MonthlySignupsResult {
-    data: { monthly_signups: number }[]
-}
-
-interface MonthlyActiveUsersResult {
-    data: { active: number }[]
 }
 
 interface ConversionRateResult {
@@ -173,7 +147,6 @@ export default function Auth0Dashboard() {
                     conversionRateResult,
                     userRetentionTimeSeriesResult,
                     dauResult,
-                    dauComparisonResult,
                     authMechResult,
                     dailySignupsResult,
                     dailyLoginFailsResult,
