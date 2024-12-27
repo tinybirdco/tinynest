@@ -4,10 +4,12 @@ TAGS "auth0"
 
 NODE ep
 SQL >
-
+    %
     SELECT toDate(toStartOfDay(event_time)) as day, count() as signups
     FROM auth0
-    WHERE event_type = 'ss' and event_time >= now() - interval 30 days
+    WHERE event_type = 'ss'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
     GROUP BY day
     order by day asc
 

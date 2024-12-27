@@ -4,11 +4,13 @@ TAGS "auth0"
 
 NODE ep
 SQL >
-
+    %
     SELECT toStartOfDay(event_time)::Date as day, count(DISTINCT event.data.user_id) as active
     FROM auth0
-    where event_type == 's' and event_time >= now() - interval 30 days
-    group by day
-    order by day
+    WHERE event_type == 's' 
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    GROUP BY day
+    ORDER BY day
 
 
