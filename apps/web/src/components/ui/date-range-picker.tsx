@@ -34,18 +34,36 @@ export function DateRangePicker({
   className,
   initialDateRange,
 }: DateRangePickerProps) {
-  const [dateRange, setDateRange] = useState<DateRange>(initialDateRange)
+  const [dateRange, setDateRange] = useState<DateRange>(initialDateRange || {
+    from: startOfDay(new Date(new Date().setDate(new Date().getDate() - 7))),
+    to: endOfDay(new Date())
+  })
   const [isOpen, setIsOpen] = useState(false)
-  const [tempDate, setTempDate] = useState<Date | null>(null)
+  const [tempFrom, setTempFrom] = useState<Date | null>(null)
   const [compareLastPeriod, setCompareLastPeriod] = useState(false)
-  const [fromInput, setFromInput] = useState(format(initialDateRange.from, "yyyy-MM-dd HH:mm:ss"))
-  const [toInput, setToInput] = useState(format(initialDateRange.to, "yyyy-MM-dd HH:mm:ss"))
 
   const handleRangeSelect = (range: DateRange | undefined) => {
-    if (range?.from && range?.to) {
-      setDateRange(range)
+    if (!range?.from) return;
+
+    // If both dates are selected or no from date, start new selection
+    if ((dateRange.from && dateRange.to) || !dateRange.from) {
+      setDateRange({
+        from: startOfDay(range.from),
+        to: undefined
+      } as DateRange);
+      return;
     }
-  }
+
+    // If only from is selected, set to date
+    if (dateRange.from && !dateRange.to) {
+      const newDate = range.to;
+      setDateRange({
+        from: dateRange.from,
+        to: endOfDay(newDate)
+      });
+      return;
+    }
+  };
 
   const handlePresetClick = (days: number) => {
     const to = new Date()
@@ -59,9 +77,7 @@ export function DateRangePicker({
   }
 
   const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setFromInput(value)
-    
+    const value = e.target.value.replace('UTC ', '')
     const date = new Date(value)
     if (!isNaN(date.getTime())) {
       setDateRange(prev => ({
@@ -72,9 +88,7 @@ export function DateRangePicker({
   }
 
   const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setToInput(value)
-    
+    const value = e.target.value.replace('UTC ', '')
     const date = new Date(value)
     if (!isNaN(date.getTime())) {
       setDateRange(prev => ({
@@ -95,7 +109,8 @@ export function DateRangePicker({
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {format(dateRange.from, "MMM dd")} - {format(dateRange.to, "MMM dd")}
+          {dateRange.from ? format(dateRange.from, "MMM dd") : "Start"} - 
+          {dateRange.to ? format(dateRange.to, "MMM dd") : "End"}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
@@ -130,16 +145,12 @@ export function DateRangePicker({
               <div className="space-y-2">
                 <div>
                   <Label className="text-sm">From</Label>
-                  <div className="flex items-center">
-                    <span className="mr-2 text-sm text-muted-foreground">UTC</span>
-                    <Input
-                      type="text"
-                      value={fromInput}
-                      onChange={handleFromChange}
-                      className="rounded-md text-sm"
-                      placeholder="YYYY-MM-DD HH:mm:ss"
-                    />
-                  </div>
+                  <Input
+                    type="text"
+                    value={dateRange.from ? `UTC ${format(dateRange.from, "yyyy-MM-dd HH:mm:ss")}` : ""}
+                    onChange={handleFromChange}
+                    className="rounded-md text-sm"
+                  />
                 </div>
 
                 <div>
@@ -148,25 +159,17 @@ export function DateRangePicker({
                     <Button
                       variant="link"
                       className="h-auto p-0 text-xs text-black hover:text-black/80"
-                      onClick={() => {
-                        const now = new Date()
-                        setToInput(format(now, "yyyy-MM-dd HH:mm:ss"))
-                        setDateRange(prev => ({ ...prev, to: now }))
-                      }}
+                      onClick={() => setDateRange(prev => ({ ...prev, to: new Date() }))}
                     >
                       Set to latest
                     </Button>
                   </div>
-                  <div className="flex items-center">
-                    <span className="mr-2 text-sm text-muted-foreground">UTC</span>
-                    <Input
-                      type="text"
-                      value={toInput}
-                      onChange={handleToChange}
-                      className="rounded-md text-sm"
-                      placeholder="YYYY-MM-DD HH:mm:ss"
-                    />
-                  </div>
+                  <Input
+                    type="text"
+                    value={dateRange.to ? `UTC ${format(dateRange.to, "yyyy-MM-dd HH:mm:ss")}` : ""}
+                    onChange={handleToChange}
+                    className="rounded-md text-sm"
+                  />
                 </div>
 
                 <div className="flex items-center space-x-2 pt-2">
