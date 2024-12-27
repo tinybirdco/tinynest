@@ -36,7 +36,7 @@ export function DailySignupsChart({ data, timeRange }: DailySignupsChartData) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Daily Signups</CardTitle>
+                <CardTitle>Signups</CardTitle>
             </CardHeader>
             <CardContent className="">
                 <ChartContainer config={chartConfig} className="h-[400px] w-full">

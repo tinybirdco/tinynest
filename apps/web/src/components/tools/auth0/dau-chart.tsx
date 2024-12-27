@@ -37,7 +37,7 @@ export function DauChart({ data, comparisonData, timeRange }: DauChartData) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Daily Active Users</CardTitle>
+                <CardTitle>Active Users</CardTitle>
             </CardHeader>
             <CardContent className="">
                 <ChartContainer config={chartConfig} className="h-[400px] w-full">

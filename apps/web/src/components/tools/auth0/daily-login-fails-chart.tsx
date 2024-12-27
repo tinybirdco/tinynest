@@ -36,7 +36,7 @@ export function DailyLoginFailsChart({ data, timeRange }: DailyLoginFailsChartDa
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Daily Login Failures</CardTitle>
+                <CardTitle>Login Failures</CardTitle>
             </CardHeader>
             <CardContent className="">
                 <ChartContainer config={chartConfig} className="h-[400px] w-full">
