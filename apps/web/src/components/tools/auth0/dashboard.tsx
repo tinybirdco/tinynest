@@ -312,14 +312,24 @@ export default function Auth0Dashboard() {
 
             {/* Charts Grid */}
             <div className="grid gap-4 grid-cols-1">
-                <DauChart data={dauData} />
+                <DauChart 
+                    data={dauData} 
+                    comparisonData={dateRange.compareMode ? dauComparisonData : undefined}
+                    timeRange={timeRange}
+                />
             </div>
             <div className="grid gap-4 md:grid-cols-1 xl:grid-cols-2">
                 <AuthMechChart data={authMechData} />
-                <DailySignupsChart data={dailySignupsData} />
+                <DailySignupsChart 
+                    data={dailySignupsData}
+                    timeRange={timeRange}
+                />
             </div>
             <div className="grid gap-4 grid-cols-1">
-                <DailyLoginFailsChart data={dailyLoginFailsData} />
+                <DailyLoginFailsChart 
+                    data={dailyLoginFailsData}
+                    timeRange={timeRange}
+                />
             </div>
         </div>
     )

@@ -13,6 +13,7 @@ import {
     ChartTooltipContent
 } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis } from "recharts"
+import { format } from "date-fns"
 
 export interface DailyLoginFailsDataPoint {
     day: string
@@ -21,6 +22,7 @@ export interface DailyLoginFailsDataPoint {
 
 export interface DailyLoginFailsChartData {
     data: DailyLoginFailsDataPoint[]
+    timeRange: 'hourly' | 'daily' | 'monthly'
 }
 
 const chartConfig = {
@@ -30,11 +32,11 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function DailyLoginFailsChart({ data }: DailyLoginFailsChartData) {
+export function DailyLoginFailsChart({ data, timeRange }: DailyLoginFailsChartData) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Daily Login Fails</CardTitle>
+                <CardTitle>Daily Login Failures</CardTitle>
             </CardHeader>
             <CardContent className="">
                 <ChartContainer config={chartConfig} className="h-[400px] w-full">
@@ -53,9 +55,14 @@ export function DailyLoginFailsChart({ data }: DailyLoginFailsChartData) {
                             axisLine={false}
                             tickMargin={8}
                             interval="equidistantPreserveStart"
-                            tickFormatter={(value) => value.split('-')[2]}
+                            tickFormatter={(value) => {
+                                const date = new Date(value)
+                                return timeRange === 'monthly' 
+                                    ? format(date, 'MMM yyyy')
+                                    : value.split('-')[2]
+                            }}
                             label={{
-                                value: "Day of Month",
+                                value: timeRange === 'monthly' ? "Month of Year" : "Day of Month",
                                 position: "bottom",
                                 offset: 20
                             }}

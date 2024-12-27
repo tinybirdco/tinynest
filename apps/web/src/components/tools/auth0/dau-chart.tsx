@@ -13,6 +13,7 @@ import {
     ChartTooltipContent
 } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis } from "recharts"
+import { format } from "date-fns"
 
 export interface DauDataPoint {
     day: string
@@ -21,6 +22,8 @@ export interface DauDataPoint {
 
 export interface DauChartData {
     data: DauDataPoint[]
+    comparisonData?: DauDataPoint[]
+    timeRange: 'hourly' | 'daily' | 'monthly'
 }
 
 const chartConfig = {
@@ -30,7 +33,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function DauChart({ data }: DauChartData) {
+export function DauChart({ data, comparisonData, timeRange }: DauChartData) {
     return (
         <Card>
             <CardHeader>
@@ -53,9 +56,14 @@ export function DauChart({ data }: DauChartData) {
                             axisLine={false}
                             tickMargin={8}
                             interval="equidistantPreserveStart"
-                            tickFormatter={(value) => value.split('-')[2]}
+                            tickFormatter={(value) => {
+                                const date = new Date(value)
+                                return timeRange === 'monthly' 
+                                    ? format(date, 'MMM yyyy')
+                                    : value.split('-')[2]
+                            }}
                             label={{
-                                value: "Day of Month",
+                                value: timeRange === 'monthly' ? "Month of Year" : "Day of Month",
                                 position: "bottom",
                                 offset: 20
                             }}

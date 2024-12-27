@@ -13,6 +13,7 @@ import {
     ChartTooltipContent
 } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis } from "recharts"
+import { format } from "date-fns"
 
 export interface DailySignupsDataPoint {
     day: string
@@ -21,6 +22,7 @@ export interface DailySignupsDataPoint {
 
 export interface DailySignupsChartData {
     data: DailySignupsDataPoint[]
+    timeRange: 'hourly' | 'daily' | 'monthly'
 }
 
 const chartConfig = {
@@ -30,14 +32,14 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function DailySignupsChart({ data }: DailySignupsChartData) {
+export function DailySignupsChart({ data, timeRange }: DailySignupsChartData) {
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Daily Signups</CardTitle>
             </CardHeader>
             <CardContent className="">
-                <ChartContainer config={chartConfig} >
+                <ChartContainer config={chartConfig} className="h-[400px] w-full">
                     <LineChart
                         data={data}
                         margin={{
@@ -53,9 +55,14 @@ export function DailySignupsChart({ data }: DailySignupsChartData) {
                             axisLine={false}
                             tickMargin={8}
                             interval="equidistantPreserveStart"
-                            tickFormatter={(value) => value.split('-')[2]}
+                            tickFormatter={(value) => {
+                                const date = new Date(value)
+                                return timeRange === 'monthly' 
+                                    ? format(date, 'MMM yyyy')
+                                    : value.split('-')[2]
+                            }}
                             label={{
-                                value: "Day of Month",
+                                value: timeRange === 'monthly' ? "Month of Year" : "Day of Month",
                                 position: "bottom",
                                 offset: 20
                             }}
