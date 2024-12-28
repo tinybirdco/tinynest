@@ -1,0 +1,14 @@
+TOKEN "read" READ
+
+TAGS "stripe"
+
+NODE ep
+SQL >
+
+    SELECT
+        countIf(event_type == 'customer.subscription.created') as created,
+        countIf(event_type == 'customer.subscription.deleted') as deleted
+    FROM stripe
+    where event_type = 'customer.subscription.created' or event_type = 'customer.subscription.deleted'
+
+
