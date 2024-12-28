@@ -3,7 +3,7 @@
 import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { pipe } from '@/lib/tinybird'
-import MetricCard from './metric'
+import MetricCard from '@/components/metric'
 import { DauChart, DauDataPoint } from './dau-chart'
 import { AuthMechChart, AuthMechDataPoint } from './auth-mech-chart'
 import { DailySignupsChart, DailySignupsDataPoint } from './daily-signups-chart'
