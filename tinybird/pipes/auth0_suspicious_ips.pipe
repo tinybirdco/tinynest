@@ -1,0 +1,41 @@
+TOKEN "read" READ
+
+TAGS "auth0"
+
+NODE suspicious_ips
+SQL >
+    %
+    SELECT 
+        event.data.ip::String as ip,
+        count(*) as failed_attempts,
+        min(event_time) as first_attempt,
+        max(event_time) as last_attempt,
+        -- User agent can help identify automated attacks
+        arrayStringConcat(groupArray(distinct event.data.user_agent::String), ', ') as user_agents,
+        -- Connection type shows authentication method being attacked
+        arrayStringConcat(groupArray(distinct event.data.connection::String), ', ') as connections,
+        -- Client/Application being targeted
+        arrayStringConcat(groupArray(distinct event.data.client_name::String), ', ') as client_names,
+        -- Error descriptions can show attack patterns
+        arrayStringConcat(groupArray(distinct event.data.description::String), ', ') as error_descriptions,
+        -- Track the hostnames being targeted
+        arrayStringConcat(groupArray(distinct event.data.hostname::String), ', ') as hostnames,
+        arrayStringConcat(groupArray(distinct event_type), ', ') as event_types
+    FROM auth0
+    WHERE 1
+        AND event_type IN ('fp', 'fcpr', 'f')
+        AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+        AND event_time <= {{DateTime(date_to, '2024-01-01 23:59:59')}}
+        {% if defined(tenant_name) and tenant_name != 'all' %}
+            AND event.data.tenant_name::String = {{String(tenant_name)}}
+        {% end %}
+        {% if defined(client_id) and client_id != 'all' %}
+            AND event.data.client_id::String = {{String(client_id)}}
+        {% end %}
+        {% if defined(connection_id) and connection_id != 'all' %}
+            AND event.data.connection_id::String = {{String(connection_id)}}
+        {% end %}
+    GROUP BY ip
+    HAVING failed_attempts >= {{Int16(min_failures, 5)}}
+    ORDER BY failed_attempts DESC
+    LIMIT {{Int32(limit, 100)}} 

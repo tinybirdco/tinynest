@@ -44,7 +44,7 @@ export function AuthMechChart({ data, className }: AuthMechChartData) {
                 <ChartContainer config={chartConfig} className={`w-full ${className}`}>
                     <BarChart
                         data={sortedData}
-                        layout="horizontal"
+                        layout="vertical"
                         margin={{
                             left: 24,
                             right: 12,
@@ -52,13 +52,13 @@ export function AuthMechChart({ data, className }: AuthMechChartData) {
                             bottom: 12,
                         }}
                     >
-                        <YAxis
+                        <XAxis
                             type="number"
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
                         />
-                        <XAxis
+                        <YAxis
                             type="category"
                             dataKey="mech"
                             tickLine={false}

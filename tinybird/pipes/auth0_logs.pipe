@@ -23,6 +23,9 @@ SQL >
         {% if defined(event_type) %}
             AND event_type = {{String(event_type)}}
         {% end %}
+        {% if defined(tenant_name) and tenant_name != 'all' %}
+            AND event.data.tenant_name::String = {{String(tenant_name)}}
+        {% end %}
         and event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
         and event_time <= {{DateTime(date_to, '2024-01-01 23:59:59')}}
         order by event_time desc

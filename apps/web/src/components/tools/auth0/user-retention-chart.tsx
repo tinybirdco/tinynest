@@ -7,6 +7,8 @@ import {
 import {
     ChartContainer,
     ChartConfig,
+    ChartTooltip,
+    ChartTooltipContent
 } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid } from "recharts"
 import { format } from "date-fns"
@@ -23,7 +25,7 @@ export interface UserRetentionChartData {
 }
 
 const chartConfig = {
-    conversion: {
+    user_retention: {
         color: "hsl(var(--primary))",
         label: "User Retention",
     },
@@ -82,14 +84,20 @@ export function UserRetentionChart({ data, timeRange, className }: UserRetention
                                 offset: 32
                             }}
                         />
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent 
+                            indicator="dot" />}
+                        />
                         <Line
                             type="monotone"
                             dataKey="user_retention"
                             strokeWidth={2}
-                            dot={false}
+                            dot={true}
                             style={{
                                 stroke: "hsl(var(--primary))",
                             }}
+                            activeDot={{ fill: "hsl(var(--primary))", stroke: "hsl(var(--primary))" }}
                         />
                     </LineChart>
                 </ChartContainer>

@@ -92,10 +92,11 @@ export function DailySignupsChart({ data, timeRange, className }: DailySignupsCh
                             type="monotone"
                             dataKey="signups"
                             strokeWidth={2}
-                            dot={false}
+                            dot={true}
                             style={{
                                 stroke: "hsl(var(--primary))",
                             }}
+                            activeDot={{ fill: "hsl(var(--primary))", stroke: "hsl(var(--primary))" }}
                         />
                     </LineChart>
                 </ChartContainer>

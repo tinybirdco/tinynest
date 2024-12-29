@@ -1,0 +1,17 @@
+TOKEN "read" READ
+
+TAGS "auth0"
+
+NODE distinct_tenants
+SQL >
+    %
+    SELECT 
+        event.data.tenant_name::String as tenant_name
+    FROM auth0
+    WHERE 1
+        AND event.data.tenant_name IS NOT NULL
+        {% if defined(event_type) %}
+            AND event_type = {{String(event_type)}}
+        {% end %}
+    GROUP BY tenant_name
+    ORDER BY tenant_name

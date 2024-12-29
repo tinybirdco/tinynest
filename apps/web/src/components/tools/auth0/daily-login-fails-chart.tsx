@@ -8,7 +8,9 @@ import {
 } from "@/components/ui/card"
 import {
     ChartContainer,
-    ChartConfig
+    ChartConfig,
+    ChartTooltip,
+    ChartTooltipContent
 } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid } from "recharts"
 import { format } from "date-fns"
@@ -82,14 +84,19 @@ export function DailyLoginFailsChart({ data, timeRange, className }: DailyLoginF
                                 offset: 32
                             }}
                         />
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent indicator="dot" />}
+                        />
                         <Line
                             type="monotone"
                             dataKey="fails"
                             strokeWidth={2}
-                            dot={false}
+                            dot={true}
                             style={{
                                 stroke: "hsl(var(--primary))",
                             }}
+                            activeDot={{ fill: "hsl(var(--primary))", stroke: "hsl(var(--primary))" }}
                         />
                     </LineChart>
                 </ChartContainer>

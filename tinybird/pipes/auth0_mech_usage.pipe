@@ -16,6 +16,9 @@ SQL >
     {% if defined(connection_id) and connection_id != 'all' %}
         AND event.data.connection_id::String = {{String(connection_id)}}
     {% end %}
+    {% if defined(tenant_name) and tenant_name != 'all' %}
+        AND event.data.tenant_name::String = {{String(tenant_name)}}
+    {% end %}
     group by mech
     order by logins desc
 

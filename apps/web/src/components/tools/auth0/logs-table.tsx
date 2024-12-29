@@ -32,10 +32,12 @@ interface LogsTableProps {
     eventType?: string
     connection?: string
     clientName?: string
+    tenant?: string
   }) => void
   connections: Array<{ connection_id: string, connection_name: string }>
   applications: Array<{ client_id: string, client_name: string }>
   dateRange: DateRange
+  tenants: Array<{ tenant_name: string }>
 }
 
 const EVENT_TYPE_NAMES: Record<string, string> = {
@@ -126,7 +128,8 @@ export function LogsTable({
   onFiltersChange,
   connections,
   applications,
-  dateRange
+  dateRange,
+  tenants
 }: LogsTableProps) {
   const [sortField, setSortField] = useState<SortField>('event_time')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
@@ -173,6 +176,26 @@ export function LogsTable({
             {Object.entries(EVENT_TYPE_NAMES).map(([code, name]) => (
               <SelectItem key={code} value={code}>
                 {name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select 
+          onValueChange={(value) => 
+            onFiltersChange({ tenant: value })
+          }
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Tenant" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Tenants</SelectItem>
+            {tenants.map((tenant) => (
+              <SelectItem 
+                key={tenant.tenant_name} 
+                value={tenant.tenant_name}
+              >
+                {tenant.tenant_name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -224,7 +247,7 @@ export function LogsTable({
                   onClick={() => toggleSort('event_type')}
                   className="h-8 flex items-center gap-1"
                 >
-                  Type
+                  Event Type
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
               </TableHead>
@@ -271,18 +294,47 @@ export function LogsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedData.map((log) => (
-              <TableRow key={log.id}>
-                <TableCell className="whitespace-nowrap">{format(new Date(log.event_time), 'yyyy-MM-dd HH:mm:ss')}</TableCell>
-                <TableCell className="font-medium truncate max-w-[150px]">
-                  {EVENT_TYPE_NAMES[log.event_type] || log.event_type}
-                </TableCell>
-                <TableCell className="truncate max-w-[300px]">{log.description}</TableCell>
-                <TableCell className="font-mono text-xs truncate max-w-[200px]">{log.id}</TableCell>
-                <TableCell className="truncate max-w-[150px]">{log.connection || 'N/A'}</TableCell>
-                <TableCell className="truncate max-w-[150px]">{log.application || 'N/A'}</TableCell>
-              </TableRow>
-            ))}
+            {isLoading ? (
+                <TableRow>
+                    <TableCell colSpan={5} className="text-center">
+                        Loading...
+                    </TableCell>
+                </TableRow>
+            ) : data.length === 0 ? (
+                <TableRow>
+                    <TableCell colSpan={5} className="text-center">
+                        No results found
+                    </TableCell>
+                </TableRow>
+            ) : (
+                sortedData.map((log, index) => (
+                    <TableRow key={`${log.id}-${index}`}>
+                        <TableCell className="truncate max-w-[150px]" title={log.event_time}>
+                            {format(new Date(log.event_time), 'dd-MM-yyyy HH:mm:ss')}
+                        </TableCell>
+                        <TableCell 
+                            className="truncate max-w-[300px]" 
+                            title={log.event_type}
+                        >
+                            {EVENT_TYPE_NAMES[log.event_type] || log.event_type}
+                        </TableCell>
+                        <TableCell className="truncate max-w-[300px]" title={log.description}>{log.description}</TableCell>
+                        <TableCell className="truncate max-w-[200px]" title={log.id}>{log.id}</TableCell>
+                        <TableCell 
+                            className="truncate max-w-[200px]" 
+                            title={log.connection}
+                        >
+                            {log.connection}
+                        </TableCell>
+                        <TableCell 
+                            className="truncate max-w-[150px]" 
+                            title={log.application}
+                        >
+                            {log.application}
+                        </TableCell>
+                    </TableRow>
+                ))
+            )}
           </TableBody>
         </Table>
         {isLoading && (
