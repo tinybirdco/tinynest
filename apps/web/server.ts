@@ -61,8 +61,9 @@ app.prepare().then(() => {
         res.write(':\n\n')
         
         // Force flush the written data
-        if (typeof res.flush === 'function') {
-            res.flush();
+        const response = res as unknown as { flush?: () => void };
+        if (typeof response.flush === 'function') {
+            response.flush();
         }
         
         // Create client object
@@ -71,8 +72,9 @@ app.prepare().then(() => {
             try {
               console.log('Sending message to client:', data.substring(0, 100))
               res.write(`data: ${data}\n\n`)
-              if (typeof res.flush === 'function') {
-                  res.flush();
+              const response = res as unknown as { flush?: () => void };
+              if (typeof response.flush === 'function') {
+                  response.flush();
               }
             } catch (error) {
               console.error('Error sending message:', error)
@@ -89,8 +91,9 @@ app.prepare().then(() => {
         const keepAlive = setInterval(() => {
           try {
             res.write(':\n\n')
-            if (typeof res.flush === 'function') {
-                res.flush();
+            const response = res as unknown as { flush?: () => void };
+            if (typeof response.flush === 'function') {
+                response.flush();
             }
           } catch (error) {
             console.error('Error sending heartbeat:', error)
@@ -154,13 +157,7 @@ app.prepare().then(() => {
               }
             } else {
               // Forward message to MCPServer
-              await mcpServer.handleMessage(JSON.stringify(message), {
-                send: (response) => {
-                  for (const client of sseClients) {
-                    client.send(response);
-                  }
-                }
-              });
+              await mcpServer.handleMessage(JSON.stringify(message));
             }
             
             // Send HTTP response
@@ -186,11 +183,7 @@ app.prepare().then(() => {
         req.on('end', async () => {
           try {
             const message: JSONRPCMessage = JSON.parse(body)
-            await mcpServer.handleMessage(JSON.stringify(message), {
-              send: (response) => {
-                sseClients.forEach(client => client.send(response))
-              }
-            });
+            await mcpServer.handleMessage(JSON.stringify(message));
             res.writeHead(200)
             res.end()
           } catch (error) {

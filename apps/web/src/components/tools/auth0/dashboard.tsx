@@ -501,7 +501,7 @@ export default function Auth0Dashboard() {
                                 <CardTitle>Chat Assistant</CardTitle>
                                 <CollapsibleTrigger asChild>
                                     <Button variant="ghost" size="sm">
-                                        {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                                        <ChevronDown className="h-4 w-4" />
                                     </Button>
                                 </CollapsibleTrigger>
                             </div>
