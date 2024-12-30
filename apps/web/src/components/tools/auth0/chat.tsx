@@ -10,26 +10,31 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 export function Chat() {
     const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([])
     const [input, setInput] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
     const clientRef = useRef<MCPClient>(new MCPClient())
+    const initRef = useRef(false)
 
+    // Initialize MCP client
     useEffect(() => {
-        let isInitialized = false;
-
         const initClient = async () => {
-            if (isInitialized) return;
-            isInitialized = true;
+            if (initRef.current) return;
+            initRef.current = true;
             
             try {
                 await clientRef.current.start()
                 console.log('MCP client initialized')
             } catch (error) {
                 console.error('Failed to initialize MCP client:', error)
+                initRef.current = false; // Allow retry on error
             }
         }
 
         initClient()
-    }, [])
+
+        // Cleanup
+        return () => {
+            initRef.current = false;
+        }
+    }, []) // Empty dependency array
 
     const formatToolCall = (toolName: string, args: any): string => {
         return `\n[${toolName}] ${JSON.stringify(args, null, 2)}\n`;

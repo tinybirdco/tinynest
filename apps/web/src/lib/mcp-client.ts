@@ -4,7 +4,7 @@ import {
   CallToolResultSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { WebSocketClientTransport } from '@modelcontextprotocol/sdk/client/websocket.js';
+import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { Tool } from '@anthropic-ai/sdk/resources/index.mjs';
 import { Stream } from '@anthropic-ai/sdk/streaming.mjs';
 
@@ -23,60 +23,77 @@ type AnthropicMessage = {
 export type MessageCallback = (message: Message) => void;
 
 export class MCPClient {
+  private static instance: MCPClient | null = null;
+  private connecting: boolean = false;
   private anthropicClient: Anthropic;
   private messages: Message[] = [];
   private mcpClient: Client;
-  private transport: WebSocketClientTransport;
+  private transport: SSEClientTransport;
   private tools: Tool[] = [];
   private isConnected = false;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 3;
+  private eventSource: EventSource | null = null;
+  private messageHandlers: Set<(data: any) => void> = new Set();
 
   constructor() {
+    if (MCPClient.instance) {
+      return MCPClient.instance;
+    }
+    
     this.anthropicClient = new Anthropic({
       apiKey: process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY,
       dangerouslyAllowBrowser: true,
     });
+    
+    MCPClient.instance = this;
   }
 
   async start() {
+    if (this.isConnected || this.connecting) {
+      console.log('Already connected or connecting...');
+      return;
+    }
+
     try {
+      this.connecting = true;
       console.log('Connecting to MCP server...')
-      this.transport = new WebSocketClientTransport(
-        new URL('ws://localhost:3001')
-      )
+      const sseUrl = 'http://localhost:3000/events'
+      console.log('Attempting to connect to:', sseUrl)
       
+      this.transport = new SSEClientTransport(
+        new URL(sseUrl)
+      )
+
       this.mcpClient = new Client(
         { name: 'web-client', version: '1.0.0' },
         {
-        capabilities: {
-          jsonrpc: {
-            request_response: true,
-            notifications: true
+          capabilities: {
+            jsonrpc: {
+              request_response: true,
+              notifications: true
+            }
           }
         }
-      })
+      )
 
-      // Access underlying WebSocket
-      const ws = (this.transport as any).ws;
-      if (ws) {
-        ws.addEventListener('close', () => this.handleDisconnect());
-        ws.addEventListener('error', (error) => {
-          console.error('Transport error:', error);
-          this.handleDisconnect();
-        });
-      }
-
-      await this.mcpClient.connect(this.transport)
+      console.log('Connecting MCP client...')
+      await this.mcpClient.connect(this.transport);
+      
       this.isConnected = true;
       this.reconnectAttempts = 0;
       console.log('Connected to MCP server')
+      
+      console.log('Starting tools initialization...')
       await this.initMCPTools()
-      console.log('Initialized MCP tools')
+      console.log('Tools initialization complete')
     } catch (error) {
       console.error('Failed to connect to MCP server:', error)
+      this.isConnected = false;
       await this.handleDisconnect();
-      throw error
+      throw error;
+    } finally {
+      this.connecting = false;
     }
   }
 
@@ -94,18 +111,22 @@ export class MCPClient {
 
   private async initMCPTools() {
     try {
+      console.log('Requesting tools list...');
       const toolsResults = await this.mcpClient.request(
         { method: 'tools/list' },
         ListToolsResultSchema,
         { timeout: 120000 }  // 2 minutes timeout
-      )
+      );
+      console.log('Received tools:', toolsResults);
+      
       this.tools = toolsResults.tools.map(({ inputSchema, ...tool }) => ({
         ...tool,
         input_schema: inputSchema,
-      }))
+      }));
+      console.log('Tools initialized:', this.tools.length);
     } catch (error) {
-      console.error('Failed to initialize tools:', error)
-      throw error
+      console.error('Failed to initialize tools:', error);
+      throw error;
     }
   }
 
