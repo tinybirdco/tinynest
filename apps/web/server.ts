@@ -3,7 +3,6 @@ import { parse } from 'url'
 import next from 'next'
 import { MCPServer } from './src/lib/mcp-server'
 import { JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js'
-import cors from 'cors'
 
 const dev = process.env.NODE_ENV !== 'production'
 const hostname = 'localhost'
