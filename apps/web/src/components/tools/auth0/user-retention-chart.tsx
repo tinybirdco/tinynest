@@ -1,5 +1,3 @@
-"use client"
-
 import {
     Card,
     CardContent,
@@ -8,36 +6,36 @@ import {
 } from "@/components/ui/card"
 import {
     ChartContainer,
-    ChartTooltip,
     ChartConfig,
+    ChartTooltip,
     ChartTooltipContent
 } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid } from "recharts"
 import { format } from "date-fns"
 
-export interface DailySignupsDataPoint {
+export interface UserRetentionDataPoint {
     day: string
-    signups: number
+    user_retention: number
 }
 
-export interface DailySignupsChartData {
-    data: DailySignupsDataPoint[]
+export interface UserRetentionChartData {
+    data: UserRetentionDataPoint[]
     timeRange: 'hourly' | 'daily' | 'monthly'
     className?: string
 }
 
 const chartConfig = {
-    signups: {
+    user_retention: {
         color: "hsl(var(--primary))",
-        label: "Signups",
+        label: "User Retention",
     },
 } satisfies ChartConfig
 
-export function DailySignupsChart({ data, timeRange, className }: DailySignupsChartData) {
+export function UserRetentionChart({ data, timeRange, className }: UserRetentionChartData) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Signups</CardTitle>
+                <CardTitle>User Retention</CardTitle>
             </CardHeader>
             <CardContent className="">
                 <ChartContainer config={chartConfig} className={`w-full ${className}`}>
@@ -53,6 +51,7 @@ export function DailySignupsChart({ data, timeRange, className }: DailySignupsCh
                         <CartesianGrid 
                             horizontal={true}
                             vertical={false}
+                            strokeDasharray="3 3"
                             className="stroke-muted"
                         />
                         <XAxis
@@ -77,8 +76,9 @@ export function DailySignupsChart({ data, timeRange, className }: DailySignupsCh
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
+                            tickFormatter={(value) => `${value}%`}
                             label={{
-                                value: "Signups",
+                                value: "User Retention",
                                 angle: -90,
                                 position: "left",
                                 offset: 32
@@ -86,11 +86,12 @@ export function DailySignupsChart({ data, timeRange, className }: DailySignupsCh
                         />
                         <ChartTooltip
                             cursor={false}
-                            content={<ChartTooltipContent indicator="dot" />}
+                            content={<ChartTooltipContent 
+                            indicator="dot" />}
                         />
                         <Line
                             type="monotone"
-                            dataKey="signups"
+                            dataKey="user_retention"
                             strokeWidth={2}
                             dot={true}
                             style={{
@@ -103,4 +104,4 @@ export function DailySignupsChart({ data, timeRange, className }: DailySignupsCh
             </CardContent>
         </Card>
     )
-}
+} 

@@ -4,10 +4,21 @@ TAGS "auth0"
 
 NODE ep
 SQL >
-
+    %
     SELECT splitByChar('|', event.data.user_id::String)[1] as mech, count() as logins
     FROM auth0
-    where event_type == 's' and event_time >= now() - interval 30 days
+    where event_type == 's'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    {% if defined(client_id) and client_id != 'all' %}
+        AND event.data.client_id::String = {{String(client_id)}}
+    {% end %}
+    {% if defined(connection_id) and connection_id != 'all' %}
+        AND event.data.connection_id::String = {{String(connection_id)}}
+    {% end %}
+    {% if defined(tenant_name) and tenant_name != 'all' %}
+        AND event.data.tenant_name::String = {{String(tenant_name)}}
+    {% end %}
     group by mech
     order by logins desc
 

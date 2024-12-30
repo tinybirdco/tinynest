@@ -21,6 +21,7 @@ export interface AuthMechDataPoint {
 
 export interface AuthMechChartData {
     data: AuthMechDataPoint[]
+    className?: string
 }
 
 const chartConfig = {
@@ -30,7 +31,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function AuthMechChart({ data }: AuthMechChartData) {
+export function AuthMechChart({ data, className }: AuthMechChartData) {
     // Sort data by number of logins in descending order
     const sortedData = [...data].sort((a, b) => b.logins - a.logins)
 
@@ -40,7 +41,7 @@ export function AuthMechChart({ data }: AuthMechChartData) {
                 <CardTitle>Authentication Methods</CardTitle>
             </CardHeader>
             <CardContent>
-                <ChartContainer config={chartConfig}>
+                <ChartContainer config={chartConfig} className={`w-full ${className}`}>
                     <BarChart
                         data={sortedData}
                         layout="vertical"

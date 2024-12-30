@@ -1,8 +1,10 @@
 TOKEN "read" READ
 
+TAGS "auth0"
+
 NODE get_applications
 SQL >
-
+    %
     SELECT 
         event.data.client_id::String as client_id,
         event.data.client_name::String as client_name,
@@ -13,6 +15,12 @@ SQL >
     WHERE 
         event.data.client_id::String != ''
         AND event.data.client_name::String != ''
+        {% if defined(client_id) and client_id != 'all' %}
+            AND event.data.client_id::String = {{String(client_id)}}
+        {% end %}
+        {% if defined(connection_id) and connection_id != 'all' %}
+            AND event.data.connection_id::String = {{String(connection_id)}}
+        {% end %}
     GROUP BY 
         event.data.client_id::String,
         event.data.client_name::String

@@ -1,8 +1,10 @@
 TOKEN "read" READ
 
+TAGS "auth0"
+
 NODE get_apis
 SQL >
-
+    %
     SELECT 
         event.data.audience::String as api_identifier,
         count() as total_events,
@@ -12,6 +14,15 @@ SQL >
     WHERE 
         event.data.audience::String != ''
         AND event_type IN ('seccft', 'sertft')  -- Token issuance events
+        {% if defined(client_id) and client_id != 'all' %}
+            AND event.data.client_id::String = {{String(client_id)}}
+        {% end %}
+        {% if defined(connection_id) and connection_id != 'all' %}
+            AND event.data.connection_id::String = {{String(connection_id)}}
+        {% end %}
+        {% if defined(tenant_name) and tenant_name != 'all' %}
+            AND event.data.tenant_name::String = {{String(tenant_name)}}
+        {% end %}
     GROUP BY 
         event.data.audience::String
     ORDER BY 
