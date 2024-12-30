@@ -31,6 +31,7 @@ export class MCPClient {
   private transport: SSEClientTransport;
   private tools: Tool[] = [];
   private isConnected = false;
+  private firstMessage = true;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 3;
   private eventSource: EventSource | null = null;
@@ -80,6 +81,7 @@ export class MCPClient {
       console.log('Connecting MCP client...')
       await this.mcpClient.connect(this.transport);
       
+      this.firstMessage = true;
       this.isConnected = true;
       this.reconnectAttempts = 0;
       console.log('Connected to MCP server')
@@ -163,9 +165,15 @@ export class MCPClient {
 
         case 'message_delta':
           if (chunk.delta.stop_reason === 'tool_use') {
-            const toolArgs = currentToolInputString
-              ? JSON.parse(currentToolInputString)
-              : {};
+            let toolArgs = {};  
+            try {
+              toolArgs = currentToolInputString
+                ? JSON.parse(currentToolInputString)
+                : {};
+            } catch (error) {
+              console.error('Failed to parse tool arguments:', error, currentToolInputString);
+              toolArgs = {};
+            }
 
             // Send tool call as a message
             onMessage({ 
@@ -194,11 +202,20 @@ export class MCPClient {
               });
             }
 
-            const formattedResult = JSON.stringify(toolResult.content.flatMap((c) => c.text));
-            this.messages.push({
-              role: 'user',
-              content: formattedResult,
-            });
+            if (toolResult.content.some(c => c.text.includes('[Error]'))) {
+                this.messages.push({
+                  role: 'user',
+                  content: `Error executing query. Please fix the query and try again. Error: ${toolResult.content.map(c => c.text).join('\n')}`
+                });
+            } else {
+                const formattedResult = JSON.stringify(toolResult.content.flatMap((c) => c.text));
+                this.messages.push({
+                role: 'user',
+                content: formattedResult,
+                });
+
+            }
+            
 
             const nextStream = await this.anthropicClient.messages.create({
               messages: this.messages,
@@ -228,8 +245,11 @@ export class MCPClient {
       if (!this.isConnected) {
         await this.start();
       }
-      const prompt = "use the auth0 data source, do not use semicolons for queries, do not use JSONExtract instead use dots to access JSON nested attributes"
-      message = `${prompt}\n${message}`
+      if (this.firstMessage) {
+        const prompt = "use the auth0 data source, do not use semicolons for queries, do not use JSONExtract instead use dots to access JSON nested attributes. cast JSON nested attributes to its corresponding type this event.data.attribute::String. keep it simple and concise."
+        message = `${prompt}\n${message}`
+        this.firstMessage = false;
+      }
       this.messages.push({ role: 'user', content: message });
 
       const anthropicMessages: AnthropicMessage[] = this.messages.map(({ role, content }) => ({

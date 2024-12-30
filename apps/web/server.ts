@@ -135,7 +135,6 @@ app.prepare().then(() => {
             if (message.method === 'initialize') {
               // Find the client's SSE connection
               for (const client of sseClients) {
-                // Send initialization response through SSE
                 client.send(JSON.stringify({
                   jsonrpc: '2.0',
                   id: message.id,
@@ -155,36 +154,14 @@ app.prepare().then(() => {
                 }));
               }
             } else {
-              // Create a promise that will resolve when MCPServer sends a response
-              const responsePromise = new Promise((resolve) => {
-                const responseHandler = (response: any) => {
-                  console.log('Got response from MCPServer:', response);
-                  resolve(response);
-                };
-                
-                // Add the response handler to MCPServer
-                // mcpServer.once('response', responseHandler);
-                
-                // Forward message to MCPServer
-                mcpServer.handleMessage(message);
-              });
-
-              // Wait for response with timeout
-              const response = await Promise.race([
-                responsePromise,
-                new Promise((_, reject) => 
-                  setTimeout(() => reject(new Error('Response timeout')), 5000)
-                )
-              ]);
-
-              console.log('MCPServer response:', response);
-              
-              if (response) {
-                // Send response back through SSE
-                for (const client of sseClients) {
-                  client.send(JSON.stringify(response));
+              // Forward message to MCPServer
+              await mcpServer.handleMessage(JSON.stringify(message), {
+                send: (response) => {
+                  for (const client of sseClients) {
+                    client.send(response);
+                  }
                 }
-              }
+              });
             }
             
             // Send HTTP response

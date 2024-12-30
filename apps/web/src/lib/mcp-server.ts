@@ -1,9 +1,12 @@
 import { spawn } from 'child_process';
-import { WebSocket } from 'ws';
+
+interface MCPClient {
+  send: (message: string) => void;
+}
 
 export class MCPServer {
     private process: any;
-    private clients: Set<WebSocket> = new Set();
+    private clients: Set<MCPClient> = new Set();
     private isReady: boolean = false;
 
     async start() {
@@ -33,21 +36,21 @@ export class MCPServer {
         });
     }
 
-    addClient(ws: WebSocket) {
-        this.clients.add(ws);
+    addClient(client: MCPClient) {
+        this.clients.add(client);
     }
 
-    removeClient(ws: WebSocket) {
-        this.clients.delete(ws);
+    removeClient(client: MCPClient) {
+        this.clients.delete(client);
     }
 
-    async handleMessage(message: string, sender: WebSocket) {
+    async handleMessage(message: string, client: MCPClient) {
         // Forward message to MCP server process
         this.process.stdin.write(message + '\n');
 
         // Handle response from MCP server
         this.process.stdout.once('data', (data: Buffer) => {
-            sender.send(data.toString());
+            client.send(data.toString());
         });
     }
 
