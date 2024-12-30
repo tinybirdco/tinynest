@@ -18,7 +18,7 @@ SQL >
         max(event_time) as last_seen
     FROM auth0
     WHERE 
-        event.data.connection::String != '' and event.data.connection::String not like '%saml%'
+        event.data.connection::String != '' --and event.data.connection::String not like '%saml%'
         AND event.data.strategy::String != ''
         {% if defined(client_id) and client_id != 'all' %}
             AND event.data.client_id::String = {{String(client_id)}}
