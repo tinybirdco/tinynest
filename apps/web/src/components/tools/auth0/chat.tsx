@@ -37,7 +37,7 @@ export function Chat() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!input.trim() || isLoading) return
+        if (!input.trim()) return
 
         const userMessage = input.trim()
         setInput('')
@@ -50,8 +50,6 @@ export function Chat() {
         ])
         
         try {
-            setIsLoading(true)
-            
             const onMessage: MessageCallback = (message) => {
                 if (message.role === 'tool') {
                     const toolCall = formatToolCall(
@@ -66,11 +64,13 @@ export function Chat() {
                 setMessages(prev => [...prev.slice(0, -1), { ...assistantMessage }])
             }
             
-            await clientRef.current.sendMessage(userMessage, onMessage)
+            clientRef.current?.sendMessage(userMessage, onMessage).catch(error => {
+                console.error('Error sending message:', error)
+                assistantMessage.content += "\n\nSorry, there was an error. Please try again."
+                setMessages(prev => [...prev.slice(0, -1), { ...assistantMessage }])
+            })
         } catch (error) {
-            console.error('Error sending message:', error)
-        } finally {
-            setIsLoading(false)
+            console.error('Error in handleSubmit:', error)
         }
     }
 
@@ -107,11 +107,10 @@ export function Chat() {
                         <Input
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="Type a message..."
-                            disabled={isLoading}
+                            placeholder="Type your message..."
                         />
-                        <Button type="submit" disabled={!input.trim() || isLoading}>
-                            {isLoading ? 'Sending...' : 'Send'}
+                        <Button type="submit" disabled={!input.trim()}>
+                            Send
                         </Button>
                     </form>
                 </div>

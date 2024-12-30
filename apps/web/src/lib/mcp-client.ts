@@ -97,6 +97,7 @@ export class MCPClient {
       const toolsResults = await this.mcpClient.request(
         { method: 'tools/list' },
         ListToolsResultSchema,
+        { timeout: 120000 }  // 2 minutes timeout
       )
       this.tools = toolsResults.tools.map(({ inputSchema, ...tool }) => ({
         ...tool,
@@ -162,6 +163,7 @@ export class MCPClient {
                 },
               },
               CallToolResultSchema,
+              { timeout: 120000 }  // 2 minutes timeout
             );
 
             if (currentMessage) {
@@ -205,6 +207,8 @@ export class MCPClient {
       if (!this.isConnected) {
         await this.start();
       }
+      const prompt = "use the auth0 data source, do not use semicolons for queries, do not use JSONExtract instead use dots to access JSON nested attributes"
+      message = `${prompt}\n${message}`
       this.messages.push({ role: 'user', content: message });
 
       const anthropicMessages: AnthropicMessage[] = this.messages.map(({ role, content }) => ({
