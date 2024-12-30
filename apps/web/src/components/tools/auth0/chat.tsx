@@ -36,6 +36,7 @@ export function Chat() {
         }
     }, []) // Empty dependency array
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-
     const formatToolCall = (toolName: string, args: any): string => {
         return `\n[${toolName}] ${JSON.stringify(args, null, 2)}\n`;
     }
