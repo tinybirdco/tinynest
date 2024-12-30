@@ -94,14 +94,10 @@ export default function Auth0Dashboard() {
     const [topBrowsers, setTopBrowsers] = useState<Array<{
         browser: string
         request_count: number
-        unique_ips: number
-        event_types: string
     }>>([])
     const [topDevices, setTopDevices] = useState<Array<{
         device: string
         request_count: number
-        unique_ips: number
-        event_types: string
     }>>([])
     const [topDomains, setTopDomains] = useState<Array<{
         domain: string
@@ -215,10 +211,20 @@ export default function Auth0Dashboard() {
             setAuthMechData(authMechResult?.data ?? [])
             setDailySignupsData(dailySignupsResult?.data ?? [])
             setDailyLoginFailsData(dailyLoginFailsResult?.data ?? [])
-            setUserRetentionData(userRetentionTimeSeriesResult?.data ?? [])
-            setTopBrowsers(topBrowsersResult?.data ?? [])
-            setTopDevices(topDevicesResult?.data ?? [])
-            setTopDomains(topDomainsResult?.data ?? [])
+            setUserRetentionData(userRetentionTimeSeriesResult?.data as UserRetentionDataPoint[] ?? [])
+            setTopBrowsers(topBrowsersResult?.data as Array<{
+                browser: string
+                request_count: number
+            }> ?? [])
+            setTopDevices(topDevicesResult?.data as Array<{
+                device: string
+                request_count: number
+            }> ?? [])
+            setTopDomains(topDomainsResult?.data as Array<{
+                domain: string
+                request_count: number
+                unique_emails: number
+            }> ?? [])
             setLogs(logsResult?.data ?? [])
         } catch (error) {
             console.error('Failed to fetch metrics:', error)

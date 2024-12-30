@@ -1,11 +1,9 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartConfig, ChartTooltipContent } from '@/components/ui/chart'
 
 interface Browser {
     browser: string
     request_count: number
-    unique_ips: number
-    event_types: string
 }
 
 interface TopBrowsersChartProps {

@@ -1,10 +1,8 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts'
-import { Card } from '@/components/ui/card'
+import { BarChart, Bar, XAxis, YAxis } from 'recharts'
 import { ChartConfig, ChartTooltip, ChartTooltipContent, ChartContainer } from '@/components/ui/chart'
 interface Device {
     device: string
     request_count: number
-    event_types: string
 }
 
 interface TopDevicesChartProps {
