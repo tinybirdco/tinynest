@@ -9,6 +9,13 @@ import { Tool } from '@anthropic-ai/sdk/resources/index.mjs';
 import { Stream } from '@anthropic-ai/sdk/streaming.mjs';
 
 interface Message {
+  role: 'user' | 'assistant' | 'tool';
+  content: string;
+  toolName?: string;
+  toolArgs?: any;
+}
+
+type AnthropicMessage = {
   role: 'user' | 'assistant';
   content: string;
 }
@@ -21,39 +28,67 @@ export class MCPClient {
   private mcpClient: Client;
   private transport: WebSocketClientTransport;
   private tools: Tool[] = [];
+  private isConnected = false;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 3;
 
   constructor() {
     this.anthropicClient = new Anthropic({
       apiKey: process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY,
       dangerouslyAllowBrowser: true,
     });
-
-    this.mcpClient = new Client(
-      { name: 'web-client', version: '1.0.0' },
-      { capabilities: {
-        jsonrpc: {
-          request_response: true,
-          notifications: true
-        }
-      } },
-    );
-
-    // Connect to the local MCP server
-    this.transport = new WebSocketClientTransport(
-      new URL('ws://localhost:3001')
-    );
   }
 
   async start() {
     try {
       console.log('Connecting to MCP server...')
+      this.transport = new WebSocketClientTransport(
+        new URL('ws://localhost:3001')
+      )
+      
+      this.mcpClient = new Client(
+        { name: 'web-client', version: '1.0.0' },
+        {
+        capabilities: {
+          jsonrpc: {
+            request_response: true,
+            notifications: true
+          }
+        }
+      })
+
+      // Access underlying WebSocket
+      const ws = (this.transport as any).ws;
+      if (ws) {
+        ws.addEventListener('close', () => this.handleDisconnect());
+        ws.addEventListener('error', (error) => {
+          console.error('Transport error:', error);
+          this.handleDisconnect();
+        });
+      }
+
       await this.mcpClient.connect(this.transport)
+      this.isConnected = true;
+      this.reconnectAttempts = 0;
       console.log('Connected to MCP server')
       await this.initMCPTools()
       console.log('Initialized MCP tools')
     } catch (error) {
       console.error('Failed to connect to MCP server:', error)
+      await this.handleDisconnect();
       throw error
+    }
+  }
+
+  private async handleDisconnect() {
+    this.isConnected = false;
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+      await this.start();
+    } else {
+      console.error('Max reconnection attempts reached');
     }
   }
 
@@ -85,7 +120,6 @@ export class MCPClient {
       switch (chunk.type) {
         case 'message_start':
         case 'content_block_stop':
-        //   onMessage({ role: 'assistant', content: '\n\n' });
           continue;
 
         case 'content_block_start':
@@ -97,7 +131,6 @@ export class MCPClient {
         case 'content_block_delta':
           if (chunk.delta.type === 'text_delta') {
             currentMessage += chunk.delta.text;
-            // Send incremental updates
             onMessage({ role: 'assistant', content: chunk.delta.text });
           } else if (chunk.delta.type === 'input_json_delta') {
             if (currentToolName && chunk.delta.partial_json) {
@@ -111,6 +144,14 @@ export class MCPClient {
             const toolArgs = currentToolInputString
               ? JSON.parse(currentToolInputString)
               : {};
+
+            // Send tool call as a message
+            onMessage({ 
+              role: 'tool', 
+              content: '',
+              toolName: currentToolName,
+              toolArgs: toolArgs
+            });
 
             const toolResult = await this.mcpClient.request(
               {
@@ -148,6 +189,12 @@ export class MCPClient {
           break;
 
         case 'message_stop':
+          if (currentMessage) {
+            this.messages.push({
+              role: 'assistant',
+              content: currentMessage,
+            });
+          }
           break;
       }
     }
@@ -155,10 +202,18 @@ export class MCPClient {
 
   async sendMessage(message: string, onMessage: MessageCallback) {
     try {
+      if (!this.isConnected) {
+        await this.start();
+      }
       this.messages.push({ role: 'user', content: message });
 
+      const anthropicMessages: AnthropicMessage[] = this.messages.map(({ role, content }) => ({
+        role: role === 'tool' ? 'assistant' : role,
+        content
+      }));
+
       const stream = await this.anthropicClient.messages.create({
-        messages: this.messages,
+        messages: anthropicMessages,
         model: 'claude-3-5-sonnet-latest',
         max_tokens: 8192,
         tools: this.tools,
@@ -168,6 +223,9 @@ export class MCPClient {
       await this.processStream(stream, onMessage);
     } catch (error) {
       console.error('Error during message processing:', error);
+      if (error.message?.includes('timeout')) {
+        await this.handleDisconnect();
+      }
       throw error;
     }
   }

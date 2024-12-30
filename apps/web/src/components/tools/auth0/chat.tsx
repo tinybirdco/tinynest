@@ -31,31 +31,39 @@ export function Chat() {
         initClient()
     }, [])
 
+    const formatToolCall = (toolName: string, args: any): string => {
+        return `\n[${toolName}] ${JSON.stringify(args, null, 2)}\n`;
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!input.trim() || isLoading) return
 
         const userMessage = input.trim()
         setInput('')
-        setMessages(prev => [...prev, { role: 'user', content: userMessage }])
+        
+        // Create new assistant message
+        const assistantMessage = { role: 'assistant', content: '' }
+        setMessages(prev => [...prev, 
+            { role: 'user', content: userMessage },
+            assistantMessage
+        ])
         
         try {
             setIsLoading(true)
-            let currentMessage = { role: 'assistant', content: '' }
             
             const onMessage: MessageCallback = (message) => {
-                if (message.content === '\n\n') {
-                    setMessages(prev => [
-                        ...prev, message
-                    ])
-                    currentMessage.content = ''
+                if (message.role === 'tool') {
+                    const toolCall = formatToolCall(
+                        message.toolName || '', 
+                        message.toolArgs || {}
+                    )
+                    assistantMessage.content += toolCall
                 } else {
-                    currentMessage.content += message.content
-                    setMessages(prev => [
-                        ...prev.slice(0, -1), // Remove previous assistant message
-                        { ...currentMessage }  // Add updated message
-                    ])
+                    assistantMessage.content += message.content
                 }
+                
+                setMessages(prev => [...prev.slice(0, -1), { ...assistantMessage }])
             }
             
             await clientRef.current.sendMessage(userMessage, onMessage)
@@ -69,7 +77,7 @@ export function Chat() {
     return (
         <Card className="w-full">
             <CardHeader>
-                <CardTitle>Chat with Claude</CardTitle>
+                {/* <CardTitle>Chat with Claude</CardTitle> */}
             </CardHeader>
             <CardContent>
                 <div className="flex flex-col h-[500px]">
@@ -83,7 +91,7 @@ export function Chat() {
                                     }`}
                                 >
                                     <div
-                                        className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                                        className={`rounded-lg px-4 py-2 max-w-[80%] whitespace-pre-wrap ${
                                             message.role === 'user'
                                                 ? 'bg-primary text-primary-foreground'
                                                 : 'bg-muted'
