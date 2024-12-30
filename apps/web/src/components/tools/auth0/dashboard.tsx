@@ -31,6 +31,7 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { Chat } from './chat'
 
 interface SummaryMetrics {
     total_users: number
@@ -105,6 +106,7 @@ export default function Auth0Dashboard() {
         unique_emails: number
     }>>([])
     const [isDomainsOpen, setIsDomainsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
         async function fetchInitialData() {
@@ -490,6 +492,25 @@ export default function Auth0Dashboard() {
                     />
                 </CardContent>
             </Card>
+            <Collapsible>
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <CardTitle>Chat Assistant</CardTitle>
+                            <CollapsibleTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                    {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                                </Button>
+                            </CollapsibleTrigger>
+                        </div>
+                    </CardHeader>
+                    <CollapsibleContent>
+                        <CardContent>
+                            <Chat />
+                        </CardContent>
+                    </CollapsibleContent>
+                </Card>
+            </Collapsible>
             
         </div>
     )
