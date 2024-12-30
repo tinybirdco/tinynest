@@ -108,7 +108,6 @@ export default function Auth0Dashboard() {
         unique_emails: number
     }>>([])
     const [isDomainsOpen, setIsDomainsOpen] = useState(false)
-    const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
         async function fetchInitialData() {

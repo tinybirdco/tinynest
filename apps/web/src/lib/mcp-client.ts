@@ -1,4 +1,4 @@
-import { Anthropic, APIError } from '@anthropic-ai/sdk';
+import { Anthropic } from '@anthropic-ai/sdk';
 import {
   ListToolsResultSchema,
   CallToolResultSchema,
@@ -12,6 +12,7 @@ interface Message {
   role: 'user' | 'assistant' | 'tool';
   content: string;
   toolName?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   toolArgs?: any;
 }
 
@@ -35,6 +36,7 @@ export class MCPClient {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 3;
   private eventSource: EventSource | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private messageHandlers: Set<(data: any) => void> = new Set();
 
   constructor() {
@@ -250,6 +252,7 @@ export class MCPClient {
                             if (nextStream) {
                                 await this.processStream(nextStream, onMessage, depth + 1);
                             }
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         } catch (error: any) {
                             // Handle rate limits in nested stream creation
                             if (error.status === 429 || error.message?.includes('rate limit')) {
@@ -274,6 +277,7 @@ export class MCPClient {
                     break;
             }
         }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         // Check for rate limit errors
         if (error.status === 429 || error.message?.includes('rate limit')) {

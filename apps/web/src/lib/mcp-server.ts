@@ -25,6 +25,7 @@ export class MCPServer {
             
             // Get session ID from the endpoint event
             await new Promise<void>((resolve, reject) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 this.eventSource.addEventListener('endpoint', (event: any) => {
                     console.log('Received endpoint event:', event.data);
                     const match = event.data.match(/session_id=([^&]+)/);
@@ -60,7 +61,7 @@ export class MCPServer {
         }
     }
 
-    async handleMessage(message: string, client: MCPClient) {
+    async handleMessage(message: string) {
         if (!this.sessionId) {
             console.error('No session ID available');
             throw new Error('No session ID available');
