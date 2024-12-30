@@ -126,7 +126,7 @@ app.prepare().then(() => {
           body += chunk.toString();
         });
         
-        req.on('end', () => {
+        req.on('end', async () => {
           try {
             const message = JSON.parse(body);
             console.log('Received message:', message);
@@ -155,8 +155,36 @@ app.prepare().then(() => {
                 }));
               }
             } else {
-              // Forward all other messages to MCPServer
-              mcpServer.handleMessage(message);
+              // Create a promise that will resolve when MCPServer sends a response
+              const responsePromise = new Promise((resolve) => {
+                const responseHandler = (response: any) => {
+                  console.log('Got response from MCPServer:', response);
+                  resolve(response);
+                };
+                
+                // Add the response handler to MCPServer
+                // mcpServer.once('response', responseHandler);
+                
+                // Forward message to MCPServer
+                mcpServer.handleMessage(message);
+              });
+
+              // Wait for response with timeout
+              const response = await Promise.race([
+                responsePromise,
+                new Promise((_, reject) => 
+                  setTimeout(() => reject(new Error('Response timeout')), 5000)
+                )
+              ]);
+
+              console.log('MCPServer response:', response);
+              
+              if (response) {
+                // Send response back through SSE
+                for (const client of sseClients) {
+                  client.send(JSON.stringify(response));
+                }
+              }
             }
             
             // Send HTTP response
@@ -184,11 +212,9 @@ app.prepare().then(() => {
             const message: JSONRPCMessage = JSON.parse(body)
             await mcpServer.handleMessage(JSON.stringify(message), {
               send: (response) => {
-                sseClients.forEach(client => {
-                  client.send(response)
-                })
+                sseClients.forEach(client => client.send(response))
               }
-            })
+            });
             res.writeHead(200)
             res.end()
           } catch (error) {
