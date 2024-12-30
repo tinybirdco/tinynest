@@ -16,20 +16,15 @@ interface Message {
   toolArgs?: any;
 }
 
-type AnthropicMessage = {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
 export type MessageCallback = (message: Message) => void;
 
 export class MCPClient {
   private static instance: MCPClient | null = null;
   private connecting: boolean = false;
-  private anthropicClient: Anthropic;
+  private anthropicClient!: Anthropic;
   private messages: Message[] = [];
-  private mcpClient: Client;
-  private transport: SSEClientTransport;
+  private mcpClient!: Client;
+  private transport!: SSEClientTransport;
   private tools: Tool[] = [];
   private isConnected = false;
   private firstMessage = true;
@@ -215,10 +210,16 @@ export class MCPClient {
                             });
                         }
 
-                        if (toolResult.content.some(c => c.text.includes('[Error]'))) {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        if (toolResult.content.some((c: any) => c.type === 'text' && c.text?.includes('[Error]'))) {
                             this.messages.push({
                                 role: 'user',
-                                content: `Error executing query. Please fix the query and try again. Error: ${toolResult.content.map(c => c.text).join('\n')}`
+                                content: `Error executing query. Please fix the query and try again. Error: ${toolResult.content
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    .filter((c: any) => c.type === 'text')
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    .map((c: any) => c.text)
+                                    .join('\n')}`
                             });
                         } else {
                             const formattedResult = JSON.stringify(toolResult.content.flatMap((c) => c.text));
@@ -229,8 +230,13 @@ export class MCPClient {
                         }
 
                         try {
+                            const anthropicMessages = this.messages.map(({ role, content }) => ({
+                                role: role === 'tool' ? 'assistant' : role,
+                                content
+                            }));
+
                             const nextStream = await this.anthropicClient.messages.create({
-                                messages: this.messages,
+                                messages: anthropicMessages,
                                 model: 'claude-3-5-sonnet-latest',
                                 max_tokens: 8192,
                                 tools: this.tools,
@@ -312,7 +318,7 @@ export class MCPClient {
         }
         this.messages.push({ role: 'user', content: message });
 
-        const anthropicMessages: AnthropicMessage[] = this.messages.map(({ role, content }) => ({
+        const anthropicMessages = this.messages.map(({ role, content }) => ({
             role: role === 'tool' ? 'assistant' : role,
             content
         }));

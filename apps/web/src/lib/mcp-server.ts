@@ -8,7 +8,7 @@ interface MCPClient {
 export class MCPServer {
     private clients: Set<MCPClient> = new Set();
     private isReady: boolean = false;
-    private eventSource: EventSource;
+    private eventSource!: EventSource;
     private sessionId: string | null = null;
 
     async start() {
