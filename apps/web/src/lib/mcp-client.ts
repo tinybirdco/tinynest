@@ -1,4 +1,4 @@
-import { Anthropic } from '@anthropic-ai/sdk';
+import { Anthropic, APIError } from '@anthropic-ai/sdk';
 import {
   ListToolsResultSchema,
   CallToolResultSchema,
@@ -134,144 +134,220 @@ export class MCPClient {
 
   private async processStream(
     stream: Stream<Anthropic.Messages.RawMessageStreamEvent>,
-    onMessage: MessageCallback
+    onMessage: MessageCallback,
+    depth: number = 0  // Track recursion depth
   ): Promise<void> {
+    // Prevent too deep recursion
+    if (depth > 4) {
+        onMessage({
+            role: 'assistant',
+            content: 'Request too complex. Start a new chat with a more specific question.'
+        });
+        return;
+    }
+
     let currentMessage = '';
     let currentToolName = '';
     let currentToolInputString = '';
 
-    for await (const chunk of stream) {
-      switch (chunk.type) {
-        case 'message_start':
-        case 'content_block_stop':
-          continue;
+    try {
+        for await (const chunk of stream) {
+            switch (chunk.type) {
+                case 'message_start':
+                case 'content_block_stop':
+                    continue;
 
-        case 'content_block_start':
-          if (chunk.content_block?.type === 'tool_use') {
-            currentToolName = chunk.content_block.name;
-          }
-          break;
+                case 'content_block_start':
+                    if (chunk.content_block?.type === 'tool_use') {
+                        currentToolName = chunk.content_block.name;
+                    }
+                    break;
 
-        case 'content_block_delta':
-          if (chunk.delta.type === 'text_delta') {
-            currentMessage += chunk.delta.text;
-            onMessage({ role: 'assistant', content: chunk.delta.text });
-          } else if (chunk.delta.type === 'input_json_delta') {
-            if (currentToolName && chunk.delta.partial_json) {
-              currentToolInputString += chunk.delta.partial_json;
+                case 'content_block_delta':
+                    if (chunk.delta.type === 'text_delta') {
+                        currentMessage += chunk.delta.text;
+                        onMessage({ role: 'assistant', content: chunk.delta.text });
+                    } else if (chunk.delta.type === 'input_json_delta') {
+                        if (currentToolName && chunk.delta.partial_json) {
+                            currentToolInputString += chunk.delta.partial_json;
+                        }
+                    }
+                    break;
+
+                case 'message_delta':
+                    if (chunk.delta.stop_reason === 'tool_use') {
+                        let toolArgs = {};  
+                        try {
+                            toolArgs = currentToolInputString
+                                ? JSON.parse(currentToolInputString)
+                                : {};
+                        } catch (error) {
+                            console.error('Failed to parse tool arguments:', error, currentToolInputString);
+                            toolArgs = {};
+                        }
+
+                        // Send tool call as a message
+                        onMessage({ 
+                            role: 'tool', 
+                            content: '',
+                            toolName: currentToolName,
+                            toolArgs: toolArgs
+                        });
+
+                        const toolResult = await this.mcpClient.request(
+                            {
+                                method: 'tools/call',
+                                params: {
+                                    name: currentToolName,
+                                    arguments: toolArgs,
+                                },
+                            },
+                            CallToolResultSchema,
+                            { timeout: 120000 }  // 2 minutes timeout
+                        );
+
+                        if (currentMessage) {
+                            this.messages.push({
+                                role: 'assistant',
+                                content: currentMessage,
+                            });
+                        }
+
+                        if (toolResult.content.some(c => c.text.includes('[Error]'))) {
+                            this.messages.push({
+                                role: 'user',
+                                content: `Error executing query. Please fix the query and try again. Error: ${toolResult.content.map(c => c.text).join('\n')}`
+                            });
+                        } else {
+                            const formattedResult = JSON.stringify(toolResult.content.flatMap((c) => c.text));
+                            this.messages.push({
+                                role: 'user',
+                                content: formattedResult,
+                            });
+                        }
+
+                        try {
+                            const nextStream = await this.anthropicClient.messages.create({
+                                messages: this.messages,
+                                model: 'claude-3-5-sonnet-latest',
+                                max_tokens: 8192,
+                                tools: this.tools,
+                                stream: true,
+                            }).catch(async (err) => {
+                                if (err instanceof Anthropic.APIError) {
+                                    console.log('Anthropic API Error in tool use:', err.status, err.name);
+                                    if (err.status === 429) {
+                                        onMessage({
+                                            role: 'assistant',
+                                            content: 'Rate limit exceeded. Please wait a moment before sending more messages.'
+                                        });
+                                        return null;
+                                    }
+                                }
+                                throw err;
+                            });
+
+                            if (nextStream) {
+                                await this.processStream(nextStream, onMessage, depth + 1);
+                            }
+                        } catch (error: any) {
+                            // Handle rate limits in nested stream creation
+                            if (error.status === 429 || error.message?.includes('rate limit')) {
+                                onMessage({
+                                    role: 'assistant',
+                                    content: 'Rate limit exceeded. Please wait a moment before sending more messages.'
+                                });
+                                return;
+                            }
+                            throw error;
+                        }
+                    }
+                    break;
+
+                case 'message_stop':
+                    if (currentMessage) {
+                        this.messages.push({
+                            role: 'assistant',
+                            content: currentMessage,
+                        });
+                    }
+                    break;
             }
-          }
-          break;
-
-        case 'message_delta':
-          if (chunk.delta.stop_reason === 'tool_use') {
-            let toolArgs = {};  
-            try {
-              toolArgs = currentToolInputString
-                ? JSON.parse(currentToolInputString)
-                : {};
-            } catch (error) {
-              console.error('Failed to parse tool arguments:', error, currentToolInputString);
-              toolArgs = {};
-            }
-
-            // Send tool call as a message
-            onMessage({ 
-              role: 'tool', 
-              content: '',
-              toolName: currentToolName,
-              toolArgs: toolArgs
-            });
-
-            const toolResult = await this.mcpClient.request(
-              {
-                method: 'tools/call',
-                params: {
-                  name: currentToolName,
-                  arguments: toolArgs,
-                },
-              },
-              CallToolResultSchema,
-              { timeout: 120000 }  // 2 minutes timeout
-            );
-
-            if (currentMessage) {
-              this.messages.push({
+        }
+    } catch (error: any) {
+        // Check for rate limit errors
+        if (error.status === 429 || error.message?.includes('rate limit')) {
+            onMessage({
                 role: 'assistant',
-                content: currentMessage,
-              });
-            }
-
-            if (toolResult.content.some(c => c.text.includes('[Error]'))) {
-                this.messages.push({
-                  role: 'user',
-                  content: `Error executing query. Please fix the query and try again. Error: ${toolResult.content.map(c => c.text).join('\n')}`
-                });
-            } else {
-                const formattedResult = JSON.stringify(toolResult.content.flatMap((c) => c.text));
-                this.messages.push({
-                role: 'user',
-                content: formattedResult,
-                });
-
-            }
-            
-
-            const nextStream = await this.anthropicClient.messages.create({
-              messages: this.messages,
-              model: 'claude-3-5-sonnet-latest',
-              max_tokens: 8192,
-              tools: this.tools,
-              stream: true,
+                content: 'Rate limit exceeded. Please wait a moment before sending more messages.'
             });
-            await this.processStream(nextStream, onMessage);
-          }
-          break;
-
-        case 'message_stop':
-          if (currentMessage) {
-            this.messages.push({
-              role: 'assistant',
-              content: currentMessage,
-            });
-          }
-          break;
-      }
+            // Cancel the stream
+            stream.controller.abort();
+            return;
+        }
+        
+        // Handle other errors
+        console.error('Error in processStream:', error);
+        onMessage({
+            role: 'assistant',
+            content: 'An error occurred while processing your request. Please try again.'
+        });
+        throw error;
     }
   }
 
   async sendMessage(message: string, onMessage: MessageCallback) {
     try {
-      if (!this.isConnected) {
-        await this.start();
-      }
-      if (this.firstMessage) {
-        const prompt = "use the auth0 data source, do not use semicolons for queries, do not use JSONExtract instead use dots to access JSON nested attributes. cast JSON nested attributes to its corresponding type this event.data.attribute::String. keep it simple and concise."
-        message = `${prompt}\n${message}`
-        this.firstMessage = false;
-      }
-      this.messages.push({ role: 'user', content: message });
+        if (!this.isConnected) {
+            await this.start();
+        }
+        if (this.firstMessage) {
+            const prompt = "you MUST keep output tokens to minimal but answering the question. use the auth0 data source, do not use semicolons for queries, do not use JSONExtract instead use dots to access JSON nested attributes. cast JSON nested attributes to its corresponding type this event.data.attribute::String. keep it simple and concise. do not append-insights"
+            message = `${prompt}\n${message}`
+            this.firstMessage = false;
+        }
+        this.messages.push({ role: 'user', content: message });
 
-      const anthropicMessages: AnthropicMessage[] = this.messages.map(({ role, content }) => ({
-        role: role === 'tool' ? 'assistant' : role,
-        content
-      }));
+        const anthropicMessages: AnthropicMessage[] = this.messages.map(({ role, content }) => ({
+            role: role === 'tool' ? 'assistant' : role,
+            content
+        }));
 
-      const stream = await this.anthropicClient.messages.create({
-        messages: anthropicMessages,
-        model: 'claude-3-5-sonnet-latest',
-        max_tokens: 8192,
-        tools: this.tools,
-        stream: true,
-      });
+        const stream = await this.anthropicClient.messages.create({
+            messages: anthropicMessages,
+            model: 'claude-3-5-sonnet-latest',
+            max_tokens: 8192,
+            tools: this.tools,
+            stream: true,
+        }).catch(async (err) => {
+            if (err instanceof Anthropic.APIError) {
+                console.log('Anthropic API Error:', err.status, err.name);
+                if (err.status === 429) {
+                    onMessage({
+                        role: 'assistant',
+                        content: 'Rate limit exceeded. Please wait a moment before sending more messages.'
+                    });
+                    return null;
+                }
+            }
+            throw err;
+        });
 
-      await this.processStream(stream, onMessage);
+        if (stream) {
+            await this.processStream(stream, onMessage, 0);
+        }
     } catch (error) {
-      console.error('Error during message processing:', error);
-      if (error.message?.includes('timeout')) {
-        await this.handleDisconnect();
-      }
-      throw error;
+        console.error('Error during message processing:', error);
+        if (error instanceof Anthropic.APIError) {
+            if (error.status === 429) {
+                onMessage({
+                    role: 'assistant',
+                    content: 'Rate limit exceeded. Please wait a moment before sending more messages.'
+                });
+                return;
+            }
+        }
+        throw error;
     }
   }
 } 
