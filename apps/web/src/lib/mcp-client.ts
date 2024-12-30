@@ -302,7 +302,7 @@ export class MCPClient {
             await this.start();
         }
         if (this.firstMessage) {
-            const prompt = "you MUST keep output tokens to minimal but answering the question. use the auth0 data source, do not use semicolons for queries, do not use JSONExtract instead use dots to access JSON nested attributes. cast JSON nested attributes to its corresponding type this event.data.attribute::String. keep it simple and concise. do not append-insights"
+            const prompt = "you MUST keep output tokens to minimal. Follow this process: 1. get sample data from auth0 data source 2. guess schema looking at the data and remember the nested attributes names 3. build a query to answer the question 4. if the query fails ask for confirmation before run-select-query again. RULES: DO NOT use semicolons for queries, DO NOT use JSONExtract instead use dots to access JSON nested attributes. cast JSON nested attributes to its corresponding type this event.data.attribute::String. keep it simple and concise. do not append-insights. answer the question in a single sentence."
             message = `${prompt}\n${message}`
             this.firstMessage = false;
         }

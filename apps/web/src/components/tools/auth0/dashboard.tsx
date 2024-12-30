@@ -33,6 +33,8 @@ import {
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { Chat } from './chat'
 
+const ANTHROPIC_API_KEY = process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY;
+
 interface SummaryMetrics {
     total_users: number
     total_applications: number
@@ -492,25 +494,27 @@ export default function Auth0Dashboard() {
                     />
                 </CardContent>
             </Card>
-            <Collapsible>
-                <Card>
-                    <CardHeader>
-                        <div className="flex items-center justify-between">
-                            <CardTitle>Chat Assistant</CardTitle>
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                    {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                                </Button>
-                            </CollapsibleTrigger>
-                        </div>
-                    </CardHeader>
-                    <CollapsibleContent>
-                        <CardContent>
-                            <Chat />
-                        </CardContent>
-                    </CollapsibleContent>
-                </Card>
-            </Collapsible>
+            {ANTHROPIC_API_KEY && (
+                <Collapsible>
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
+                                <CardTitle>Chat Assistant</CardTitle>
+                                <CollapsibleTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                        {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                                    </Button>
+                                </CollapsibleTrigger>
+                            </div>
+                        </CardHeader>
+                        <CollapsibleContent>
+                            <CardContent>
+                                <Chat />
+                            </CardContent>
+                        </CollapsibleContent>
+                    </Card>
+                </Collapsible>
+            )}
             
         </div>
     )
