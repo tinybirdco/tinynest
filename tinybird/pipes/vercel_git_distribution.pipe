@@ -6,8 +6,8 @@ SQL >
     %
     SELECT 
         multiIf(
-            event.payload.deployment.meta.githubRepo != '', 'GitHub',
-            event.payload.deployment.meta.gitlabProjectRepo != '', 'GitLab',
+            event.payload.deployment.meta.githubRepo::String != '', 'GitHub',
+            event.payload.deployment.meta.gitlabProjectRepo::String != '', 'GitLab',
             'Other'
         ) as source,
         count() as deployments,

@@ -19,8 +19,8 @@ SQL >
     FROM (
         SELECT 
             coalesce(
-                event.payload.deployment.meta.githubCommitMessage,
-                event.payload.deployment.meta.gitlabCommitMessage
+                event.payload.deployment.meta.githubCommitMessage::String,
+                event.payload.deployment.meta.gitlabCommitMessage::String
             ) as message
         FROM vercel_logs
         WHERE event_type = 'deployment.created'

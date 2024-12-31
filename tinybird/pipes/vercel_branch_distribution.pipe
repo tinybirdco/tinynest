@@ -6,8 +6,8 @@ SQL >
     %
     SELECT 
         coalesce(
-            event.payload.deployment.meta.githubCommitRef,
-            event.payload.deployment.meta.gitlabCommitRef
+            event.payload.deployment.meta.githubCommitRef::String,
+            event.payload.deployment.meta.gitlabCommitRef::String
         ) as branch,
         count() as deployments,
         round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
