@@ -1,0 +1,27 @@
+NODE commit_types
+SQL >
+    SELECT 
+        multiIf(
+            lower(message) LIKE '%fix%', 'fix',
+            lower(message) LIKE '%feat%', 'feature',
+            lower(message) LIKE '%docs%', 'docs',
+            lower(message) LIKE '%refactor%', 'refactor',
+            lower(message) LIKE '%test%', 'test',
+            lower(message) LIKE '%chore%', 'chore',
+            'other'
+        ) as commit_type,
+        count() as count,
+        round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+    FROM (
+        SELECT 
+            coalesce(
+                event.payload.deployment.meta.githubCommitMessage,
+                event.payload.deployment.meta.gitlabCommitMessage
+            ) as message
+        FROM vercel_logs
+        WHERE event_type = 'deployment.created'
+        AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+        AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    )
+    GROUP BY commit_type
+    ORDER BY count DESC 

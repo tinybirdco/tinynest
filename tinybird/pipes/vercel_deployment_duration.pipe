@@ -1,0 +1,30 @@
+NODE deployment_duration
+SQL >
+    SELECT 
+        {% if defined(time_range) %}
+            {% if time_range == 'monthly' %}
+                toStartOfMonth(start_time)
+            {% elif time_range == 'daily' %}
+                toStartOfDay(start_time)
+            {% else %}
+                toStartOfHour(start_time)
+            {% end %}
+        {% else %}
+            toStartOfHour(start_time)
+        {% end %} as period,
+        avg(dateDiff('second', start_time, end_time)) as avg_duration,
+        quantile(0.95)(dateDiff('second', start_time, end_time)) as p95_duration
+    FROM (
+        SELECT 
+            event.payload.deployment.id as deployment_id,
+            min(_event_time) as start_time,
+            max(_event_time) as end_time
+        FROM vercel_logs
+        WHERE event_type IN ('deployment.created', 'deployment.succeeded')
+        AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+        AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+        GROUP BY deployment_id
+        HAVING count(DISTINCT event_type) = 2
+    )
+    GROUP BY period
+    ORDER BY period DESC 

@@ -1,0 +1,14 @@
+NODE project_stats
+SQL >
+    SELECT 
+        event.payload.project.id as project_id,
+        event.payload.name as project_name,
+        count() as total_deployments,
+        countIf(event_type = 'deployment.error') as errors,
+        round(countIf(event_type = 'deployment.error') * 100.0 / count(), 2) as error_rate
+    FROM vercel_logs
+    WHERE event_type IN ('deployment.created', 'deployment.succeeded', 'deployment.error')
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    GROUP BY project_id, project_name
+    ORDER BY total_deployments DESC 
