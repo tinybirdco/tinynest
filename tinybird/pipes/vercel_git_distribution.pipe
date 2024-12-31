@@ -1,0 +1,20 @@
+TOKEN "read" READ
+TAGS "vercel"
+
+NODE git_distribution
+SQL >
+    %
+    SELECT 
+        multiIf(
+            event.payload.deployment.meta.githubRepo::String != '', 'GitHub',
+            event.payload.deployment.meta.gitlabProjectRepo::String != '', 'GitLab',
+            'Other'
+        ) as source,
+        count() as deployments,
+        round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+    FROM vercel
+    WHERE event_type = 'deployment.created'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    GROUP BY source
+    ORDER BY deployments DESC 
