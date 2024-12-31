@@ -1,4 +1,4 @@
-# SaaS metrics template
+# SaaS starter kit
 
 All your SaaS data and metrics in one place.
 
