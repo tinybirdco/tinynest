@@ -4,7 +4,6 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { pipe } from '@/lib/tinybird'
-import { StatusDistributionChart } from './status-distribution-chart'
 import { ErrorsChart } from './errors-chart'
 import { CacheStatsChart } from './cache-stats-chart'
 import { ResponseTimesChart } from './response-times-chart'
@@ -19,10 +18,15 @@ export default function VercelLogsDashboard() {
     const [eventType, setEventType] = useState('')
     const [source, setSource] = useState('')
     const [isLoading, setIsLoading] = useState(true)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [requestsData, setRequestsData] = useState<any[]>([])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [errorsData, setErrorsData] = useState<any[]>([])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [responseTimesData, setResponseTimesData] = useState<any[]>([])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [topPathsData, setTopPathsData] = useState<any[]>([])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [cacheStatsData, setCacheStatsData] = useState<any[]>([])
     const [topPathsPage, setTopPathsPage] = useState(0)
     const [topPathsLoading, setTopPathsLoading] = useState(false)

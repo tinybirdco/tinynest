@@ -101,15 +101,9 @@ export function VercelFilters({
     token, 
     className,
     environment,
-    host,
     project,
-    eventType,
-    source,
     onEnvironmentChange,
-    onHostChange,
-    onProjectChange,
-    onEventTypeChange,
-    onSourceChange
+    onProjectChange
 }: VercelFiltersProps) {
     return (
         <div className={cn("flex flex-wrap gap-2", className)}>
@@ -120,13 +114,6 @@ export function VercelFilters({
                 value={environment}
                 onChange={onEnvironmentChange}
             />
-            {/* <Filter
-                token={token}
-                pipeName="vercel_hosts"
-                label="Host"
-                value={host}
-                onChange={onHostChange}
-            /> */}
             <Filter
                 token={token}
                 pipeName="vercel_projects"
@@ -134,20 +121,6 @@ export function VercelFilters({
                 value={project}
                 onChange={onProjectChange}
             />
-            {/* <Filter
-                token={token}
-                pipeName="vercel_event_types"
-                label="Event Type"
-                value={eventType}
-                onChange={onEventTypeChange}
-            />
-            <Filter
-                token={token}
-                pipeName="vercel_sources"
-                label="Source"
-                value={source}
-                onChange={onSourceChange}
-            /> */}
         </div>
     )
 } 

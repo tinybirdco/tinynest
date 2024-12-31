@@ -1,5 +1,5 @@
 import { LineChart, Line, XAxis, YAxis } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartConfig, ChartTooltipContent } from '@/components/ui/chart'
+import { ChartContainer, ChartTooltip, ChartConfig } from '@/components/ui/chart'
 import { format } from 'date-fns'
 
 interface ErrorData {
