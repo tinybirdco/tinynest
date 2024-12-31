@@ -1,0 +1,26 @@
+TOKEN "read" READ
+
+TAGS "vercel_logs"
+
+NODE response_times
+SQL >
+    
+    SELECT 
+        toStartOfHour(event_time) as hour,
+        round(avg(toFloat64OrZero(duration)), 2) as avg_duration,
+        round(quantile(0.95)(toFloat64OrZero(duration)), 2) as p95_duration,
+        round(max(toFloat64OrZero(duration)), 2) as max_duration
+    FROM (
+        SELECT 
+            event_time,
+            event.proxy.path as path,
+            extractAll(event.message, 'Duration: ([0-9]+) ms')[1] as duration
+        FROM vercel_logs
+        WHERE event_type = 'stdout'
+        AND event.message LIKE '%Duration:%'
+        AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+        AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    )
+    WHERE duration != ''
+    GROUP BY hour
+    ORDER BY hour DESC 

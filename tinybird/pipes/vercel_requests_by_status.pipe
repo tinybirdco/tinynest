@@ -1,0 +1,16 @@
+TOKEN "read" READ
+
+TAGS "vercel_logs"
+
+NODE requests_by_status
+SQL >
+    SELECT 
+        event.proxy.statusCode as status,
+        count() as count,
+        round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+    FROM vercel_logs
+    WHERE event.proxy.statusCode != 0
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    GROUP BY status
+    ORDER BY count DESC 

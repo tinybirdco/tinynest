@@ -1,0 +1,17 @@
+TOKEN "read" READ
+
+TAGS "vercel_logs"
+
+NODE errors_over_time
+SQL >
+    SELECT 
+        toStartOfHour(event_time) as hour,
+        countIf(event.proxy.statusCode >= 400) as error_count,
+        count() as total_requests,
+        round(countIf(event.proxy.statusCode >= 400) * 100.0 / count(), 2) as error_rate
+    FROM vercel_logs
+    WHERE event.proxy.statusCode != 0
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    GROUP BY hour
+    ORDER BY hour DESC 
