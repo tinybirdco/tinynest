@@ -7,12 +7,27 @@ SQL >
     %
     SELECT 
         toStartOfHour(event_time) as hour,
-        countIf(event.proxy.statusCode >= 400) as error_count,
+        countIf(event.proxy.statusCode::Int32 >= 400) as error_count,
         count() as total_requests,
-        round(countIf(event.proxy.statusCode >= 400) * 100.0 / count(), 2) as error_rate
+        round(countIf(event.proxy.statusCode::Int32 >= 400) * 100.0 / count(), 2) as error_rate
     FROM vercel_logs
     WHERE event.proxy.statusCode::Int32 != 0
     AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    {% if defined(environment) and environment != '' %}
+        AND event.environment::String = {{ String(environment) }}
+    {% end %}
+    {% if defined(host) and host != '' %}
+        AND event.host::String = {{ String(host) }}
+    {% end %}
+    {% if defined(project) and project != '' %}
+        AND event.projectName::String = {{ String(project) }}
+    {% end %}
+    {% if defined(event_type) and event_type != '' %}
+        AND event_type::String = {{ String(event_type) }}
+    {% end %}
+    {% if defined(source) and source != '' %}
+        AND event.source::String = {{ String(source) }}
+    {% end %}
     GROUP BY hour
     ORDER BY hour DESC 

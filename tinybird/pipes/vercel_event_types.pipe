@@ -1,0 +1,10 @@
+TOKEN "read" READ
+TAGS "vercel_logs"
+
+NODE event_types
+SQL >
+    SELECT DISTINCT
+        event_type as value
+    FROM vercel_logs
+    WHERE event_type != ''
+    ORDER BY event_type ASC

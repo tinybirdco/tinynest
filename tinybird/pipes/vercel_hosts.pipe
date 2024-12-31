@@ -1,0 +1,11 @@
+TOKEN "read" READ
+TAGS "vercel_logs"
+
+NODE hosts
+SQL >
+    SELECT DISTINCT
+        event.host as value
+    FROM vercel_logs
+    WHERE event.host::String != ''
+    and event.host::String not like '%vercel%'
+    ORDER BY value::String ASC
