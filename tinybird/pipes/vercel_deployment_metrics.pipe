@@ -1,5 +1,9 @@
+TOKEN "read" READ
+TAGS "vercel"
+
 NODE deployment_metrics
 SQL >
+    %
     SELECT 
         count() as total_deployments,
         round(countIf(event_type = 'deployment.succeeded') * 100.0 / countIf(event_type = 'deployment.created'), 2) as success_rate,

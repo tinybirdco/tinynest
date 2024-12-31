@@ -1,5 +1,9 @@
+TOKEN "read" READ
+TAGS "vercel"
+
 NODE git_analytics
 SQL >
+    %
     SELECT 
         event.payload.deployment.meta.githubCommitAuthorName as github_author,
         event.payload.deployment.meta.gitlabCommitAuthorName as gitlab_author,

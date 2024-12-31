@@ -1,5 +1,9 @@
+TOKEN "read" READ
+TAGS "vercel"
+
 NODE git_distribution
 SQL >
+    %
     SELECT 
         multiIf(
             event.payload.deployment.meta.githubRepo != '', 'GitHub',

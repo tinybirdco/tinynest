@@ -1,5 +1,9 @@
+TOKEN "read" READ
+TAGS "vercel"
+
 NODE deployment_duration
 SQL >
+    %
     SELECT 
         {% if defined(time_range) %}
             {% if time_range == 'monthly' %}

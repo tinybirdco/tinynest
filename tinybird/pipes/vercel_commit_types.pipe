@@ -1,5 +1,9 @@
+TOKEN "read" READ
+TAGS "vercel"
+
 NODE commit_types
 SQL >
+    %
     SELECT 
         multiIf(
             lower(message) LIKE '%fix%', 'fix',

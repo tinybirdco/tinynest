@@ -1,5 +1,9 @@
+TOKEN "read" READ
+TAGS "vercel"
+
 NODE project_stats
 SQL >
+    %
     SELECT 
         event.payload.project.id as project_id,
         event.payload.name as project_name,

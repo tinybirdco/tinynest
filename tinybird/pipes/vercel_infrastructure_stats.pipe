@@ -1,5 +1,9 @@
+TOKEN "read" READ
+TAGS "vercel"
+
 NODE infrastructure_stats
 SQL >
+    %
     SELECT 
         event.payload.regions[1] as region,
         event.payload.type as deployment_type,

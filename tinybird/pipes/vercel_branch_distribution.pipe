@@ -1,5 +1,9 @@
+TOKEN "read" READ
+TAGS "vercel"
+
 NODE branch_distribution
 SQL >
+    %
     SELECT 
         coalesce(
             event.payload.deployment.meta.githubCommitRef,
