@@ -9,6 +9,10 @@ import { CacheStatsChart } from './cache-stats-chart'
 import { ResponseTimesChart } from './response-times-chart'
 import { TopPathsTable } from './top-paths-table'
 import { VercelFilters } from './filters'
+import { TimeRange } from '../shared/time-range'
+import { format } from 'date-fns'
+import { addDays } from 'date-fns'
+import { DateRange } from 'react-day-picker'
 
 export default function VercelLogsDashboard() {
     const [token] = useQueryState('token')
@@ -30,6 +34,11 @@ export default function VercelLogsDashboard() {
     const [cacheStatsData, setCacheStatsData] = useState<any[]>([])
     const [topPathsPage, setTopPathsPage] = useState(0)
     const [topPathsLoading, setTopPathsLoading] = useState(false)
+    const [timeRange, setTimeRange] = useState('daily')
+    const [dateRange, setDateRange] = useState<DateRange>({
+        from: addDays(new Date(), -7),
+        to: new Date()
+    })
 
     const fetchTopPaths = async () => {
         if (!token) return
@@ -63,7 +72,10 @@ export default function VercelLogsDashboard() {
             host,
             project,
             event_type: eventType,
-            source
+            source,
+            time_range: timeRange,
+            ...(dateRange?.from && { date_from: format(dateRange.from, 'yyyy-MM-dd HH:mm:ss') }),
+            ...(dateRange?.to && { date_to: format(dateRange.to, 'yyyy-MM-dd 23:59:59') })
         }
 
         try {
@@ -93,28 +105,37 @@ export default function VercelLogsDashboard() {
 
     useEffect(() => {
         fetchMetrics()
-    }, [token, environment, host, project, eventType, source])
+    }, [token, environment, host, project, eventType, source, timeRange, dateRange])
 
     useEffect(() => {
         fetchTopPaths()
-    }, [token, environment, host, project, eventType, source, topPathsPage])
+    }, [token, environment, host, project, eventType, source, topPathsPage, timeRange, dateRange])
 
     return (
         <div className="space-y-8">
-            <VercelFilters 
-                token={token ?? ''} 
-                className="mb-8"
-                environment={environment}
-                host={host}
-                project={project}
-                eventType={eventType}
-                source={source}
-                onEnvironmentChange={setEnvironment}
-                onHostChange={setHost}
-                onProjectChange={setProject}
-                onEventTypeChange={setEventType}
-                onSourceChange={setSource}
-            />
+            <div className="flex justify-between items-start">
+                <VercelFilters 
+                    token={token ?? ''} 
+                    className="mb-8"
+                    environment={environment}
+                    host={host}
+                    project={project}
+                    eventType={eventType}
+                    source={source}
+                    onEnvironmentChange={setEnvironment}
+                    onHostChange={setHost}
+                    onProjectChange={setProject}
+                    onEventTypeChange={setEventType}
+                    onSourceChange={setSource}
+                />
+                <TimeRange
+                    timeRange={timeRange}
+                    onTimeRangeChange={setTimeRange}
+                    dateRange={dateRange}
+                    onDateRangeChange={(range) => setDateRange(range || { from: new Date(), to: addDays(new Date(), 7) })}
+                    className="mb-8"
+                />
+            </div>
             {/* Metrics Row */}
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>

@@ -6,7 +6,18 @@ NODE response_times
 SQL >
     %
     SELECT 
-        toStartOfHour(event_time) as hour,
+        {% if defined(time_range) %}
+            {% if time_range == 'monthly' %}
+                toStartOfMonth(event_time)
+            {% elif time_range == 'daily' %}
+                toDate(event_time)
+            {% else %}
+                toStartOfHour(event_time)
+            {% end %}
+        {% else %}
+            toDate(event_time)
+        {% end %}
+        as hour,
         round(avg(toFloat64OrZero(duration)), 2) as avg_duration,
         round(quantile(0.95)(toFloat64OrZero(duration)), 2) as p95_duration,
         round(max(toFloat64OrZero(duration)), 2) as max_duration

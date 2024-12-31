@@ -6,7 +6,18 @@ NODE cache_stats
 SQL >
     %
     SELECT 
-        toStartOfHour(event_time) as hour,
+        {% if defined(time_range) %}
+            {% if time_range == 'monthly' %}
+                toStartOfMonth(event_time)
+            {% elif time_range == 'daily' %}
+                toDate(event_time)
+            {% else %}
+                toStartOfHour(event_time)
+            {% end %}
+        {% else %}
+            toDate(event_time)
+        {% end %}
+        as hour,
         count() as total_requests,
         countIf(event.proxy.vercelCache = 'HIT') as cache_hits,
         round(countIf(event.proxy.vercelCache = 'HIT') * 100.0 / count(), 2) as hit_rate
