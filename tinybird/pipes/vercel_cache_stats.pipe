@@ -4,6 +4,7 @@ TAGS "vercel_logs"
 
 NODE cache_stats
 SQL >
+    %
     SELECT 
         toStartOfHour(event_time) as hour,
         count() as total_requests,

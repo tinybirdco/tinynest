@@ -4,6 +4,7 @@ TAGS "vercel_logs"
 
 NODE requests_by_status
 SQL >
+    %
     SELECT 
         event.proxy.statusCode as status,
         count() as count,

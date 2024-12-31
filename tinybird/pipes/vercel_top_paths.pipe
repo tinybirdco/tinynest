@@ -4,6 +4,7 @@ TAGS "vercel_logs"
 
 NODE top_paths
 SQL >
+    %
     SELECT 
         event.proxy.path as path,
         count() as requests,

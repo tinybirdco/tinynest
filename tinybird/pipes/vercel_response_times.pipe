@@ -4,7 +4,7 @@ TAGS "vercel_logs"
 
 NODE response_times
 SQL >
-    
+    %
     SELECT 
         toStartOfHour(event_time) as hour,
         round(avg(toFloat64OrZero(duration)), 2) as avg_duration,

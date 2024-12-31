@@ -4,6 +4,7 @@ TAGS "vercel_logs"
 
 NODE errors_over_time
 SQL >
+    %
     SELECT 
         toStartOfHour(event_time) as hour,
         countIf(event.proxy.statusCode >= 400) as error_count,
