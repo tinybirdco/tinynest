@@ -22,6 +22,7 @@ jobs:
       uses: tinybirdco/ci/.github/workflows/ci.yml@v4.1.0
       with:
         data_project_dir: ./tinybird
+        use_last_partition: false
       secrets:
         tb_admin_token: ${{ secrets.TB_ADMIN_TOKEN }}
         tb_host: https://api.tinybird.co
