@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 
-import { type ToolState } from './constants';
+import { type ToolState, baseURL } from './constants';
 
 export class InvalidTokenError extends Error {
   constructor() {
@@ -19,7 +19,7 @@ export interface TinybirdDataSource {
 }
 
 export async function listDataSources(token: string): Promise<TinybirdDataSource[]> {
-  const response = await fetch(`http://localhost:3000/api/datasources?token=${token}`);
+  const response = await fetch(`${baseURL}/api/datasources?token=${token}`);
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
@@ -47,7 +47,7 @@ export interface QueryResult {
 }
 
 export async function query(token: string, sql: string): Promise<QueryResult> {
-  const response = await fetch(`http://localhost:3000/api/query?token=${token}&query=${encodeURIComponent(sql)}`);
+  const response = await fetch(`${baseURL}/api/query?token=${token}&query=${encodeURIComponent(sql)}`);
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
@@ -123,7 +123,7 @@ export async function pipe<T = QueryResult>(
     });
   }
 
-  const response = await fetch(`http://localhost:3000/api/pipes?${searchParams}`);
+  const response = await fetch(`${baseURL}/api/pipes?${searchParams}`);
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
