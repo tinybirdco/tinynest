@@ -1,0 +1,40 @@
+TOKEN "read" READ
+
+TAGS "vercel_logs"
+
+NODE top_paths
+SQL >
+    %
+    SELECT 
+        splitByChar('?', event.proxy.path::String)[1] as path,
+        count() as requests,
+        round(avg(if(event.proxy.statusCode >= 400, 1, 0)) * 100, 2) as error_rate,
+        round(avg(if(event.proxy.vercelCache = 'HIT', 1, 0)) * 100, 2) as cache_hit_rate
+    FROM vercel_logs
+    WHERE event.proxy.path::String != ''
+    and event.proxy.path::String not like '%favicon.ico%'
+    and event.proxy.path::String not like '%phi/i/v0/%'
+    and not endsWith(event.proxy.path::String, '/check')
+    and event.proxy.path::String not like '%_next%'
+    and event.proxy.path::String not like '%_vercel%'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    {% if defined(environment) and environment != '' %}
+        AND event.environment::String = {{ String(environment) }}
+    {% end %}
+    {% if defined(host) and host != '' %}
+        AND event.host::String = {{ String(host) }}
+    {% end %}
+    {% if defined(project) and project != '' %}
+        AND event.projectName::String = {{ String(project) }}
+    {% end %}
+    {% if defined(event_type) and event_type != '' %}
+        AND event_type::String = {{ String(event_type) }}
+    {% end %}
+    {% if defined(source) and source != '' %}
+        AND event.source::String = {{ String(source) }}
+    {% end %}
+    GROUP BY path
+    ORDER BY requests DESC
+    LIMIT {{Int32(page_size, 100)}}
+    OFFSET {{Int32(page, 0) * Int32(page_size, 100)}}
