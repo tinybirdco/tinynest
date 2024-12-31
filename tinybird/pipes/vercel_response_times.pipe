@@ -17,7 +17,7 @@ SQL >
             extractAll(event.message, 'Duration: ([0-9]+) ms')[1] as duration
         FROM vercel_logs
         WHERE event_type = 'stdout'
-        AND event.message LIKE '%Duration:%'
+        AND event.message::String LIKE '%Duration:%'
         AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
         AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
     )

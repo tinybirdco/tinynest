@@ -10,7 +10,7 @@ SQL >
         countIf(event.proxy.vercelCache = 'HIT') as cache_hits,
         round(countIf(event.proxy.vercelCache = 'HIT') * 100.0 / count(), 2) as hit_rate
     FROM vercel_logs
-    WHERE event.proxy.vercelCache != ''
+    WHERE event.proxy.vercelCache::String != ''
     AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
     GROUP BY hour
