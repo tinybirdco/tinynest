@@ -31,6 +31,7 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { CumulativeSignupsChart } from './cumulative-signups-chart'
 
 interface SummaryMetrics {
     total_users: number
@@ -105,6 +106,7 @@ export default function Auth0Dashboard() {
         unique_emails: number
     }>>([])
     const [isDomainsOpen, setIsDomainsOpen] = useState(false)
+    const [cumulativeSignupsData, setCumulativeSignupsData] = useState<Array<{ day: string; new_users: number; cumulative_users: number }>>([])
 
     useEffect(() => {
         async function fetchInitialData() {
@@ -226,6 +228,9 @@ export default function Auth0Dashboard() {
                 unique_emails: number
             }> ?? [])
             setLogs(logsResult?.data ?? [])
+
+            const cumulativeSignupsResult = await pipe<{ data: Array<{ day: string; new_users: number; cumulative_users: number }> }>(token, 'auth0_cumulative_users', baseParams)
+            setCumulativeSignupsData(cumulativeSignupsResult?.data ?? [])
         } catch (error) {
             console.error('Failed to fetch metrics:', error)
         } finally {
@@ -349,6 +354,18 @@ export default function Auth0Dashboard() {
                     description="New users compared to total users"
                 />
             </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Cumulative Signups</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <CumulativeSignupsChart 
+                        data={cumulativeSignupsData ?? []}
+                        isLoading={isLoading}
+                        className="h-[150px]"
+                    />
+                </CardContent>
+            </Card>
 
             <Separator className="my-6" />
 
