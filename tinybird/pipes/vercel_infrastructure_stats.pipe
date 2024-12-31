@@ -5,7 +5,7 @@ NODE infrastructure_stats
 SQL >
     %
     SELECT 
-        event.payload.regions[1] as region,
+        array(event.payload.regions)[1] as region,
         event.payload.type as deployment_type,
         event.payload.plan as plan,
         count() as deployments
