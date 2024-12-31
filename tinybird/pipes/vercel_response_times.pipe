@@ -14,7 +14,7 @@ SQL >
         SELECT 
             event_time,
             event.proxy.path as path,
-            extractAll(event.message, 'Duration: ([0-9]+) ms')[1] as duration
+            extractAll(event.message::String, 'Duration: ([0-9]+) ms')[1] as duration
         FROM vercel_logs
         WHERE event_type = 'stdout'
         AND event.message::String LIKE '%Duration:%'
