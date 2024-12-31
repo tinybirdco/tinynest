@@ -143,7 +143,7 @@ export default function VercelLogsDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-destructive">
-                            {isLoading ? "Loading..." : `${Math.round(errorsData[0]?.error_rate ?? 0)}%`}
+                            {isLoading ? "Loading..." : `${Math.round(requestsData.filter(d => d.status > 399).reduce((acc, curr) => acc + curr.percentage, 0))}%`}
                         </div>
                     </CardContent>
                 </Card>
