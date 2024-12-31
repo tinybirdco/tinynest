@@ -8,6 +8,7 @@ import { checkToolState, InvalidTokenError } from '@/lib/tinybird';
 import { TOOLS, type AppGridItem, type ToolState } from '@/lib/constants';
 import { SectionHeader } from '@/components/section-header';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { MessageSquare } from 'lucide-react';
 
 function AppCard({
   app,
@@ -113,6 +114,7 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
           tinynest
         </Link>
       </div>
+
       <ScrollArea className="h-[calc(100vh-65px)] px-4 py-6">
         {isLoading ? (
           <div className="flex items-center justify-center">
@@ -120,6 +122,20 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
           </div>
         ) : (
           <div className="space-y-6">
+            <Link
+              href={token ? `/chat?token=${token}` : '/chat'}
+              className="block"
+            >
+              <Card className={`p-3 hover:bg-accent mb-2 ${activeAppId === 'chat' ? 'bg-accent' : ''}`}>
+                <div className="flex items-center gap-3">
+                  <MessageSquare className="w-5 h-5" />
+                  <div>
+                    <h3 className="font-semibold text-sm">Chat</h3>
+                  </div>
+                </div>
+              </Card>
+            </Link>
+
             {/* Configured Apps */}
             {Object.values(TOOLS).some(app => toolStates[app.id] === 'configured') && (
               <div className="space-y-2">
