@@ -12,7 +12,7 @@ SQL >
         ) as source,
         count() as deployments,
         round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
-    FROM vercel_logs
+    FROM vercel
     WHERE event_type = 'deployment.created'
     AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}

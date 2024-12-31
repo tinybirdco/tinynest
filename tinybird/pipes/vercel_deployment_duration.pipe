@@ -23,7 +23,7 @@ SQL >
             event.payload.deployment.id as deployment_id,
             min(event_time) as start_time,
             max(event_time) as end_time
-        FROM vercel_logs
+        FROM vercel
         WHERE event_type IN ('deployment.created', 'deployment.succeeded')
         AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
         AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}

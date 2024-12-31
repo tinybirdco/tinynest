@@ -3,7 +3,7 @@
 import { useQueryState } from 'nuqs'
 import { useEffect, useState, useCallback } from 'react'
 import { pipe } from '@/lib/tinybird'
-import MetricCard from './metric'
+import MetricCard from '@/components/tools/shared/metric-card'
 import { DauChart, DauDataPoint } from './dau-chart'
 import { AuthMechChart, AuthMechDataPoint } from './auth-mech-chart'
 import { DailySignupsChart, DailySignupsDataPoint } from './daily-signups-chart'
@@ -341,17 +341,17 @@ export default function Auth0Dashboard() {
                 <MetricCard
                     title="Monthly Sign Ups"
                     value={summaryMetrics.monthly_signups}
-                    description="New users signed up in the last 30 days"
+                    isLoading={isLoading}
                 />
                 <MetricCard
                     title="Monthly Active Users"
                     value={summaryMetrics.monthly_active_users}
-                    description="Users active in the last 30 days"
+                    isLoading={isLoading}
                 />
                 <MetricCard
                     title="New Signups Rate"
                     value={`${summaryMetrics.conversion_rate}%`}
-                    description="New users compared to total users"
+                    isLoading={isLoading}
                 />
             </div>
             <Card>

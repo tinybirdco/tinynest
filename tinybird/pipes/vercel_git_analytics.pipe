@@ -5,16 +5,15 @@ NODE git_analytics
 SQL >
     %
     SELECT 
-        event.payload.deployment.meta.githubCommitAuthorName::String as github_author,
-        event.payload.deployment.meta.gitlabCommitAuthorName::String as gitlab_author,
-        coalesce(github_author::String, gitlab_author::String) as author,
+        coalesce(event.payload.deployment.meta.githubCommitAuthorName::String, event.payload.deployment.meta.gitlabCommitAuthorName::String) as author,
         count() as commits,
         any(event.payload.deployment.meta.githubRepo::String) as github_repo,
         any(event.payload.deployment.meta.gitlabProjectRepo::String) as gitlab_repo,
         any(event.payload.deployment.meta.githubCommitRef::String) as branch
-    FROM vercel_logs
+    FROM vercel
     WHERE event_type = 'deployment.created'
     AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
-    GROUP BY github_author, gitlab_author, author
-    ORDER BY commits DESC 
+    AND author != ''
+    GROUP BY author
+    ORDER BY commits DESC

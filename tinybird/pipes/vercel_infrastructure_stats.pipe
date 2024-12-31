@@ -9,7 +9,7 @@ SQL >
         event.payload.type as deployment_type,
         event.payload.plan as plan,
         count() as deployments
-    FROM vercel_logs
+    FROM vercel
     WHERE event_type = 'deployment.created'
     AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}

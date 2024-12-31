@@ -3,7 +3,7 @@
 import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { pipe } from '@/lib/tinybird'
-import MetricCard from '../auth0/metric'
+import MetricCard from '@/components/tools/shared/metric-card'
 import { SubsChart } from './subs-chart'
 
 interface SubsDataPoint {
