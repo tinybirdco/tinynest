@@ -4,8 +4,8 @@ import { format } from 'date-fns'
 
 interface DeploymentsData {
     period: string
-    'deployment.succeeded': number
-    'deployment.error': number
+    event_type: string
+    count: number
 }
 
 const chartConfig = {
@@ -27,7 +27,8 @@ export function DeploymentsChart({ data, isLoading, className }: {
     if (isLoading) return <div className={`flex items-center justify-center ${className}`}>Loading...</div>
     if (!data.length) return <div className={`flex items-center justify-center ${className}`}>No data available</div>
 
-    const chartData = data.reduce((acc: any[], curr) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const chartData = data.reduce((acc: any[], curr: DeploymentsData) => {
         const existing = acc.find(d => d.period === curr.period)
         if (existing) {
             existing[curr.event_type] = curr.count
@@ -65,7 +66,9 @@ export function DeploymentsChart({ data, isLoading, className }: {
                                 <div className="text-xs text-muted-foreground">
                                     {format(new Date(data.period), 'd HH:mm')}
                                 </div>
-                                {payload.map((p: any) => (
+                                {
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                payload.map((p: any) => (
                                     <div key={p.dataKey} className="font-bold">
                                         {chartConfig[p.dataKey as keyof typeof chartConfig].label}: {p.value}
                                     </div>

@@ -12,11 +12,13 @@ import { DeploymentsChart } from './deployments-chart'
 import { DurationChart } from './duration-chart'
 import { ProjectsChart } from './projects-chart'
 import { GitAnalyticsChart } from './git-analytics-chart'
-import { InfrastructureChart } from './infrastructure-chart'
 
 interface GitData {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     analytics: any[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     distribution: any[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     branches: any[]
 }
 
@@ -29,16 +31,19 @@ export default function VercelDashboard() {
     })
     
     const [isLoading, setIsLoading] = useState(true)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [metrics, setMetrics] = useState<any>()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [deploymentsData, setDeploymentsData] = useState<any[]>([])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [durationData, setDurationData] = useState<any[]>([])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [projectsData, setProjectsData] = useState<any[]>([])
     const [gitData, setGitData] = useState<GitData>({
         analytics: [],
         distribution: [],
         branches: []
     })
-    const [infraData, setInfraData] = useState<any[]>([])
 
     useEffect(() => {
         async function fetchData() {
@@ -60,7 +65,6 @@ export default function VercelDashboard() {
                     gitAnalyticsResult,
                     gitDistributionResult,
                     branchResult,
-                    infraResult
                 ] = await Promise.all([
                     pipe(token, 'vercel_deployment_metrics', params),
                     pipe(token, 'vercel_deployments_over_time', params),
@@ -69,7 +73,6 @@ export default function VercelDashboard() {
                     pipe(token, 'vercel_git_analytics', params),
                     pipe(token, 'vercel_git_distribution', params),
                     pipe(token, 'vercel_branch_distribution', params),
-                    pipe(token, 'vercel_infrastructure_stats', params)
                 ])
 
                 setMetrics(metricsResult?.data?.[0])
@@ -81,7 +84,6 @@ export default function VercelDashboard() {
                     distribution: gitDistributionResult?.data ?? [],
                     branches: branchResult?.data ?? []
                 })
-                setInfraData(infraResult?.data ?? [])
             } catch (error) {
                 console.error('Failed to fetch data:', error)
             } finally {
@@ -171,18 +173,6 @@ export default function VercelDashboard() {
                         />
                     </CardContent>
                 </Card>
-
-                {/* <Card>
-                    <CardHeader>
-                        <CardTitle>Infrastructure</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <InfrastructureChart 
-                            data={infraData} 
-                            isLoading={isLoading}
-                        />
-                    </CardContent>
-                </Card> */}
             </div>
         </div>
     )
