@@ -95,7 +95,7 @@ export async function getInstalledDataSources(token: string): Promise<string[]> 
         if (result.data[0]?.count > 0) {
           installedSources.push(source.name);
         }
-      } catch (error) {
+      } catch {
         continue;
       }
     }

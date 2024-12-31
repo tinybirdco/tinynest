@@ -2,10 +2,12 @@
 
 import { useChat } from 'ai/react';
 import { useQueryState } from 'nuqs';
+import { Suspense } from 'react';
 
-export default function Chat() {
+function ChatContent() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
   const [token] = useQueryState('token');
+  
   return (
     <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
       {messages.map(m => (
@@ -30,5 +32,17 @@ export default function Chat() {
         />
       </form>
     </div>
+  );
+}
+
+export default function Chat() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+        <p>Loading chat...</p>
+      </div>
+    }>
+      <ChatContent />
+    </Suspense>
   );
 }
