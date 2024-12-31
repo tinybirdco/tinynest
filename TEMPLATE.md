@@ -1,5 +1,3 @@
-# SaaS starter kit
-
 All your SaaS data and metrics in one place.
 
 ## Set up the data project
