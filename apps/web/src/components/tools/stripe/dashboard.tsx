@@ -4,7 +4,7 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { DailySubsChart, DailySubsDataPoint } from './subs-ts-chart'
 import { pipe } from '@/lib/tinybird'
-import MetricCard from '@/components/metric'
+import MetricCard from '@/components/metric-card'
 
 type SubsMetricsDataPoint = {
     created: number
