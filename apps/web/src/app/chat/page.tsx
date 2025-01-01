@@ -7,31 +7,45 @@ import { Suspense } from 'react';
 function ChatContent() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
   const [token] = useQueryState('token');
-  
-  return (
-    <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
-      {messages.map(m => (
-        <div key={m.id} className="whitespace-pre-wrap">
-          {m.role === 'user' ? 'User: ' : 'AI: '}
-          {m.toolInvocations ? (
-            <pre>{JSON.stringify(m.toolInvocations, null, 2)}</pre>
-          ) : (
-            <p>{m.content}</p>
-          )}
-        </div>
-      ))}
+  const [aiKey, setAiKey] = useQueryState('ai_key');
 
-      <form onSubmit={(e) => {
-        handleSubmit(e, { headers: { token: token ?? '' } });
-      }}>
+  return (
+    <>
+      <div className="fixed top-0 w-full max-w-md p-4 bg-white">
+        <span className="inline-block w-24">Token:</span>
         <input
-          className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
-          value={input}
-          placeholder="Say something..."
-          onChange={handleInputChange}
+          type="password"
+          className="inline-block w-full p-2 border border-gray-300 rounded"
+          value={aiKey || ''}
+          onChange={(e) => setAiKey(e.target.value)}
+          placeholder="Enter your OpenAI/Anthropic API key..."
         />
-      </form>
-    </div>
+      </div>
+    
+      <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+        {messages.map(m => (
+          <div key={m.id} className="whitespace-pre-wrap">
+            {m.role === 'user' ? 'User: ' : 'AI: '}
+            {m.toolInvocations ? (
+              <pre>{JSON.stringify(m.toolInvocations, null, 2)}</pre>
+            ) : (
+              <p>{m.content}</p>
+            )}
+          </div>
+        ))}
+
+        <form onSubmit={(e) => {
+          handleSubmit(e, { headers: { token: token ?? '', ai_key: aiKey ?? '' } });
+        }}>
+          <input
+            className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
+            value={input}
+            placeholder="Say something..."
+            onChange={handleInputChange}
+          />
+        </form>
+      </div>
+    </>
   );
 }
 

@@ -1,10 +1,11 @@
-import { anthropic } from '@ai-sdk/anthropic';
+import { createAnthropic } from '@ai-sdk/anthropic';
 import { streamText, tool } from 'ai';
 import { getInstalledDataSources } from '@/lib/tinybird';
 import { z } from 'zod';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
+const apiKey = process.env.ANTHROPIC_API_KEY;
 
 const event_type_context = `
 tool,event_type,description
@@ -103,11 +104,16 @@ auth0,w,"A warning has happened during a login flow"
 
 export async function POST(req: Request) {
   const token = req.headers.get('token') ?? '';
+  const userAIApiKey = req.headers.get('ai_key') ?? '';
   const { messages } = await req.json();
   console.log('token: ' + token)
 
+  const anthropic = createAnthropic(
+    { apiKey: apiKey ?? userAIApiKey },
+  );
+
   const result = streamText({
-    model: anthropic('claude-3-5-sonnet-latest'),
+    model: anthropic.languageModel('claude-3-5-sonnet-20240620'),
     maxSteps: 5,
     tools: {
       getAvailableDataSources: tool({
