@@ -10,8 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { format } from "date-fns"
-import { DateRangePicker, DateRange } from "@/components/ui/date-range-picker"
+import { DateRangePicker } from "@/components/ui/date-range-picker"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import type { DateRange } from "react-day-picker"
 
 interface LogEntry {
   event_time: string
