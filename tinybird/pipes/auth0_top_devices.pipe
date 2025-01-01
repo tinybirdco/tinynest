@@ -1,0 +1,38 @@
+TOKEN "read" READ
+
+TAGS "auth0"
+
+NODE extract_device
+SQL >
+    %
+    SELECT 
+        case
+            when match(event.data.user_agent::String, '(?i)wget|ahrefsbot|curl|urllib|bitdiscovery|\+https://|googlebot')
+            then 'Bot'
+            when match(event.data.user_agent::String, '(?i)android')
+            then 'Mobile (Android)'
+            when match(event.data.user_agent::String, '(?i)ipad|iphone|ipod')
+            then 'Mobile (iOS)'
+            else 'Desktop'
+        END as device,
+        count(*) as request_count
+    FROM auth0
+    WHERE 1
+        AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+        AND event_time <= {{DateTime(date_to, '2024-01-01 23:59:59')}}
+        AND event.data.user_agent IS NOT NULL
+        {% if defined(event_type) %}
+            AND event_type = {{String(event_type)}}
+        {% end %}
+        {% if defined(client_name) %}
+            AND event.data.client_name::String = {{String(client_name)}}
+        {% end %}
+        {% if defined(connection_id) %}
+            AND event.data.connection_id::String = {{String(connection_id)}}
+        {% end %}
+        {% if defined(tenant_name) %}
+            AND event.data.tenant_name::String = {{String(tenant_name)}}
+        {% end %}
+    GROUP BY device
+    ORDER BY request_count DESC
+    LIMIT 10 

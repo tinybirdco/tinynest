@@ -4,23 +4,23 @@ TAGS "auth0"
 
 NODE get_conversion
 SQL >
-
+    %
+    with (select uniq(event.data.user_id) from auth0) as total_users
     SELECT
-        count(DISTINCT signups.user_id) as new_signups,
-        count(DISTINCT logins.user_id) as active_new_users,
+        count(DISTINCT event.data.user_id) as new_signups,
+        total_users,
         ROUND(
-            count(DISTINCT logins.user_id) / count(DISTINCT signups.user_id) * 100, 1
+            new_signups / total_users * 100, 1
         ) as conversion_rate
-    FROM
-        (
-            SELECT event.data.user_id as user_id
-            FROM auth0
-            WHERE event_type = 'ss' AND event_time >= now() - interval 30 days
-        ) signups
-    LEFT JOIN
-        (
-            SELECT event.data.user_id as user_id
-            FROM auth0
-            WHERE event_type = 'sl' AND event_time >= now() - interval 30 days
-        ) logins
-        ON signups.user_id = logins.user_id
+    FROM auth0
+    WHERE
+        event_type = 'ss' AND event_time >= now() - interval 30 days
+        {% if defined(client_id) and client_id != 'all' %}
+            AND event.data.client_id::String = {{ String(client_id) }}
+        {% end %}
+        {% if defined(connection_id) and connection_id != 'all' %}
+            AND event.data.connection_id::String = {{ String(connection_id) }}
+        {% end %}
+        {% if defined(tenant_name) and tenant_name != 'all' %}
+            AND event.data.tenant_name::String = {{ String(tenant_name) }}
+        {% end %}

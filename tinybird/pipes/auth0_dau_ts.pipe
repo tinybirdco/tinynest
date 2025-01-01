@@ -4,11 +4,30 @@ TAGS "auth0"
 
 NODE ep
 SQL >
-
-    SELECT toStartOfDay(event_time)::Date as day, count(DISTINCT event.data.user_id) as active
+    %
+    SELECT
+        {% if defined(time_range) and time_range == 'hourly' %}
+            toStartOfHour(event_time)::DateTime as day,
+        {% elif defined(time_range) and time_range == 'monthly' %}  
+            toStartOfMonth(event_time)::Date as day,
+        {% else %}
+            toStartOfDay(event_time)::Date as day,
+        {% end %}
+        count(DISTINCT event.data.user_id) as active
     FROM auth0
-    where event_type == 's' and event_time >= now() - interval 30 days
-    group by day
-    order by day
+    WHERE event_type == 's' 
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    {% if defined(client_id) and client_id != 'all' %}
+        AND event.data.client_id::String = {{String(client_id)}}
+    {% end %}
+    {% if defined(connection_id) and connection_id != 'all' %}
+        AND event.data.connection_id::String = {{String(connection_id)}}
+    {% end %}
+    {% if defined(tenant_name) and tenant_name != 'all' %}
+        AND event.data.tenant_name::String = {{String(tenant_name)}}
+    {% end %}
+    GROUP BY day
+    ORDER BY day
 
 

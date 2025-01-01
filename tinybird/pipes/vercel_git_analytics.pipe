@@ -1,0 +1,19 @@
+TOKEN "read" READ
+TAGS "vercel"
+
+NODE git_analytics
+SQL >
+    %
+    SELECT 
+        coalesce(event.payload.deployment.meta.githubCommitAuthorName::String, event.payload.deployment.meta.gitlabCommitAuthorName::String) as author,
+        count() as commits,
+        any(event.payload.deployment.meta.githubRepo::String) as github_repo,
+        any(event.payload.deployment.meta.gitlabProjectRepo::String) as gitlab_repo,
+        any(event.payload.deployment.meta.githubCommitRef::String) as branch
+    FROM vercel
+    WHERE event_type = 'deployment.created'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    AND author != ''
+    GROUP BY author
+    ORDER BY commits DESC

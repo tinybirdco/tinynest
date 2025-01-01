@@ -1,0 +1,25 @@
+TOKEN "read" READ
+
+TAGS "auth0"
+
+NODE cumulative_users_node
+SQL >
+    %
+    SELECT day, new_users, sum(new_users) OVER (ORDER BY day) as cumulative_users
+    FROM
+    (
+        SELECT toDate(event_time) as day, uniqExact(event.data.user_name) as new_users
+        FROM auth0
+        WHERE event_type = 'ss'  -- Successful signup
+        {% if defined(client_id) and client_id != 'all' %}
+            AND event.data.client_id::String = {{String(client_id)}}
+        {% end %}
+        {% if defined(connection_id) and connection_id != 'all' %}
+            AND event.data.connection_id::String = {{String(connection_id)}}
+        {% end %}
+        {% if defined(tenant_name) and tenant_name != 'all' %}
+            AND event.data.tenant_name::String = {{String(tenant_name)}}
+        {% end %}
+        GROUP BY day
+    )
+ORDER BY day ASC

@@ -1,0 +1,11 @@
+TOKEN "read" READ
+
+TAGS "vercel_logs"
+
+NODE environments
+SQL >
+    SELECT DISTINCT
+        event.environment as value
+    FROM vercel_logs
+    WHERE event.environment::String != ''
+    ORDER BY value::String ASC

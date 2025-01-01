@@ -1,0 +1,10 @@
+TOKEN "read" READ
+TAGS "vercel_logs"
+
+NODE projects
+SQL >
+    SELECT DISTINCT
+        event.projectName as value
+    FROM vercel_logs
+    WHERE event.projectName::String != ''
+    ORDER BY value::String ASC

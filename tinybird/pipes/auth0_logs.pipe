@@ -1,0 +1,33 @@
+TOKEN "read" READ
+
+TAGS "auth0"
+
+NODE get_logs
+SQL >
+    %
+    SELECT 
+        event_time,
+        event_type,
+        event.data.description::String as description,
+        event.data.log_id::String as id,
+        event.data.connection::String as connection,
+        event.data.client_name::String as application
+    FROM auth0
+    WHERE 1
+        {% if defined(client_name) %}
+            AND event.data.client_name::String = {{String(client_name)}}
+        {% end %}
+        {% if defined(connection) %}
+            AND event.data.connection::String = {{String(connection)}}
+        {% end %}
+        {% if defined(event_type) %}
+            AND event_type = {{String(event_type)}}
+        {% end %}
+        {% if defined(tenant_name) and tenant_name != 'all' %}
+            AND event.data.tenant_name::String = {{String(tenant_name)}}
+        {% end %}
+        and event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+        and event_time <= {{DateTime(date_to, '2024-01-01 23:59:59')}}
+        order by event_time desc
+        LIMIT {{Int32(page_size, 30)}}
+        OFFSET {{Int32(page, 0) * Int32(page_size, 30)}} 

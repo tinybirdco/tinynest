@@ -12,7 +12,8 @@ import {
     ChartConfig,
     ChartTooltipContent
 } from "@/components/ui/chart"
-import { Line, LineChart, XAxis, YAxis } from "recharts"
+import { Line, LineChart, XAxis, YAxis, CartesianGrid } from "recharts"
+import { format } from "date-fns"
 
 export interface DailySignupsDataPoint {
     day: string
@@ -21,6 +22,8 @@ export interface DailySignupsDataPoint {
 
 export interface DailySignupsChartData {
     data: DailySignupsDataPoint[]
+    timeRange: 'hourly' | 'daily' | 'monthly'
+    className?: string
 }
 
 const chartConfig = {
@@ -30,14 +33,14 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function DailySignupsChart({ data }: DailySignupsChartData) {
+export function DailySignupsChart({ data, timeRange, className }: DailySignupsChartData) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Daily Signups</CardTitle>
+                <CardTitle>Signups</CardTitle>
             </CardHeader>
             <CardContent className="">
-                <ChartContainer config={chartConfig} >
+                <ChartContainer config={chartConfig} className={`w-full ${className}`}>
                     <LineChart
                         data={data}
                         margin={{
@@ -47,15 +50,25 @@ export function DailySignupsChart({ data }: DailySignupsChartData) {
                             bottom: 32
                         }}
                     >
+                        <CartesianGrid 
+                            horizontal={true}
+                            vertical={false}
+                            className="stroke-muted"
+                        />
                         <XAxis
                             dataKey="day"
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
                             interval="equidistantPreserveStart"
-                            tickFormatter={(value) => value.split('-')[2]}
+                            tickFormatter={(value) => {
+                                const date = new Date(value)
+                                return timeRange === 'monthly' 
+                                    ? format(date, 'MMM yyyy')
+                                    : value.split('-')[2]
+                            }}
                             label={{
-                                value: "Day of Month",
+                                value: timeRange === 'monthly' ? "Month of Year" : "Day of Month",
                                 position: "bottom",
                                 offset: 20
                             }}
@@ -79,13 +92,11 @@ export function DailySignupsChart({ data }: DailySignupsChartData) {
                             type="monotone"
                             dataKey="signups"
                             strokeWidth={2}
-                            activeDot={{
-                                r: 4,
-                                style: { fill: "hsl(var(--primary))" },
-                            }}
+                            dot={true}
                             style={{
                                 stroke: "hsl(var(--primary))",
                             }}
+                            activeDot={{ fill: "hsl(var(--primary))", stroke: "hsl(var(--primary))" }}
                         />
                     </LineChart>
                 </ChartContainer>

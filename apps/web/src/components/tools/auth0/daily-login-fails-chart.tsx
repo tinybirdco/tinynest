@@ -8,11 +8,12 @@ import {
 } from "@/components/ui/card"
 import {
     ChartContainer,
-    ChartTooltip,
     ChartConfig,
+    ChartTooltip,
     ChartTooltipContent
 } from "@/components/ui/chart"
-import { Line, LineChart, XAxis, YAxis } from "recharts"
+import { Line, LineChart, XAxis, YAxis, CartesianGrid } from "recharts"
+import { format } from "date-fns"
 
 export interface DailyLoginFailsDataPoint {
     day: string
@@ -21,6 +22,8 @@ export interface DailyLoginFailsDataPoint {
 
 export interface DailyLoginFailsChartData {
     data: DailyLoginFailsDataPoint[]
+    timeRange: 'hourly' | 'daily' | 'monthly'
+    className?: string
 }
 
 const chartConfig = {
@@ -30,14 +33,14 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function DailyLoginFailsChart({ data }: DailyLoginFailsChartData) {
+export function DailyLoginFailsChart({ data, timeRange, className }: DailyLoginFailsChartData) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Daily Login Fails</CardTitle>
+                <CardTitle>Login Failures</CardTitle>
             </CardHeader>
             <CardContent className="">
-                <ChartContainer config={chartConfig} className="h-[400px] w-full">
+                <ChartContainer config={chartConfig} className={`w-full ${className}`}>
                     <LineChart
                         data={data}
                         margin={{
@@ -47,15 +50,25 @@ export function DailyLoginFailsChart({ data }: DailyLoginFailsChartData) {
                             bottom: 32
                         }}
                     >
+                        <CartesianGrid 
+                            horizontal={true}
+                            vertical={false}
+                            className="stroke-muted"
+                        />
                         <XAxis
                             dataKey="day"
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
                             interval="equidistantPreserveStart"
-                            tickFormatter={(value) => value.split('-')[2]}
+                            tickFormatter={(value) => {
+                                const date = new Date(value)
+                                return timeRange === 'monthly' 
+                                    ? format(date, 'MMM yyyy')
+                                    : value.split('-')[2]
+                            }}
                             label={{
-                                value: "Day of Month",
+                                value: timeRange === 'monthly' ? "Month of Year" : "Day of Month",
                                 position: "bottom",
                                 offset: 20
                             }}
@@ -65,7 +78,7 @@ export function DailyLoginFailsChart({ data }: DailyLoginFailsChartData) {
                             axisLine={false}
                             tickMargin={8}
                             label={{
-                                value: "Login Fails",
+                                value: "Login Failures",
                                 angle: -90,
                                 position: "left",
                                 offset: 32
@@ -79,13 +92,11 @@ export function DailyLoginFailsChart({ data }: DailyLoginFailsChartData) {
                             type="monotone"
                             dataKey="fails"
                             strokeWidth={2}
-                            activeDot={{
-                                r: 4,
-                                style: { fill: "hsl(var(--primary))" },
-                            }}
+                            dot={true}
                             style={{
                                 stroke: "hsl(var(--primary))",
                             }}
+                            activeDot={{ fill: "hsl(var(--primary))", stroke: "hsl(var(--primary))" }}
                         />
                     </LineChart>
                 </ChartContainer>
