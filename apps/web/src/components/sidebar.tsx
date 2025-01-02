@@ -81,12 +81,10 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
       setIsLoading(true);
       setError(undefined);
       try {
-        const states = await Promise.all(
-          Object.values(TOOLS).map(async (app) => {
-            const state = await checkToolState(token, app.ds);
-            return [app.id, state] as const;
-          })
-        );
+        const allStates = await checkToolState(token);
+        const states = Object.values(TOOLS).map((app) => {
+          return [app.id, allStates[app.ds]] as const;
+        });
         setToolStates(Object.fromEntries(states));
       } catch (error) {
         if (error instanceof InvalidTokenError) {

@@ -60,27 +60,55 @@ export async function query(token: string, sql: string): Promise<QueryResult> {
   return data;
 }
 
-export async function checkToolState(token: string, datasource: string): Promise<ToolState> {
+export async function checkToolState(token: string, datasource?: string): Promise<Record<string, ToolState>> {
   try {
-    // First check if data source exists
+    // Get all data sources
     const sources = await listDataSources(token);
-    const exists = sources.some(source => source.name === datasource);
-
-    if (!exists) {
-      return 'available';
+    const sourceNames = new Set(sources.map(source => source.name));
+    
+    // If a specific datasource is requested, only check that one
+    if (datasource) {
+      let state: ToolState = 'available';
+      if (sourceNames.has(datasource)) {
+        state = 'installed';
+        const rows = await query(token, `SELECT count(*) as count FROM ${datasource} FORMAT JSON`);
+        if (rows.data[0]?.count > 0) {
+          state = 'configured';
+        }
+      }
+      return { [datasource]: state };
     }
 
-    // Then check if it has data
-    const result = await query(token, `SELECT count(*) as count FROM ${datasource} FORMAT JSON`);
-    const hasData = result.data[0]?.count > 0;
+    // Build a query to check counts for all sources at once
+    const sourcesArray = Array.from(sourceNames);
+    if (sourcesArray.length === 0) {
+      return {};
+    }
 
-    return hasData ? 'configured' : 'installed';
+    const unionQuery = sourcesArray
+      .map(name => `SELECT '${name}' as source, count(*) as count FROM ${name}`)
+      .join(' UNION ALL ');
+
+    console.log(unionQuery);
+    
+    const result = await query(token, `${unionQuery} FORMAT JSON`);
+    console.log(result);
+    
+    // Convert results to state map
+    const stateMap: Record<string, ToolState> = {};
+    result.data.forEach(row => {
+      stateMap[row.source] = row.count > 0 ? 'configured' : 'installed';
+    });
+    console.log(stateMap);
+
+    // Add available state for any datasource not in Tinybird
+    return stateMap;
   } catch (error) {
     if (error instanceof InvalidTokenError) {
       throw error;
     }
-    console.error('Error checking tool state:', error);
-    return 'available';
+    console.error('Error checking tool states:', error);
+    return {};
   }
 }
 
