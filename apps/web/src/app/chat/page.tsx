@@ -3,6 +3,15 @@
 import { useChat } from 'ai/react';
 import { useQueryState } from 'nuqs';
 import { Suspense } from 'react';
+import { Input } from "@/components/ui/input"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { CircleHelp } from 'lucide-react'
+import { cn } from '@/lib/utils';
 
 function ChatContent() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
@@ -11,17 +20,18 @@ function ChatContent() {
 
   return (
     <>
-      <div className="fixed top-0 w-full max-w-md p-4 bg-white">
-        <span className="inline-block w-24">Token:</span>
-        <input
-          type="password"
-          className="inline-block w-full p-2 border border-gray-300 rounded"
-          value={aiKey || ''}
-          onChange={(e) => setAiKey(e.target.value)}
-          placeholder="Enter your OpenAI/Anthropic API key..."
-        />
+      <div className="flex w-full max-w-sm items-center space-x-2">
+        <Input type="password" placeholder="Anthropic API key" value={aiKey ?? ''} onChange={(e) => setAiKey(e.target.value)} />
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger><CircleHelp className="h-4 w-4 text-muted-foreground" /></TooltipTrigger>
+            <TooltipContent>
+              <p>Add your Anthropic API key here. The key is stored in your URL and used to authenticate requests to the Anthropic API. It is not stored remotely.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
-    
+
       <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
         {messages.map(m => (
           <div key={m.id} className="whitespace-pre-wrap">
@@ -38,10 +48,11 @@ function ChatContent() {
           handleSubmit(e, { headers: { token: token ?? '', ai_key: aiKey ?? '' } });
         }}>
           <input
-            className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
+            className={cn("fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl", !token || !aiKey && 'opacity-50 cursor-not-allowed')}
             value={input}
-            placeholder="Say something..."
+            placeholder={aiKey ? 'Ask about your data' : "Anthropic API key is required"}
             onChange={handleInputChange}
+            disabled={!token || !aiKey}
           />
         </form>
       </div>
