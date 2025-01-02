@@ -1,0 +1,16 @@
+TOKEN "read" READ
+TAGS "pagerduty"
+
+NODE status_distribution
+SQL >
+    %
+    SELECT 
+        event_type,
+        count() as count,
+        round(count() * 100.0 / sum(count()) OVER (), 2) as percentage
+    FROM pagerduty
+    WHERE event.event.data.type = 'incident'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    GROUP BY event_type
+    ORDER BY count DESC 

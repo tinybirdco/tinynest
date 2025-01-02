@@ -1,0 +1,16 @@
+TOKEN "read" READ
+TAGS "pagerduty"
+
+NODE incidents_over_time
+SQL >
+    %
+    SELECT 
+        toStartOfHour(event_time) as hour,
+        event_type,
+        count() as count
+    FROM pagerduty
+    WHERE event.event.data.type::String = 'incident'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    GROUP BY hour, event_type
+    ORDER BY hour DESC 

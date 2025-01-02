@@ -1,0 +1,19 @@
+TOKEN "read" READ
+TAGS "pagerduty"
+
+NODE responders
+SQL >
+    %
+    SELECT 
+        event.event.agent.summary as responder,
+        count() as responses,
+        avg(dateDiffSeconds(
+            parseDateTimeBestEffort(event.event.data.created_at),
+            parseDateTimeBestEffort(event.event.occurred_at)
+        )) as avg_response_time
+    FROM pagerduty
+    WHERE event_type = 'incident.acknowledged'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    GROUP BY responder
+    ORDER BY responses DESC 

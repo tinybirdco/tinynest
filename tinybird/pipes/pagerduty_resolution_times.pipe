@@ -1,0 +1,19 @@
+TOKEN "read" READ
+TAGS "pagerduty"
+
+NODE resolution_times
+SQL >
+    %
+    SELECT 
+        avg(dateDiffSeconds(
+            parseDateTimeBestEffort(event.event.data.resolved_at),
+            parseDateTimeBestEffort(event.event.data.created_at)
+        )) as avg_time_to_resolve,
+        avg(dateDiffSeconds(
+            parseDateTimeBestEffort(event.event.data.last_status_change_at),
+            parseDateTimeBestEffort(event.event.data.created_at)
+        )) as avg_time_to_last_update
+    FROM pagerduty
+    WHERE event_type = 'incident.resolved'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}

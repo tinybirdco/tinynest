@@ -1,0 +1,14 @@
+TOKEN "read" READ
+TAGS "pagerduty"
+
+NODE incident_metrics
+SQL >
+    %
+    SELECT 
+        count() as total_incidents,
+        countIf(event_type = 'incident.escalated') * 100.0 / count() as escalation_rate,
+        countIf(event_type = 'incident.resolved') * 100.0 / count() as resolution_rate
+    FROM pagerduty
+    WHERE event.event.data.type::String = 'incident'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
