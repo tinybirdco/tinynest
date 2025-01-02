@@ -12,6 +12,7 @@ export interface AppGridItem {
     name: string;
     description: string;
     icon: string;
+    icon_url?: string;
 }
 
 export const TOOLS: Record<string, AppGridItem> = {
@@ -21,14 +22,16 @@ export const TOOLS: Record<string, AppGridItem> = {
         ds: 'resend',
         name: 'Resend',
         description: 'Email delivery service',
-        icon: '📨'
+        icon: '📨',
+        icon_url: '/resend_favicon.png'
     },
     mailgun: {
         id: 'mailgun',
         ds: 'mailgun',
         name: 'Mailgun',
         description: 'Email delivery service',
-        icon: '📨'
+        icon: '📨',
+        icon_url: '/mailgun_favicon.ico'
     },
     // Auth
     clerk: {
@@ -36,14 +39,16 @@ export const TOOLS: Record<string, AppGridItem> = {
         ds: 'clerk',
         name: 'Clerk',
         description: 'Authentication and user management',
-        icon: '🔐'
+        icon: '🔐',
+        icon_url: '/clerk_favicon.ico'
     },
     auth0: {
         id: 'auth0',
         ds: 'auth0',
         name: 'Auth0',
         description: 'Identity platform',
-        icon: '🔐'
+        icon: '🔐',
+        icon_url: '/auth0_favicon.png'
     },
     // Hosting
     vercel_logs: {
@@ -51,14 +56,16 @@ export const TOOLS: Record<string, AppGridItem> = {
         ds: 'vercel_logs',
         name: 'Vercel Logs',
         description: 'Deployment and serverless logs',
-        icon: '🧱'
+        icon: '🧱',
+        icon_url: '/vercel_favicon.ico'
     },
     vercel: {
         id: 'vercel',
         ds: 'vercel',
         name: 'Vercel',
         description: 'Deployment and serverless',
-        icon: '🧱'
+        icon: '🧱',
+        icon_url: '/vercel_favicon.ico'
     },
     // VCS
     gitlab: {
@@ -66,14 +73,16 @@ export const TOOLS: Record<string, AppGridItem> = {
         ds: 'gitlab',
         name: 'Gitlab',
         description: 'Source code management',
-        icon: '🦊'
+        icon: '🦊',
+        icon_url: '/gitlab_favicon.png'
     },
     github: {
         id: 'github',
         ds: 'github',
         name: 'Github',
         description: 'Source code management',
-        icon: '🦊'
+        icon: '🦊',
+        icon_url: '/github_favicon.png'
     },
     // Payment & billing
     orb: {
@@ -81,14 +90,16 @@ export const TOOLS: Record<string, AppGridItem> = {
         ds: 'orb',
         name: 'Orb',
         description: 'Usage-based billing',
-        icon: '💰'
+        icon: '💰',
+        icon_url: '/orb_favicon.png'
     },
     stripe: {
         id: 'stripe',
         ds: 'stripe',
         name: 'Stripe',
         description: 'Payment processing',
-        icon: '💰'
+        icon: '💰',
+        icon_url: '/stripe_favicon.ico'
     },
     // Notifications
     knock: {
@@ -96,14 +107,16 @@ export const TOOLS: Record<string, AppGridItem> = {
         ds: 'knock',
         name: 'Knock',
         description: 'Push notifications',
-        icon: '🔔'
+        icon: '🔔',
+        icon_url: '/knock_favicon.png'
     },
     pagerduty: {
         id: 'pagerduty',
         ds: 'pagerduty',
         name: 'Pagerduty',
         description: 'Notifications',
-        icon: '🔔'
+        icon: '🔔',
+        icon_url: '/pagerduty_favicon.png'
     },
     // Logging
     sentry: {
@@ -111,7 +124,8 @@ export const TOOLS: Record<string, AppGridItem> = {
         ds: 'sentry',
         name: 'Sentry',
         description: 'Error logging',
-        icon: '👀'
+        icon: '👀',
+        icon_url: '/sentry_favicon.ico'
     },
 };
 

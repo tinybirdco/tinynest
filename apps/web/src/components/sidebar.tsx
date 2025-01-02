@@ -9,6 +9,7 @@ import { TOOLS, type AppGridItem, type ToolState } from '@/lib/constants';
 import { SectionHeader } from '@/components/section-header';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageSquare } from 'lucide-react';
+import Image from 'next/image';
 
 function AppCard({
   app,
@@ -34,7 +35,8 @@ function AppCard({
     >
       <Card className={`p-3 hover:bg-accent mb-2 ${stateColors[state]} ${isActive ? 'bg-accent' : ''}`}>
         <div className="flex items-center gap-3">
-          <div className="text-xl">{app.icon}</div>
+          {/* <div className="text-xl">{app.icon}</div> */}
+          {app.icon_url && <Image src={app.icon_url} width={16} height={16} alt={app.name} />}
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-sm">{app.name}</h3>
@@ -75,16 +77,14 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
   useEffect(() => {
     async function fetchToolStates() {
       if (!token) return;
-      
+
       setIsLoading(true);
       setError(undefined);
       try {
-        const states = await Promise.all(
-          Object.values(TOOLS).map(async (app) => {
-            const state = await checkToolState(token, app.ds);
-            return [app.id, state] as const;
-          })
-        );
+        const allStates = await checkToolState(token);
+        const states = Object.values(TOOLS).map((app) => {
+          return [app.id, allStates[app.ds]] as const;
+        });
         setToolStates(Object.fromEntries(states));
       } catch (error) {
         if (error instanceof InvalidTokenError) {
@@ -107,7 +107,7 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
   return (
     <div className="w-64 border-r h-screen">
       <div className="p-4 border-b">
-        <Link 
+        <Link
           href={token ? `/?token=${token}` : '/'}
           className="text-xl font-bold hover:text-primary transition-colors"
         >

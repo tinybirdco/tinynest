@@ -24,7 +24,10 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
       setError(undefined);
       try {
         const state = await checkToolState(token, TOOLS[id].ds);
-        setToolState(state);
+        console.log(id);
+        console.log(state);
+        console.log(state[id]);
+        setToolState(state[id]);
         setIsValidToken(true);
       } catch (error) {
         if (error instanceof InvalidTokenError) {
