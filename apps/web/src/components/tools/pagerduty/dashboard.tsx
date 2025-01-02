@@ -33,6 +33,12 @@ interface Responder {
   type: string;
 }
 
+interface InterruptionData {
+  day: string
+  interruptions: number
+  day_type: 'business' | 'off'
+}
+
 export default function PagerDutyDashboard() {
   const [token] = useQueryState('token')
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -77,11 +83,7 @@ export default function PagerDutyDashboard() {
   const pageSize = 10
   const [incidentTypes, setIncidentTypes] = useState<IncidentType[]>([])
   const [selectedService, setSelectedService] = useState<string>()
-  const [interruptions, setInterruptions] = useState<Array<{
-    day: string
-    interruptions: number
-    day_type: 'business' | 'off'
-  }>>([])
+  const [interruptions, setInterruptions] = useState<InterruptionData[]>([])
   const [responseEffort, setResponseEffort] = useState<Array<{
     responder: Array<{
       html_url: string
@@ -211,9 +213,28 @@ export default function PagerDutyDashboard() {
         high_urgency_rate: number
       }>)
       setIncidentTypes(incidentTypesData.data as IncidentType[])
-      setInterruptions(interruptionsData.data)
-      setResponseEffort(responseEffortData.data)
-      setSleepInterruptions(sleepInterruptionsData.data)
+      setInterruptions(interruptionsData.data as InterruptionData[])
+      setResponseEffort(responseEffortData.data as Array<{
+        responder: Array<{
+          html_url: string
+          id: string
+          self: string
+          summary: string
+          type: string
+        }>
+        hours: number
+      }>)
+      setSleepInterruptions(sleepInterruptionsData.data as Array<{
+        responder: Array<{
+          html_url: string
+          id: string
+          self: string
+          summary: string
+          type: string
+        }>
+        interruptions: number
+        avg_response_time: number
+      }>)
 
     } catch (error) {
       console.error('Failed to fetch metrics:', error)

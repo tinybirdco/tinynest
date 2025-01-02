@@ -41,7 +41,7 @@ export default function InterruptionsChart({ data }: InterruptionsChartProps) {
             />
             <Tooltip 
               labelFormatter={(value) => new Date(value).toLocaleString()}
-              formatter={(value, name) => [value, name.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')]}
+              formatter={(value, name: string) => [value, name.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')]}
             />
             <Legend />
             <Bar dataKey="business_hours" stackId="a" fill="hsl(var(--primary))" name="Business Hours" />
