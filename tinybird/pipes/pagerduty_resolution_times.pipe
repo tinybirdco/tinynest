@@ -1,0 +1,30 @@
+TOKEN "read" READ
+TAGS "pagerduty"
+
+NODE resolution_times
+SQL >
+    %
+    SELECT 
+        avg(dateDiff('second', created_time, resolved_time)) as avg_time_to_resolve
+    FROM (SELECT 
+            event.event.data.id as incident_id,
+            event_time as created_time
+        FROM pagerduty
+        WHERE event_type = 'incident.triggered'
+        AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+        AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+        {% if defined(service_id) and service_id != '' %}
+        AND event.event.data.service.id::String = {{String(service_id)}}
+        {% end %} 
+        ) as incident_starts
+    JOIN (SELECT 
+            event.event.data.id as incident_id,
+            event_time as resolved_time
+        FROM pagerduty
+        WHERE event_type = 'incident.resolved'
+        AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+        AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+        {% if defined(service_id) and service_id != '' %}
+        AND event.event.data.service.id::String = {{String(service_id)}}
+        {% end %}
+        ) as incident_ends ON incident_starts.incident_id = incident_ends.incident_id
