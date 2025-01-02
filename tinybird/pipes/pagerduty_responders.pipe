@@ -5,14 +5,16 @@ NODE responders
 SQL >
     %
     SELECT 
-        event.event.agent.summary as responder,
-        count() as responses,
+        event.event.data.assignees as responder,
+        count(DISTINCT event.event.data.id) as responses,
+        countIf(event_type = 'incident.acknowledged') as acknowledgements,
         avg(dateDiff('second',
             parseDateTimeBestEffort(event.event.data.created_at::String),
             parseDateTimeBestEffort(event.event.occurred_at::String)
         )) as avg_response_time
     FROM pagerduty
-    WHERE event_type = 'incident.acknowledged'
+    WHERE event_type IN ['incident.triggered', 'incident.acknowledged', 'incident.delegated', 'incident.reassigned', 'incident.escalated']
+    --AND array(event.event.data.assignees)[1] != ''
     AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
     {% if defined(service_id) and service_id != '' %}

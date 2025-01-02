@@ -1,0 +1,47 @@
+TOKEN "read" READ
+TAGS "pagerduty"
+
+NODE incidents_resolved
+SQL >
+    %
+    SELECT 
+        event.event.data.id as incident_id,
+        event.event.occurred_at as resolved_at,
+        event.event.data.created_at as created_at
+    FROM pagerduty
+    WHERE event_type = 'incident.resolved'
+    --AND event.event.data.resolved_at IS NOT NULL
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    {% if defined(service_id) and service_id != '' %}
+    AND event.event.data.service.id::String = {{String(service_id)}}
+    {% end %}
+
+NODE response_effort
+SQL >
+    %
+    SELECT 
+        array(assignees)[1] as responder,
+        round(
+            sum(
+                dateDiff('second', 
+                    parseDateTimeBestEffort(i.created_at::String),
+                    parseDateTimeBestEffort(i.resolved_at::String)
+                )
+            ) / 3600.0,
+            1
+        ) as hours
+    FROM incidents_resolved i
+    JOIN (
+        select
+            event.event.data.id incident_id,
+            event.event.data.assignees assignees
+        from pagerduty
+        where event_type = 'incident.triggered'
+        AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+        AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    ) p ON p.incident_id = i.incident_id
+    --WHERE p.event.event.data.assignees[1].summary::String != ''
+
+    GROUP BY responder
+    ORDER BY hours DESC

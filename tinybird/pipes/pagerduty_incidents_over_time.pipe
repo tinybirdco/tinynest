@@ -1,20 +1,44 @@
 TOKEN "read" READ
 TAGS "pagerduty"
 
+NODE date_range
+SQL >
+    %
+    WITH RECURSIVE
+    numbers AS (
+        SELECT 0 AS number
+        UNION ALL
+        SELECT number + 1
+        FROM system.numbers
+        WHERE number < dateDiff('hour', toStartOfHour(toDateTime({{DateTime(date_from, '2024-01-01 00:00:00')}})), toStartOfHour(toDateTime({{DateTime(date_to, '2024-12-31 23:59:59')}})))
+    )
+    SELECT addHours(toStartOfHour(toDateTime({{DateTime(date_from, '2024-01-01 00:00:00')}})), number) as hour
+    FROM numbers
+
 NODE incidents_over_time
 SQL >
     %
     SELECT 
-        toStartOfHour(event_time) as hour,
+        dr.hour hour,
         countIf(event_type = 'incident.triggered') as triggered,
         countIf(event_type = 'incident.resolved') as resolved,
         countIf(event_type = 'incident.escalated') as escalated
-    FROM pagerduty
-    WHERE event.event.data.type::String = 'incident'
-    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
-    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
-    {% if defined(service_id) and service_id != '' %}
-    AND event.event.data.service.id::String = {{String(service_id)}}
-    {% end %}
-    GROUP BY hour
-    ORDER BY hour ASC
+    FROM date_range dr
+    LEFT JOIN 
+    (
+        SELECT 
+            toStartOfHour(event_time) as hour,
+            event_type,
+            event.event.data.type::String as _event_type,
+            event.event.data.service.id::String as service_id
+        FROM pagerduty
+        WHERE _event_type = 'incident'
+        AND hour >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+        AND hour <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+        {% if defined(service_id) and service_id != '' %}
+            AND service_id = {{String(service_id)}}
+        {% end %}
+    ) as p
+    ON dr.hour = p.hour
+    GROUP BY dr.hour
+    ORDER BY dr.hour ASC

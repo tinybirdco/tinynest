@@ -5,13 +5,16 @@ import { useState, useEffect, useCallback } from 'react'
 import { pipe } from '@/lib/tinybird'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatDuration, formatNumber, formatPercentage } from '@/lib/utils'
-import Overview from '@/components/overview-chart'
+import Overview from '@/components/tools/pagerduty/overview-chart'
 import BarList from '@/components/bar-list'
 import { DateRangePicker, DateRange } from '@/components/ui/date-range-picker'
 import { startOfDay, endOfDay, format } from 'date-fns'
 import MetricCard from '@/components/metric-card'
-import IncidentCategoriesTable from "@/components/incident-categories-table"
+import IncidentCategoriesTable from "@/components/tools/pagerduty/incident-categories-table"
 import { Filter } from './filters'
+import InterruptionsChart from "@/components/tools/pagerduty/interruptions-chart"
+import ResponseEffortChart from "@/components/tools/pagerduty/response-effort-chart"
+import SleepInterruptions from "@/components/tools/pagerduty/sleep-interruptions"
 
 interface IncidentType {
   title: string
@@ -20,6 +23,20 @@ interface IncidentType {
   total_incidents: number
   high_urgency_incidents: number
   example_title: string
+}
+
+interface Responder {
+  html_url: string;
+  id: string;
+  self: string;
+  summary: string;
+  type: string;
+}
+
+interface InterruptionData {
+  day: string
+  interruptions: number
+  day_type: 'business' | 'off'
 }
 
 export default function PagerDutyDashboard() {
@@ -52,9 +69,10 @@ export default function PagerDutyDashboard() {
     high_urgency_rate: number
   }>>([])
   const [responders, setResponders] = useState<Array<{
-    responder: string
-    responses: number
-    avg_response_time: number
+    responder: Responder[];
+    responses: number;
+    acknowledgements: number;
+    avg_response_time: number;
   }>>([])
   const [statusDistribution, setStatusDistribution] = useState<Array<{
     event_type: string
@@ -65,6 +83,28 @@ export default function PagerDutyDashboard() {
   const pageSize = 10
   const [incidentTypes, setIncidentTypes] = useState<IncidentType[]>([])
   const [selectedService, setSelectedService] = useState<string>()
+  const [interruptions, setInterruptions] = useState<InterruptionData[]>([])
+  const [responseEffort, setResponseEffort] = useState<Array<{
+    responder: Array<{
+      html_url: string
+      id: string
+      self: string
+      summary: string
+      type: string
+    }>
+    hours: number
+  }>>([])
+  const [sleepInterruptions, setSleepInterruptions] = useState<Array<{
+    responder: Array<{
+      html_url: string
+      id: string
+      self: string
+      summary: string
+      type: string
+    }>
+    interruptions: number
+    avg_response_time: number
+  }>>([])
 
   const fetchIncidentTypes = useCallback(async (newPage: number) => {
     if (!token) return
@@ -116,7 +156,10 @@ export default function PagerDutyDashboard() {
         statusDistributionData,
         resolutionTimesData,
         serviceDistributionData,
-        incidentTypesData
+        incidentTypesData,
+        interruptionsData,
+        responseEffortData,
+        sleepInterruptionsData
       ] = await Promise.all([
         pipe(token, 'pagerduty_incident_metrics', baseParams),
         pipe(token, 'pagerduty_incidents_over_time', baseParams),
@@ -124,7 +167,10 @@ export default function PagerDutyDashboard() {
         pipe(token, 'pagerduty_status_distribution', baseParams),
         pipe(token, 'pagerduty_resolution_times', baseParams),
         pipe(token, 'pagerduty_service_distribution', baseParams),
-        pipe(token, 'pagerduty_incident_types', baseParams)
+        pipe(token, 'pagerduty_incident_types', baseParams),
+        pipe(token, 'pagerduty_interruptions', baseParams),
+        pipe(token, 'pagerduty_response_effort', baseParams),
+        pipe(token, 'pagerduty_sleep_interruptions', baseParams)
       ])
 
       setMetrics((incidentMetrics?.data?.[0] || {
@@ -143,9 +189,10 @@ export default function PagerDutyDashboard() {
         escalated: number
       }>)
       setResponders(respondersData.data as Array<{
-        responder: string
-        responses: number
-        avg_response_time: number
+        responder: Responder[];
+        responses: number;
+        acknowledgements: number;
+        avg_response_time: number;
       }>)
       setStatusDistribution(statusDistributionData.data as Array<{
         event_type: string
@@ -166,6 +213,28 @@ export default function PagerDutyDashboard() {
         high_urgency_rate: number
       }>)
       setIncidentTypes(incidentTypesData.data as IncidentType[])
+      setInterruptions(interruptionsData.data as InterruptionData[])
+      setResponseEffort(responseEffortData.data as Array<{
+        responder: Array<{
+          html_url: string
+          id: string
+          self: string
+          summary: string
+          type: string
+        }>
+        hours: number
+      }>)
+      setSleepInterruptions(sleepInterruptionsData.data as Array<{
+        responder: Array<{
+          html_url: string
+          id: string
+          self: string
+          summary: string
+          type: string
+        }>
+        interruptions: number
+        avg_response_time: number
+      }>)
 
     } catch (error) {
       console.error('Failed to fetch metrics:', error)
@@ -270,9 +339,9 @@ export default function PagerDutyDashboard() {
             data={incidentsOverTime} 
             categories={['triggered', 'resolved', 'escalated']}
             colors={{
-              'triggered': '#dc2626',    // Red-600
-              'resolved': '#16a34a',     // Green-600
-              'escalated': '#d97706'     // Amber-600
+              'triggered': 'hsl(var(--primary))',    // Red-600
+              'resolved': '#93c5fd',     // Green-600
+              'escalated': '#6b7280'     // Amber-600
             }}
             index="hour"
             valueKey="count"
@@ -282,31 +351,65 @@ export default function PagerDutyDashboard() {
       </Card>
 
       {/* Response Analysis */}
-      <div className="grid gap-4 grid-cols-3">
+      <div className="grid gap-4 grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Response Team Activity</CardTitle>
+            <CardTitle>Oncall Team Activity</CardTitle>
           </CardHeader>
           <CardContent className="max-h-[400px] overflow-auto">
             <BarList
-              data={(responders || []).map((item) => ({
-                name: item.responder,
-                value: item.responses,
-                extra: `${formatDuration(item.avg_response_time)} avg response time`,
-              }))}
+              data={responders
+                .reduce((acc, item) => {
+                  if (item.responder.length > 1) return acc;
+
+                  const name = item.responder[0]?.summary || 'Unknown'
+                  const existing = acc.find(x => x.name === name)
+                  if (existing) {
+                    existing.value += item.responses
+                    existing.acknowledgements += item.acknowledgements
+                    existing.avgTime = (existing.avgTime * existing.count + item.avg_response_time) / (existing.count + 1)
+                    existing.count++
+                  } else {
+                    acc.push({
+                      name,
+                      value: item.responses,
+                      acknowledgements: item.acknowledgements,
+                      avgTime: item.avg_response_time,
+                      count: 1
+                    })
+                  }
+                  return acc
+                }, [] as Array<{
+                  name: string
+                  value: number
+                  acknowledgements: number
+                  avgTime: number
+                  count: number
+                }>)
+                .map(item => ({
+                  name: item.name,
+                  value: item.value,
+                  extra: `${item.acknowledgements} acks • ${formatDuration(item.avgTime)} avg response time`
+                }))
+              }
             />
           </CardContent>
         </Card>
-        <div className="col-span-2">
-          <IncidentCategoriesTable 
-            data={incidentTypes || []}
-            page={page}
-            onPageChange={handlePageChange}
-            pageSize={pageSize}
-            isLoading={isTableLoading}
-          />
-        </div>
+        <ResponseEffortChart data={responseEffort} />
       </div>
+
+      <div className="grid gap-4 grid-cols-2">
+        <InterruptionsChart data={interruptions} />
+        <SleepInterruptions data={sleepInterruptions} />
+      </div>
+
+      <IncidentCategoriesTable 
+          data={incidentTypes || []}
+          page={page}
+          onPageChange={handlePageChange}
+          pageSize={pageSize}
+          isLoading={isTableLoading}
+        />
     </div>
   )
 }
