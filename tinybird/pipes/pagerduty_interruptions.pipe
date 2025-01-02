@@ -1,0 +1,54 @@
+TOKEN "read" READ
+TAGS "pagerduty"
+
+NODE notifications
+SQL >
+    %
+    SELECT 
+        event_time,
+        toStartOfHour(event_time) as hour,
+        event.event.data.id as incident_id
+    FROM pagerduty
+    WHERE event_type IN ['incident.triggered', 'incident.escalated']
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    {% if defined(service_id) and service_id != '' %}
+    AND event.event.data.service.id::String = {{String(service_id)}}
+    {% end %}
+
+NODE interruptions
+SQL >
+    %
+    SELECT 
+        hour,
+        count() as interruptions,
+        toDayOfWeek(hour) as day_of_week,
+        toHour(hour) as hour_of_day
+    FROM (
+        SELECT 
+            hour,
+            incident_id,
+            min(event_time) as first_notification
+        FROM notifications
+        GROUP BY hour, incident_id
+        HAVING dateDiff('second', 
+                lagInFrame(first_notification) OVER (ORDER BY first_notification), 
+                first_notification) > 60
+        OR lagInFrame(first_notification) OVER (ORDER BY first_notification) IS NULL
+    )
+    GROUP BY hour
+    
+
+NODE interruptions_summary
+SQL >
+    %
+    SELECT 
+        hour,
+        interruptions,
+        multiIf(
+            hour_of_day >= 9 AND hour_of_day < 17 AND day_of_week >= 1 AND day_of_week <= 5, 'business',
+            hour_of_day >= 23 OR hour_of_day < 7, 'sleep',
+            'off'
+        ) as hour_type
+    FROM interruptions
+    ORDER BY hour ASC 
