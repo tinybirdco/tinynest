@@ -41,8 +41,9 @@ export default function PagerDutyDashboard() {
   })
   const [incidentsOverTime, setIncidentsOverTime] = useState<Array<{
     hour: string
-    event_type: string
-    count: number
+    triggered: number
+    resolved: number
+    escalated: number
   }>>([])
   const [serviceDistribution, setServiceDistribution] = useState<Array<{
     service: string
@@ -137,8 +138,9 @@ export default function PagerDutyDashboard() {
       })
       setIncidentsOverTime(incidentsOverTimeData.data as Array<{
         hour: string
-        event_type: string
-        count: number
+        triggered: number
+        resolved: number
+        escalated: number
       }>)
       setResponders(respondersData.data as Array<{
         responder: string
