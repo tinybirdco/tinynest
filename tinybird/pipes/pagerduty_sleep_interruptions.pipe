@@ -1,0 +1,62 @@
+TOKEN "read" READ
+TAGS "pagerduty"
+
+NODE incidents_resolved
+SQL >
+    %
+    SELECT 
+        event.event.data.id as incident_id,
+        event.event.occurred_at::String as resolved_at,
+        event.event.data.created_at::String as created_at,
+        toHour(event_time) as hour
+    FROM pagerduty
+    WHERE event_type = 'incident.resolved'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    {% if defined(service_id) and service_id != '' %}
+    AND event.event.data.service.id::String = {{String(service_id)}}
+    {% end %}
+
+NODE sleep_interruptions
+SQL >
+    %
+    SELECT 
+        array(assignees)[1] as responder,
+        count() as interruptions,
+        round(avg(
+            dateDiff('second', 
+                parseDateTimeBestEffort(p.created_at::String),
+                parseDateTimeBestEffort(p.occurred_at::String)
+            )
+        )) as avg_response_time,
+        round(
+            sum(
+                dateDiff('second', 
+                    parseDateTimeBestEffort(i.created_at::String),
+                    parseDateTimeBestEffort(i.resolved_at::String)
+                )
+            ) / 3600.0,
+            1
+        ) as hours
+    FROM (
+        select
+            event_type,
+            event.event.data.id incident_id,
+            event.event.data.assignees assignees,
+            event.event.data.created_at as created_at,
+            event.event.occurred_at as occurred_at,
+            event_time
+        from pagerduty
+        where event_type IN ['incident.triggered', 'incident.acknowledged', 'incident.delegated', 'incident.reassigned', 'incident.escalated']
+        AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+        AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    ) p
+    LEFT JOIN incidents_resolved i ON i.incident_id = p.incident_id
+    WHERE (toHour(p.event_time) >= 23 OR toHour(p.event_time) < 8)  -- Sleep hours
+    AND p.event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND p.event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    {% if defined(service_id) and service_id != '' %}
+    AND p.event.event.data.service.id::String = {{String(service_id)}}
+    {% end %}
+    GROUP BY responder
+    ORDER BY interruptions DESC

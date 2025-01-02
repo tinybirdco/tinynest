@@ -1,54 +1,88 @@
 TOKEN "read" READ
 TAGS "pagerduty"
 
+NODE date_range
+SQL >
+    %
+    WITH RECURSIVE
+    numbers AS (
+        SELECT 0 AS number
+        UNION ALL
+        SELECT number + 1
+        FROM system.numbers
+        WHERE number < dateDiff('day', toDate(toDateTime({{DateTime(date_from, '2024-01-01 00:00:00')}})), toDate(toDateTime({{DateTime(date_to, '2024-12-31 23:59:59')}})))
+    )
+    SELECT addDays(toDate(toDateTime({{DateTime(date_from, '2024-01-01 00:00:00')}})), number) as day
+    FROM numbers
+
 NODE notifications
 SQL >
     %
     SELECT 
         event_time,
-        toStartOfHour(event_time) as hour,
-        event.event.data.id as incident_id
+        toDate(event_time) as date,
+        toHour(event_time) as hour,
+        event.event.data.id as incident_id,
+        event.event.data.status as status
     FROM pagerduty
-    WHERE event_type IN ['incident.triggered', 'incident.escalated']
+    WHERE event_type in ['incident.triggered', 'incident.escalated']
     AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
     {% if defined(service_id) and service_id != '' %}
     AND event.event.data.service.id::String = {{String(service_id)}}
     {% end %}
+    ORDER BY event_time ASC
 
 NODE interruptions
 SQL >
     %
     SELECT 
+        date,
         hour,
-        count() as interruptions,
-        toDayOfWeek(hour) as day_of_week,
-        toHour(hour) as hour_of_day
+        countIf(is_interruption) as interruptions
     FROM (
         SELECT 
+            date,
             hour,
             incident_id,
-            min(event_time) as first_notification
-        FROM notifications
-        GROUP BY hour, incident_id
-        HAVING dateDiff('second', 
-                lagInFrame(first_notification) OVER (ORDER BY first_notification), 
-                first_notification) > 60
-        OR lagInFrame(first_notification) OVER (ORDER BY first_notification) IS NULL
+            event_time,
+            if(
+                event_time > addSeconds(lagInFrame(event_time) OVER (ORDER BY event_time), 60) 
+                OR lagInFrame(event_time) OVER (ORDER BY event_time) IS NULL,
+                1,
+                0
+            ) as is_interruption
+        FROM (
+            SELECT DISTINCT
+                date,
+                hour,
+                incident_id,
+                min(event_time) as event_time
+            FROM notifications
+            GROUP BY date, hour, incident_id
+            ORDER BY event_time
+        )
     )
-    GROUP BY hour
-    
+    GROUP BY date, hour
 
 NODE interruptions_summary
 SQL >
     %
     SELECT 
-        hour,
-        interruptions,
-        multiIf(
-            hour_of_day >= 9 AND hour_of_day < 17 AND day_of_week >= 1 AND day_of_week <= 5, 'business',
-            hour_of_day >= 23 OR hour_of_day < 7, 'sleep',
-            'off'
-        ) as hour_type
-    FROM interruptions
-    ORDER BY hour ASC 
+        dr.day,
+        sum(multiIf(
+            hour >= 10 AND hour < 18 AND toDayOfWeek(dr.day) >= 1 AND toDayOfWeek(dr.day) <= 5, i.interruptions,
+            0
+        )) as business_hours,
+        sum(multiIf(
+            hour >= 23 OR hour < 8, i.interruptions,
+            0
+        )) as sleep_hours,
+        sum(multiIf(
+            (hour >= 18 AND hour < 23) OR (hour >= 8 AND hour < 10), i.interruptions,
+            0
+        )) as off_hours
+    FROM date_range dr
+    LEFT JOIN interruptions i ON dr.day = i.date
+    GROUP BY dr.day
+    ORDER BY day ASC 
