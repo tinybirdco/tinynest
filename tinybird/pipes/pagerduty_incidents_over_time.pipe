@@ -17,4 +17,4 @@ SQL >
     AND event.event.data.service.id::String = {{String(service_id)}}
     {% end %}
     GROUP BY hour
-    ORDER BY hour DESC 
+    ORDER BY hour ASC
