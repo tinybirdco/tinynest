@@ -6,11 +6,15 @@ SQL >
     %
     SELECT 
         toStartOfHour(event_time) as hour,
-        event_type,
-        count() as count
+        countIf(event_type = 'incident.triggered') as triggered,
+        countIf(event_type = 'incident.resolved') as resolved,
+        countIf(event_type = 'incident.escalated') as escalated
     FROM pagerduty
     WHERE event.event.data.type::String = 'incident'
     AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
-    GROUP BY hour, event_type
+    {% if defined(service_id) and service_id != '' %}
+    AND event.event.data.service.id::String = {{String(service_id)}}
+    {% end %}
+    GROUP BY hour
     ORDER BY hour DESC 

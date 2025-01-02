@@ -4,11 +4,40 @@ TAGS "pagerduty"
 NODE incident_metrics
 SQL >
     %
-    SELECT 
-        count() as total_incidents,
-        countIf(event_type = 'incident.escalated') * 100.0 / count() as escalation_rate,
-        countIf(event_type = 'incident.resolved') * 100.0 / count() as resolution_rate
-    FROM pagerduty
-    WHERE event.event.data.type::String = 'incident'
-    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
-    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    SELECT
+        count(DISTINCT triggered.incident_id) as total_incidents,
+        countIf(p.event_type = 'incident.resolved') as resolved_incidents,
+        round(
+            countIf(p.event_type = 'incident.resolved') / count(DISTINCT triggered.incident_id) * 100, 1
+        ) as resolution_rate,
+        round(
+            countIf(p.event_type = 'incident.escalated') / count(DISTINCT triggered.incident_id) * 100,
+            1
+        ) as escalation_rate
+    FROM
+        (
+            SELECT event.event.data.id as incident_id, min(event_time) as triggered_at
+            FROM pagerduty
+            WHERE
+                event_type = 'incident.triggered'
+                AND event_time >= {{ DateTime(date_from, '2024-01-01 00:00:00') }}
+                AND event_time <= {{ DateTime(date_to, '2025-01-31 23:59:59') }}
+                {% if defined(service_id) and service_id != '' %}
+                AND event.event.data.service.id::String = {{String(service_id)}}
+                {% end %}
+            GROUP BY incident_id
+        ) as triggered
+    LEFT JOIN
+        (
+            select *, event.event.data.id::String incident_id
+            from pagerduty
+            where
+                event_type in ['incident.resolved', 'incident.escalated']
+                AND event_time >= {{ DateTime(date_from, '2024-01-01 00:00:00') }}
+                AND event_time <= {{ DateTime(date_to, '2025-01-31 23:59:59') }}
+                {% if defined(service_id) and service_id != '' %}
+                AND event.event.data.service.id::String = {{String(service_id)}}
+                {% end %}
+        ) p
+        ON triggered.incident_id::String = p.incident_id::String
+    WHERE p.event_time >= triggered.triggered_at

@@ -1,0 +1,34 @@
+TOKEN "read" READ
+TAGS "pagerduty"
+
+NODE incident_types
+SQL >
+    %
+      with replaceRegexpOne(event.event.data.title::String, '\\[FIRING:\\d+\\]\\s*', '') as title,
+       substring(title, 1, 20) as incident_type
+    SELECT 
+        title,
+        multiIf(
+            lower(event.event.data.title::String) LIKE '%aws%', 'AWS',
+            lower(event.event.data.title::String) LIKE '%gcp%', 'GCP',
+            lower(event.event.data.title::String) LIKE '%azure%', 'Azure',
+            'Unknown'
+        ) as cloud,
+        coalesce(
+            extractAll(event.event.data.title::String, '(?:aws|gcp|azure)-([a-z]+-[a-z]+-[0-9]+)')[1],
+            'unknown'
+        ) as cluster,
+        count() as total_incidents,
+        countIf(event.event.data.urgency::String = 'high') as high_urgency_incidents,
+        groupArray(event.event.data.title::String)[1] as example_title
+    FROM pagerduty
+    WHERE event_type = 'incident.triggered'
+    AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+    AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
+    {% if defined(service_id) and service_id != '' %}
+    AND event.event.data.service.id::String = {{String(service_id)}}
+    {% end %}
+    GROUP BY incident_type, title, cloud, cluster
+    ORDER BY total_incidents DESC
+    LIMIT {{Int32(page_size, 100)}}
+    OFFSET {{Int32(page, 0) * Int32(page_size, 100)}}

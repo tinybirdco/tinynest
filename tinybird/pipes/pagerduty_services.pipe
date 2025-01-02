@@ -1,0 +1,12 @@
+TOKEN "read" READ
+TAGS "pagerduty"
+
+NODE services
+SQL >
+    SELECT DISTINCT
+        event.event.data.service.summary as service_name,
+        event.event.data.service.id as service_id
+    FROM pagerduty
+    WHERE event.event.data.service.summary::String IS NOT NULL
+    AND event_time >= now() - interval 30 day
+    ORDER BY service_name ASC 
