@@ -16,12 +16,13 @@ interface IncidentType {
 
 interface IncidentCategoriesTableProps {
   data: IncidentType[]
-  onPageChange: (page: number) => void
   page: number
+  onPageChange: (page: number) => void
   pageSize: number
+  isLoading: boolean
 }
 
-export default function IncidentCategoriesTable({ data, onPageChange, page, pageSize }: IncidentCategoriesTableProps) {
+export default function IncidentCategoriesTable({ data, onPageChange, page, pageSize, isLoading }: IncidentCategoriesTableProps) {
   const [sortConfig, setSortConfig] = useState<{
     key: keyof IncidentType
     direction: 'asc' | 'desc'
@@ -78,15 +79,23 @@ export default function IncidentCategoriesTable({ data, onPageChange, page, page
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedData.map((item) => (
-              <TableRow key={`${item.title}-${item.cloud}-${item.cluster}`}>
-                <TableCell className="truncate max-w-[300px]">{item.title}</TableCell>
-                <TableCell className="truncate max-w-[100px]">{item.cloud}</TableCell>
-                <TableCell className="truncate max-w-[150px]">{item.cluster}</TableCell>
-                <TableCell className="text-right">{item.total_incidents}</TableCell>
-                <TableCell className="text-right">{parseInt(formatPercentage(item.high_urgency_incidents / item.total_incidents * 100))}%</TableCell>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center">
+                  Loading...
+                </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              sortedData.map((item) => (
+                <TableRow key={`${item.title}-${item.cloud}-${item.cluster}`}>
+                  <TableCell className="truncate max-w-[300px]">{item.title}</TableCell>
+                  <TableCell className="truncate max-w-[100px]">{item.cloud}</TableCell>
+                  <TableCell className="truncate max-w-[150px]">{item.cluster}</TableCell>
+                  <TableCell className="text-right">{item.total_incidents}</TableCell>
+                  <TableCell className="text-right">{parseInt(formatPercentage(item.high_urgency_incidents / item.total_incidents * 100))}%</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </CardContent>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useQueryState } from 'nuqs'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { pipe } from '@/lib/tinybird'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatDuration, formatNumber, formatPercentage } from '@/lib/utils'
@@ -63,13 +63,9 @@ export default function PagerDutyDashboard() {
   const [page, setPage] = useState(0)
   const pageSize = 10
   const [incidentTypes, setIncidentTypes] = useState<IncidentType[]>([])
-  const [services, setServices] = useState<Array<{
-    service_name: string
-    service_id: string
-  }>>([])
   const [selectedService, setSelectedService] = useState<string>()
 
-  const fetchIncidentTypes = async (newPage: number) => {
+  const fetchIncidentTypes = useCallback(async (newPage: number) => {
     if (!token) return
     setIsTableLoading(true)
     try {
@@ -90,22 +86,14 @@ export default function PagerDutyDashboard() {
     } finally {
       setIsTableLoading(false)
     }
-  }
+  }, [token, dateRange.from, dateRange.to, selectedService, pageSize])
 
   const handlePageChange = async (newPage: number) => {
     setPage(newPage)
     await fetchIncidentTypes(newPage)
   }
 
-  useEffect(() => {
-    fetchMetrics()
-  }, [token, dateRange.from, dateRange.to, selectedService])
-
-  useEffect(() => {
-    fetchIncidentTypes(page)
-  }, [token, dateRange.from, dateRange.to, selectedService, page])
-
-  const fetchMetrics = async () => {
+  const fetchMetrics = useCallback(async () => {
     if (!token) return
     setIsLoading(true)
     try {
@@ -182,27 +170,21 @@ export default function PagerDutyDashboard() {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const fetchServices = async () => {
-    if (!token) return
-    try {
-      const servicesData = await pipe(token, 'pagerduty_services')
-      setServices(servicesData.data)
-    } catch (error) {
-      console.error('Failed to fetch services:', error)
-    }
-  }
+  }, [token, dateRange.from, dateRange.to, selectedService])
 
   useEffect(() => {
-    fetchServices()
-  }, [token])
+    fetchMetrics()
+  }, [fetchMetrics])
+
+  useEffect(() => {
+    fetchIncidentTypes(page)
+  }, [fetchIncidentTypes, page])
 
   return (
     <div className="space-y-8">
       <div className="flex justify-end items-center gap-4">
         <Filter
-          token={token}
+          token={token || ''}
           pipeName="pagerduty_services"
           label="Service"
           value={selectedService}
@@ -319,6 +301,7 @@ export default function PagerDutyDashboard() {
             page={page}
             onPageChange={handlePageChange}
             pageSize={pageSize}
+            isLoading={isTableLoading}
           />
         </div>
       </div>
