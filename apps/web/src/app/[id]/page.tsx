@@ -45,14 +45,6 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
     checkInstallation();
   }, [token, id, setToken, router]);
 
-  if (!token || !isValidToken) {
-    return (
-      <div className="py-6">
-        <TokenPrompt error={error} />
-      </div>
-    );
-  }
-
   if (!(id in TOOLS)) {
     return <div>Tool not found</div>;
   }
@@ -73,6 +65,9 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
         </div>
         {error && (
           <p className="text-sm text-red-500">{error}</p>
+        )}
+        {!token || !isValidToken && (
+          <TokenPrompt error={error} />
         )}
         <Component />
       </div>

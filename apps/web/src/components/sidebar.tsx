@@ -19,7 +19,7 @@ function AppCard({
 }: {
   app: AppGridItem;
   state: ToolState;
-  token?: string;
+  token?: string | null;
   isActive: boolean;
 }) {
   const stateColors = {
@@ -35,7 +35,6 @@ function AppCard({
     >
       <Card className={`p-3 hover:bg-accent mb-2 ${stateColors[state]} ${isActive ? 'bg-accent' : ''}`}>
         <div className="flex items-center gap-3">
-          {/* <div className="text-xl">{app.icon}</div> */}
           {app.icon_url && <Image src={app.icon_url} width={16} height={16} alt={app.name} />}
           <div>
             <div className="flex items-center gap-2">
@@ -77,7 +76,6 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
   useEffect(() => {
     async function fetchToolStates() {
       if (!token) return;
-
       setIsLoading(true);
       setError(undefined);
       try {
@@ -98,11 +96,8 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
         setIsLoading(false);
       }
     }
-
-    fetchToolStates();
+    if (token) fetchToolStates();
   }, [token, setToken]);
-
-  if (!token || error) return null;
 
   return (
     <div className="w-64 border-r h-screen">
@@ -183,26 +178,30 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
             )}
 
             {/* Available Apps */}
-            <div className="space-y-2">
-              <SectionHeader
-                title="Available Apps"
-                tooltip="Your Tinybird Workspace doesn't have the Data Sources installed yet. Click an app to learn how to install it."
-              />
+            {Object.values(TOOLS).some(app => toolStates[app.id] === 'available') && (
               <div className="space-y-2">
-                {Object.values(TOOLS)
-                  .filter(app => !toolStates[app.id] || toolStates[app.id] === 'available')
-                  .map(app => (
-                    <AppCard
-                      key={app.id}
-                      app={app}
-                      state={toolStates[app.id] || 'available'}
-                      token={token}
-                      isActive={app.id === activeAppId}
-                    />
-                  ))}
+                <SectionHeader
+                  title="Available Apps"
+                  tooltip="Your Tinybird Workspace doesn't have the Data Sources installed yet. Click an app to learn how to install it."
+                />
+                <div className="space-y-2">
+                  {Object.values(TOOLS)
+                    .filter(app => !toolStates[app.id] || toolStates[app.id] === 'available')
+                    .map(app => (
+                      <AppCard
+                        key={app.id}
+                        app={app}
+                        state={toolStates[app.id] || 'available'}
+                        token={token}
+                        isActive={app.id === activeAppId}
+                      />
+                    ))}
+                </div>
               </div>
-            </div>
+            )}
+
           </div>
+
         )}
       </ScrollArea>
     </div>
