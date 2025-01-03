@@ -1,12 +1,11 @@
 "use client"
 
-import { SquareArrowOutUpRight } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 
-export default function TokenPrompt({ error }: { error?: string }) {
+export default function TokenPrompt() {
     const [token, setToken] = useQueryState('token')
     const [inputToken, setInputToken] = useState('')
 

@@ -67,7 +67,7 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
           <p className="text-sm text-red-500">{error}</p>
         )}
         {!token || !isValidToken && (
-          <TokenPrompt error={error} />
+          <TokenPrompt />
         )}
         <Component />
       </div>

@@ -71,13 +71,13 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
   const [token, setToken] = useQueryState('token');
   const [toolStates, setToolStates] = useState<Record<string, ToolState>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>();
+  // const [error,setError] = useState<string>();
 
   useEffect(() => {
     async function fetchToolStates() {
       if (!token) return;
       setIsLoading(true);
-      setError(undefined);
+      // setError(undefined);
       try {
         const allStates = await checkToolState(token);
         const states = Object.values(TOOLS).map((app) => {
@@ -86,11 +86,11 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
         setToolStates(Object.fromEntries(states));
       } catch (error) {
         if (error instanceof InvalidTokenError) {
-          setError('Invalid token');
+          // setError('Invalid token');
           setToken(null);
         } else {
           console.error('Failed to fetch tool states:', error);
-          setError('Failed to fetch tool states');
+          // setError('Failed to fetch tool states');
         }
       } finally {
         setIsLoading(false);
