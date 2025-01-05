@@ -10,7 +10,7 @@ import { SectionHeader } from '@/components/section-header';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageSquare, HardDriveDownload, Settings, ChevronRight, ChevronLeft, Menu, LayoutDashboard, Download, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import Image from 'next/image';
 
 function AppCard({
@@ -119,6 +119,7 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="p-0 w-80">
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           <SidebarInner 
             token={token}
             activeAppId={activeAppId}
