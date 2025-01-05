@@ -8,7 +8,7 @@ import { checkToolState, InvalidTokenError } from '@/lib/tinybird';
 import { TOOLS, type AppGridItem, type ToolState } from '@/lib/constants';
 import { SectionHeader } from '@/components/section-header';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, HardDriveDownload, Settings } from 'lucide-react';
 import Image from 'next/image';
 
 function AppCard({
@@ -23,8 +23,8 @@ function AppCard({
   isActive: boolean;
 }) {
   const stateColors = {
-    configured: 'border-green-500',
-    installed: 'border-blue-500',
+    configured: '',
+    installed: '',
     available: ''
   };
 
@@ -34,13 +34,14 @@ function AppCard({
       href={`/${app.id}${token ? `?token=${token}` : ''}`}
     >
       <Card className={`p-3 hover:bg-accent mb-2 ${stateColors[state]} ${isActive ? 'bg-accent' : ''}`}>
-        <div className="flex items-center gap-3">
-          {app.icon_url && <Image src={app.icon_url} width={16} height={16} alt={app.name} />}
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-3">
+            {app.icon_url && <Image src={app.icon_url} width={16} height={16} alt={app.name} />}
+            <span className="font-medium">{app.name}</span>
+          </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-sm">{app.name}</h3>
-              {/* <span className="text-xs text-muted-foreground">({state})</span> */}
-            </div>
+            {state === 'available' && <HardDriveDownload className="w-4 h-4 text-muted-foreground" />}
+            {state === 'installed' && <Settings className="w-4 h-4 text-muted-foreground" />}
           </div>
         </div>
       </Card>
@@ -141,7 +142,7 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
             {Object.values(TOOLS).some(app => toolStates[app.id] === 'configured') && (
               <div className="space-y-2">
                 <SectionHeader
-                  title="Configured Apps"
+                  title="Dashboards"
                   tooltip="These apps are fully set up and have data. They're ready to use!"
                 />
                 <div className="space-y-2">
@@ -164,7 +165,7 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
             {Object.values(TOOLS).some(app => toolStates[app.id] === 'installed') && (
               <div className="space-y-2">
                 <SectionHeader
-                  title="Installed Apps"
+                  title="Installed"
                   tooltip="Your Tinybird Workspace has the Data Sources installed, but you're not receiving data. Click an app to learn how to add data."
                 />
                 <div className="space-y-2">
@@ -187,7 +188,7 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
             {Object.values(TOOLS).some(app => toolStates[app.id] === 'available') && (
               <div className="space-y-2">
                 <SectionHeader
-                  title="Available Apps"
+                  title="Available"
                   tooltip="Your Tinybird Workspace doesn't have the Data Sources installed yet. Click an app to learn how to install it."
                 />
                 <div className="space-y-2">
