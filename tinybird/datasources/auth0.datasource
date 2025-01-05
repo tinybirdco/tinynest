@@ -1,4 +1,5 @@
 TOKEN "append" APPEND
+TOKEN "read" READ
 
 # Refer to https://github.com/auth0/auth0-log-schemas and https://auth0.com/docs/deploy-monitor/logs/log-event-type-codes for the type codes
 

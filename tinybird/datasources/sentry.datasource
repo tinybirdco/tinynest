@@ -1,4 +1,5 @@
 TOKEN "append" APPEND
+TOKEN "read" READ
 
 # Refer to https://docs.sentry.io/organization/integrations/integration-platform/webhooks/ for the json schemas
 

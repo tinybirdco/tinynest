@@ -1,4 +1,5 @@
 TOKEN "append" APPEND
+TOKEN "read" READ
 
 # Refer to https://docs.withorb.com/guides/integrations-and-exports/webhooks for the `details` schema definition for each resource type
 

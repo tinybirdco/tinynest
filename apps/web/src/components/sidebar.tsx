@@ -39,7 +39,7 @@ function AppCard({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-sm">{app.name}</h3>
-              <span className="text-xs text-muted-foreground">({state})</span>
+              {/* <span className="text-xs text-muted-foreground">({state})</span> */}
             </div>
           </div>
         </div>
@@ -75,28 +75,34 @@ function SidebarContent({ activeAppId }: { activeAppId?: string }) {
 
   useEffect(() => {
     async function fetchToolStates() {
-      if (!token) return;
-      setIsLoading(true);
-      // setError(undefined);
-      try {
-        const allStates = await checkToolState(token);
+      if (!token) {
         const states = Object.values(TOOLS).map((app) => {
-          return [app.id, allStates[app.ds]] as const;
+          return [app.id, 'available'] as const;
         });
         setToolStates(Object.fromEntries(states));
-      } catch (error) {
-        if (error instanceof InvalidTokenError) {
-          // setError('Invalid token');
-          setToken(null);
-        } else {
-          console.error('Failed to fetch tool states:', error);
-          // setError('Failed to fetch tool states');
+      } else {
+        setIsLoading(true);
+        // setError(undefined);
+        try {
+          const allStates = await checkToolState(token);
+          const states = Object.values(TOOLS).map((app) => {
+            return [app.id, allStates[app.ds] ?? 'available'] as const;
+          });
+          setToolStates(Object.fromEntries(states));
+        } catch (error) {
+          if (error instanceof InvalidTokenError) {
+            // setError('Invalid token');
+            setToken(null);
+          } else {
+            console.error('Failed to fetch tool states:', error);
+            // setError('Failed to fetch tool states');
+          }
+        } finally {
+          setIsLoading(false);
         }
-      } finally {
-        setIsLoading(false);
       }
     }
-    if (token) fetchToolStates();
+    fetchToolStates();
   }, [token, setToken]);
 
   return (

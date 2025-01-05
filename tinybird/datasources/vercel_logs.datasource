@@ -1,4 +1,5 @@
 TOKEN "append" APPEND
+TOKEN "read" READ
 
 # Refer to https://vercel.com/docs/observability/log-drains/log-drains-reference for the logs schema
 
