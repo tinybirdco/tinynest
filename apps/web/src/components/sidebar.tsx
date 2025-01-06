@@ -8,7 +8,7 @@ import { checkToolState, InvalidTokenError } from '@/lib/tinybird';
 import { TOOLS, type AppGridItem, type ToolState } from '@/lib/constants';
 import { SectionHeader } from '@/components/section-header';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquare, HardDriveDownload, Settings, ChevronRight, ChevronLeft, Menu, LayoutDashboard, Download, Plus } from 'lucide-react';
+import { MessageSquare, HardDriveDownload, Settings, ChevronRight, ChevronLeft, Menu, LayoutDashboard, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import Image from 'next/image';
