@@ -1,4 +1,5 @@
 TOKEN "append" APPEND
+TOKEN "read" READ
 
 # Refer to https://docs.stripe.com/api/events/object for the event schemas
 

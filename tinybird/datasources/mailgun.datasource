@@ -1,4 +1,5 @@
 TOKEN "append" APPEND
+TOKEN "read" READ
 
 # Refer to https://mailgun-docs.redoc.ly/docs/mailgun/user-manual/events/#event-structure
 

@@ -1,4 +1,5 @@
 TOKEN "append" APPEND
+TOKEN "read" READ
 
 # Refer to https://clerk.com/docs/webhooks/overview#payload-structure
 

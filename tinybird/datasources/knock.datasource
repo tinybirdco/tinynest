@@ -1,4 +1,5 @@
 TOKEN "append" APPEND
+TOKEN "read" READ
 
 # Refer to https://docs.knock.app/developer-tools/outbound-webhooks/event-types
 

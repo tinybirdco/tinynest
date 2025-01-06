@@ -1,4 +1,5 @@
 TOKEN "append" APPEND
+TOKEN "read" READ
 
 # Refer to https://developer.pagerduty.com/docs/webhooks-overview#webhook-payload
 
