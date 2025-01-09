@@ -26,14 +26,20 @@ export interface AuthMechChartData {
 
 const chartConfig = {
     logins: {
-        color: "hsl(var(--primary))",
+        color: "hsl(var(--chart-1))",
         label: "Logins",
     },
 } satisfies ChartConfig
 
+function transformData(data: AuthMechDataPoint[]): (AuthMechDataPoint & { fill: string })[] {
+    return data.map((item, index) => ({
+        ...item,
+        fill: `hsl(var(--chart-${(index % 12) + 1}))`
+    }));
+}
+
 export function AuthMechChart({ data, className }: AuthMechChartData) {
-    // Sort data by number of logins in descending order
-    const sortedData = [...data].sort((a, b) => b.logins - a.logins)
+    const sortedData = transformData([...data].sort((a, b) => b.logins - a.logins))
 
     return (
         <Card>
@@ -73,7 +79,6 @@ export function AuthMechChart({ data, className }: AuthMechChartData) {
                         <Bar
                             dataKey="logins"
                             radius={[4, 4, 4, 4]}
-                            fill="hsl(var(--primary))"
                         />
                     </BarChart>
                 </ChartContainer>

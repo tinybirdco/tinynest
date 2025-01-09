@@ -26,7 +26,7 @@ export interface UserRetentionChartData {
 
 const chartConfig = {
     user_retention: {
-        color: "hsl(var(--primary))",
+        color: "hsl(var(--chart-1))",
         label: "User Retention",
     },
 } satisfies ChartConfig
@@ -95,9 +95,9 @@ export function UserRetentionChart({ data, timeRange, className }: UserRetention
                             strokeWidth={2}
                             dot={true}
                             style={{
-                                stroke: "hsl(var(--primary))",
+                                stroke: chartConfig.user_retention.color,
                             }}
-                            activeDot={{ fill: "hsl(var(--primary))", stroke: "hsl(var(--primary))" }}
+                            activeDot={{ fill: chartConfig.user_retention.color, stroke: chartConfig.user_retention.color }}
                         />
                     </LineChart>
                 </ChartContainer>
