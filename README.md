@@ -1,6 +1,11 @@
-# tinynest
+# Tinynest: The Ultimate Dev Stack Analytics Dashboard
+Tinynest is an open source utility built with love by Tinybird. Capture and analyze data from over a dozen common dev tools, from Vercel to Stripe to Auth0 and more, with just a few lines of code.
 
-Deploy this project to your Tinybird account and configure the webhooks for the services you want to ingest.
+## Get Started
+To start using Tinynest, you just need to deploy the data project to Tinybird, configure some webhooks, and fork the Next.js app (or use the public app at https://tinynest.tinybird.co with your Tinybird token).
+
+### Deploy the Tinybird data project
+You can deploy the entire Tinybird project to your Tinybird account by clicking the button below. If you don't have a Tinybird account you can [signup for free](https://www.tinybird.co/signup).
 
 <p align="left">
   <a href="https://app.tinybird.co?starter_kit=https://github.com/tinybirdco/tinynest/tinybird">
@@ -8,7 +13,8 @@ Deploy this project to your Tinybird account and configure the webhooks for the 
   </a>
 </p>
 
-## Webhooks configuration
+### Configure the webhooks
+You'll need to configure webhooks from the tools in your stack to send data to Tinybird. Find guides below on how to do that for each tool in the Tinynest.
 
 - [Auth0 Log Streams](https://www.tinybird.co/docs/get-data-in/guides/ingest-auth0-logs)
 - [Clerk](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-clerk)
