@@ -1,6 +1,8 @@
 # Tinynest: The Ultimate Dev Stack Analytics Dashboard
 Tinynest is an open source utility built with love by Tinybird. Capture and analyze data from over a dozen common dev tools, from Vercel to Stripe to Auth0 and more, with just a few lines of code.
 
+![image](https://github.com/user-attachments/assets/32f24c18-a815-44f5-8a37-40e2d899e866)
+
 ## Get Started
 To start using Tinynest, you just need to deploy the data project to Tinybird, configure some webhooks, and fork the Next.js app (or use the public app at https://tinynest.tinybird.co with your Tinybird token).
 
