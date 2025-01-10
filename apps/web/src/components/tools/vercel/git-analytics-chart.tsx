@@ -15,6 +15,13 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
+function transformData(data: GitData[]): (GitData & { fill: string })[] {
+    return data.map((item, index) => ({
+        ...item,
+        fill: `hsl(var(--chart-${(index % 12) + 1}))`
+    }));
+}
+
 export function GitAnalyticsChart({ data, isLoading, className }: {
     data: GitData[]
     isLoading: boolean
@@ -23,11 +30,13 @@ export function GitAnalyticsChart({ data, isLoading, className }: {
     if (isLoading) return <div className={`flex items-center justify-center ${className}`}>Loading...</div>
     if (!data.length) return <div className={`flex items-center justify-center ${className}`}>No data available</div>
 
+    data = transformData(data)
+
     return (
         <ChartContainer config={chartConfig} className={`w-full ${className}`}>
             <BarChart
                 data={data}
-                margin={{ left: 120, right: 24, top: 24, bottom: 24 }}
+                margin={{ left: 24, right: 24, top: 24, bottom: 24 }}
                 layout="vertical"
             >
                 <XAxis type="number" tickLine={false} axisLine={false} />

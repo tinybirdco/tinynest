@@ -43,14 +43,14 @@ export function DurationChart({ data }: DurationChartProps) {
                 <Line
                     type="monotone"
                     dataKey="avg_duration"
-                    stroke="hsl(var(--primary))"
+                    stroke="hsl(var(--chart-1))"
                     strokeWidth={2}
                     dot={false}
                 />
                 <Line
                     type="monotone"
                     dataKey="p95_duration"
-                    stroke="hsl(var(--secondary))"
+                    stroke="hsl(var(--chart-2))"
                     strokeWidth={2}
                     dot={false}
                 />
