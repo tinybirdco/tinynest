@@ -10,11 +10,11 @@ interface DeploymentsData {
 
 const chartConfig = {
     'deployment.succeeded': {
-        color: "hsl(var(--primary))",
+        color: "hsl(var(--chart-2))",
         label: "Successful Deployments",
     },
     'deployment.error': {
-        color: "hsl(var(--secondary))",
+        color: "hsl(var(--chart-1))",
         label: "Failed Deployments",
     },
 } satisfies ChartConfig
@@ -80,7 +80,7 @@ export function DeploymentsChart({ data, isLoading, className }: {
                 <Bar
                     dataKey="deployment.succeeded"
                     fill={chartConfig['deployment.succeeded'].color}
-                    radius={[4, 4, 0, 0]}
+                    radius={[0, 0, 4, 4]}
                     stackId="stack"
                 />
                 <Bar

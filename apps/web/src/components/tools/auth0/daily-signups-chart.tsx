@@ -28,7 +28,7 @@ export interface DailySignupsChartData {
 
 const chartConfig = {
     signups: {
-        color: "hsl(var(--primary))",
+        color: "hsl(var(--chart-1))",
         label: "Signups",
     },
 } satisfies ChartConfig
@@ -94,9 +94,9 @@ export function DailySignupsChart({ data, timeRange, className }: DailySignupsCh
                             strokeWidth={2}
                             dot={true}
                             style={{
-                                stroke: "hsl(var(--primary))",
+                                stroke: chartConfig.signups.color,
                             }}
-                            activeDot={{ fill: "hsl(var(--primary))", stroke: "hsl(var(--primary))" }}
+                            activeDot={{ fill: chartConfig.signups.color, stroke: chartConfig.signups.color }}
                         />
                     </LineChart>
                 </ChartContainer>

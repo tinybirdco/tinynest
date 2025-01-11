@@ -15,15 +15,24 @@ interface TopDomainsChartProps {
 
 const chartConfig = {
     unique_emails: {
-        color: "hsl(var(--primary))",
+        color: "hsl(var(--chart-1))",
         label: "Users",
     },
 } satisfies ChartConfig
+
+function transformData(data: Domain[]): (Domain & { fill: string })[] {
+    return data.map((item, index) => ({
+        ...item,
+        fill: `hsl(var(--chart-${(index % 12) + 1}))`
+    }));
+}
 
 export function TopDomainsChart({ data, isLoading, className }: TopDomainsChartProps) {
     if (isLoading) return <div className={`flex items-center justify-center ${className}`}>Loading...</div>
     if (!data.length) return <div className={`flex items-center justify-center ${className}`}>No data available</div>
 
+    data = transformData(data)
+    
     return (
         <ChartContainer config={chartConfig} className={`w-full ${className}`}>
             <BarChart 

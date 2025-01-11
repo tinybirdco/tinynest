@@ -64,6 +64,8 @@ export function SubsByPlanTsChart({ data: rawData }: SubsByPlanTsChartData) {
                         margin={{
                             left: 12,
                             right: 12,
+                            top: 12,
+                            bottom: 12,
                         }}
                     >
                         <XAxis
@@ -89,7 +91,7 @@ export function SubsByPlanTsChart({ data: rawData }: SubsByPlanTsChartData) {
                             }}
                         />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                        {planNames.map((plan) => (
+                        {planNames.map((plan, i) => (
                             <Line
                                 key={plan}
                                 type="monotone"
@@ -97,6 +99,7 @@ export function SubsByPlanTsChart({ data: rawData }: SubsByPlanTsChartData) {
                                 name={plan}
                                 strokeWidth={2}
                                 dot={false}
+                                stroke={`hsl(var(--chart-${i}))`}
                             />
                         ))}
                     </LineChart>

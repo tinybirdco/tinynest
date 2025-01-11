@@ -28,7 +28,7 @@ export interface DailyLoginFailsChartData {
 
 const chartConfig = {
     fails: {
-        color: "hsl(var(--primary))",
+        color: "hsl(var(--chart-1))",
         label: "Login Fails",
     },
 } satisfies ChartConfig
@@ -94,9 +94,9 @@ export function DailyLoginFailsChart({ data, timeRange, className }: DailyLoginF
                             strokeWidth={2}
                             dot={true}
                             style={{
-                                stroke: "hsl(var(--primary))",
+                                stroke: chartConfig.fails.color,
                             }}
-                            activeDot={{ fill: "hsl(var(--primary))", stroke: "hsl(var(--primary))" }}
+                            activeDot={{ fill: chartConfig.fails.color, stroke: chartConfig.fails.color }}
                         />
                     </LineChart>
                 </ChartContainer>

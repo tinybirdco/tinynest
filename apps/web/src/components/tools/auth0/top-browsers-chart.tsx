@@ -19,9 +19,18 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
+function transformData(data: Browser[]): (Browser & { fill: string })[] {
+    return data.map((item, index) => ({
+        ...item,
+        fill: `hsl(var(--chart-${(index % 12) + 1}))`
+    }));
+}
+
 export function TopBrowsersChart({ data, isLoading, className }: TopBrowsersChartProps) {
     if (isLoading) return <div className={`flex items-center justify-center ${className}`}>Loading...</div>
     if (!data.length) return <div className={`flex items-center justify-center ${className}`}>No data available</div>
+
+    data = transformData(data)
 
     return (
         <ChartContainer config={chartConfig} className={`w-full ${className}`}>
@@ -55,7 +64,6 @@ export function TopBrowsersChart({ data, isLoading, className }: TopBrowsersChar
                 />
                 <Bar 
                     dataKey="request_count" 
-                    fill="hsl(var(--primary))"
                     radius={[4, 4, 4, 4]}
                 />
             </BarChart>

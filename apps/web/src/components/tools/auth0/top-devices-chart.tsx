@@ -13,14 +13,23 @@ interface TopDevicesChartProps {
 
 const chartConfig = {
     request_count: {
-        color: "hsl(var(--primary))",
+        color: "hsl(var(--chart-1))",
         label: "Requests",
     },
 } satisfies ChartConfig
 
+function transformData(data: Device[]): (Device & { fill: string })[] {
+    return data.map((item, index) => ({
+        ...item,
+        fill: `hsl(var(--chart-${(index % 12) + 1}))`
+    }));
+}
+
 export function TopDevicesChart({ data, isLoading, className }: TopDevicesChartProps) {
     if (isLoading) return <div className={`flex items-center justify-center ${className}`}>Loading...</div>
     if (!data.length) return <div className={`flex items-center justify-center ${className}`}>No data available</div>
+
+    data = transformData(data)
 
     return (
         <ChartContainer config={chartConfig} className={`w-full ${className}`}>

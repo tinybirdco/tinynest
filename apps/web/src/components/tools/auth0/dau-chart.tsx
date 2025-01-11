@@ -29,7 +29,7 @@ export interface DauChartData {
 
 const chartConfig = {
     active: {
-        color: "hsl(var(--primary))",
+        color: "hsl(var(--chart-1))",
         label: "Active Users",
     },
 } satisfies ChartConfig
@@ -95,10 +95,10 @@ export function DauChart({ data, timeRange, className }: DauChartData) {
                             strokeWidth={2}
                             activeDot={{
                                 r: 4,
-                                style: { fill: "hsl(var(--primary))" },
+                                style: { fill: chartConfig.active.color },
                             }}
                             style={{
-                                stroke: "hsl(var(--primary))",
+                                stroke: chartConfig.active.color,
                             }}
                         />
                     </LineChart>

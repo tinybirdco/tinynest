@@ -25,7 +25,7 @@ export interface SubsChartProps {
 
 const chartConfig = {
     invoices: {
-        color: "hsl(var(--primary))",
+        color: "hsl(var(--chart-1))",
         label: "New Subscriptions",
     },
 } satisfies ChartConfig
@@ -43,6 +43,8 @@ export function SubsChart({ data }: SubsChartProps) {
                         margin={{
                             left: 12,
                             right: 12,
+                            top: 12,
+                            bottom: 12
                         }}
                     >
                         <XAxis
@@ -77,11 +79,9 @@ export function SubsChart({ data }: SubsChartProps) {
                             strokeWidth={2}
                             activeDot={{
                                 r: 4,
-                                style: { fill: "hsl(var(--primary))" },
+                                style: { fill: chartConfig.invoices.color },
                             }}
-                            style={{
-                                stroke: "hsl(var(--primary))",
-                            }}
+                            stroke={chartConfig.invoices.color}
                         />
                     </LineChart>
                 </ChartContainer>

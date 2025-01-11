@@ -15,11 +15,11 @@ interface CumulativeSignupsChartProps {
 
 const chartConfig = {
     cumulative_users: {
-        color: "hsl(var(--primary))",
+        color: "hsl(var(--chart-1))",
         label: "Total Users",
     },
     new_users: {
-        color: "hsl(var(--secondary))",
+        color: "hsl(var(--chart-2))",
         label: "New Users",
     },
 } satisfies ChartConfig
@@ -57,13 +57,13 @@ export function CumulativeSignupsChart({ data, isLoading, className }: Cumulativ
                 />
                 <Bar 
                     dataKey="cumulative_users" 
-                    fill="hsl(var(--primary))"
-                    radius={[4, 4, 0, 0]}
+                    fill={chartConfig.cumulative_users.color}
+                    radius={[0, 0, 4, 4]}
                     stackId="a"
                 />
                 <Bar 
                     dataKey="new_users" 
-                    fill="hsl(var(--secondary))"
+                    fill={chartConfig.new_users.color}
                     radius={[4, 4, 0, 0]}
                     stackId="a"
                 />

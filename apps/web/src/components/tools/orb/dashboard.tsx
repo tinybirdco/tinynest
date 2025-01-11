@@ -93,9 +93,8 @@ export default function OrbDashboard() {
             {/* Charts Grid */}
             <div className="grid gap-4 grid-cols-1">
                 <SubsChart data={subsTimeSeriesData} />
-
             </div>
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 max-h-[400px]">
                 <SubsByPlanTsChart data={subsByPlanTsData} />
                 <SubsByPlanChart data={subsByPlanData} />
             </div>

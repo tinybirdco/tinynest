@@ -9,14 +9,21 @@ interface ProjectData {
 
 const chartConfig = {
     total_deployments: {
-        color: "hsl(var(--primary))",
+        color: "hsl(var(--chart-1))",
         label: "Total Deployments",
     },
     error_rate: {
-        color: "hsl(0 84.2% 60.2%)",
+        color: "hsl(var(--chart-2))",
         label: "Error Rate %",
     },
 } satisfies ChartConfig
+
+function transformData(data: ProjectData[]): (ProjectData & { fill: string })[] {
+    return data.map((item, index) => ({
+        ...item,
+        fill: `hsl(var(--chart-${(index % 12) + 1}))`
+    }));
+}
 
 export function ProjectsChart({ data, isLoading, className }: {
     data: ProjectData[]
@@ -25,6 +32,8 @@ export function ProjectsChart({ data, isLoading, className }: {
 }) {
     if (isLoading) return <div className={`flex items-center justify-center ${className}`}>Loading...</div>
     if (!data.length) return <div className={`flex items-center justify-center ${className}`}>No data available</div>
+
+    data = transformData(data)
 
     return (
         <ChartContainer config={chartConfig} className={`w-full ${className}`}>
