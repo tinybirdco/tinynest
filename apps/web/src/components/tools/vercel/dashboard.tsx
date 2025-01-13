@@ -28,7 +28,7 @@ export default function VercelDashboard() {
     })
 
     const [, setIsLoading] = useState(true)
-    const [metrics, setMetrics] = useState<any>()
+    const [metrics, setMetrics] = useState<VercelMetrics>()
     const [deploymentsData, setDeploymentsData] = useState<DeploymentsData[]>([])
     const [durationData, setDurationData] = useState<DurationData[]>([])
     const [projectsData, setProjectsData] = useState<ProjectData[]>([])
