@@ -26,4 +26,4 @@ Check the status of the integration from the **Log** tab in the Tinybird `gitlab
 
 * [Events API](https://tinybird.co/docs/get-data-in/ingest-apis/events-api)
 * [GitLab Webhooks](https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html)
-* [Tinybird Data Sources](https://github.com/tinybirdco/tinynest/blob/main/tinybird/datasources/)
+* [Tinybird Data Sources](https://github.com/tinybirdco/dev-stack-analytics-template/blob/main/tinybird/datasources/)

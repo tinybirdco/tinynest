@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tinynest",
-  description: "Analyze your SaaS stack",
+  title: "Dev stack analytics template",
+  description: "Analyze your dev stack",
 };
 
 export default function RootLayout({

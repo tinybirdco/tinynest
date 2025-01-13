@@ -1,22 +1,22 @@
-# Tinynest: The Ultimate Dev Stack Analytics Dashboard
-Tinynest is an open source utility built with love by Tinybird. Capture and analyze data from over a dozen common dev tools, from Vercel to Stripe to Auth0 and more, with just a few lines of code.
+# Dev stack analytics template
+The dev stack analytics template is an open source utility built with love by Tinybird. Capture and analyze data from over a dozen common dev tools, from Vercel to Stripe to Auth0 and more, with just a few lines of code.
 
 ![image](https://github.com/user-attachments/assets/32f24c18-a815-44f5-8a37-40e2d899e866)
 
 ## Get Started
-To start using Tinynest, you just need to deploy the data project to Tinybird, configure some webhooks, and fork the Next.js app (or use the public app at https://tinynest.tinybird.co with your Tinybird token).
+To start using Dev Stack Analytics, you just need to deploy the data project to Tinybird, configure some webhooks, and fork the Next.js app (or use the public app at https://dsat.tinybird.app with your Tinybird token).
 
 ### Deploy the Tinybird data project
 You can deploy the entire Tinybird project to your Tinybird account by clicking the button below. If you don't have a Tinybird account you can [signup for free](https://www.tinybird.co/signup).
 
 <p align="left">
-  <a href="https://app.tinybird.co?starter_kit=https://github.com/tinybirdco/tinynest/tinybird">
+  <a href="https://app.tinybird.co?starter_kit=https://github.com/tinybirdco/dev-stack-analytics-template/tinybird">
     <img width="200" src="https://img.shields.io/badge/Deploy%20to-Tinybird-25283d?style=flat&labelColor=25283d&color=27f795&logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNTAwIDUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNTAwIDQyLjhsLTE1Ni4xLTQyLjgtNTQuOSAxMjIuN3pNMzUwLjcgMzQ1LjRsLTE0Mi45LTUxLjEtODMuOSAyMDUuN3oiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii42Ii8+PHBhdGggZD0iTTAgMjE5LjlsMzUwLjcgMTI1LjUgNTcuNS0yNjguMnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=" />
   </a>
 </p>
 
 ### Configure the webhooks
-You'll need to configure webhooks from the tools in your stack to send data to Tinybird. Find guides below on how to do that for each tool in the Tinynest.
+You'll need to configure webhooks from the tools in your stack to send data to Tinybird. Find guides below on how to do that for each tool in the template.
 
 - [Auth0 Log Streams](https://www.tinybird.co/docs/get-data-in/guides/ingest-auth0-logs)
 - [Clerk](https://www.tinybird.co/docs/get-data-in/guides/ingest-from-clerk)

@@ -37,7 +37,7 @@ function AppCard({
       className="block"
       href={`/${app.id}${token ? `?token=${token}` : ''}`}
     >
-      <Card className={`h-[42px] hover:bg-accent mb-2 ${stateColors[state]} ${isActive ? 'bg-accent' : ''} ${isCollapsed ? 'w-10' : ''}`}>
+      <Card className={`h-[42px] hover:bg-accent mb-2 ${stateColors[state]} ${isActive ? 'bg-accent' : ''} ${isCollapsed ? 'w-auto' : ''}`}>
         <div className={`flex items-center justify-between h-full ${isCollapsed ? 'px-2' : 'px-3'} w-full`}>
           <div className={`flex items-center gap-3 min-w-0 ${isCollapsed && 'mx-auto'}`}>
             {app.icon_url && <Image src={app.icon_url} width={16} height={16} alt={app.name} className="flex-shrink-0" />}
@@ -60,7 +60,7 @@ export function Sidebar({ activeAppId }: { activeAppId?: string }) {
     <Suspense fallback={
       <div className="w-64 border-r h-screen">
         <div className="p-4 border-b">
-          <div className="text-xl font-bold">tinynest</div>
+          <div className="text-xl font-bold">Dev stack analytics template</div>
         </div>
         <div className="h-[calc(100vh-65px)] px-4 py-6">
           <div className="flex items-center justify-center">
@@ -178,7 +178,7 @@ function SidebarInner({
           href={token ? `/?token=${token}` : '/'}
           className={`font-bold hover:text-primary transition-colors ${isCollapsed ? 'text-lg' : 'text-xl'}`}
         >
-          {isCollapsed ? 'tn' : 'tinynest'}
+          {isCollapsed ? 'dsat' : 'Dev stack analytics template'}
         </Link>
       </div>
 

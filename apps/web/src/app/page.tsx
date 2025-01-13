@@ -12,7 +12,7 @@ function HomeContent() {
   return (
     <div className="py-6">
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">Welcome to Tinynest</h1>
+        <h1 className="text-2xl font-bold">Dev stack analytics template</h1>
         {token && (
           <>
             <p className="text-muted-foreground">
@@ -27,11 +27,11 @@ function HomeContent() {
         )}
         {!token && (
           <div className="prose">
-            <p>Tinynest lets you see what&apos;s going on in your SaaS stack.</p>
+            <p>The dev stack analytics template (DSAT) lets you see what&apos;s going on in your SaaS stack.</p>
             <p>Modern products use a nest of SaaS tools as building blocks, like Tinybird for Analytics, Clerk for Auth, Stripe for Payments, and more.</p>
             <p>This lets you focus on building your product and delighting your users.</p>
             <p>But it can also make it hard to see the complete picture of how your users are interacting with your product.</p>
-            <p>Tinynest helps you to bring that data together in one place.</p>
+            <p>DSAT helps you to bring that data together in one place.</p>
             <TokenPrompt />
 
             <h2>New here? Deploy now</h2>
@@ -39,7 +39,7 @@ function HomeContent() {
               Deploy a new project to Tinybird to get started
             </p>
             <Link
-              href="https://app.tinybird.co/?starter_kit=https://github.com/tinybirdco/tinynest/tinybird"
+              href="https://app.tinybird.co/?starter_kit=https://github.com/tinybirdco/dev-stack-analytics-template/tinybird"
               target="_blank"
               className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow hover:bg-primary/90"
             >
