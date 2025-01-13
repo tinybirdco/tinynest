@@ -2,9 +2,14 @@ import { format } from 'date-fns'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Card } from '@/components/ui/card'
 
+export interface DurationData {
+    period: string
+    avg_duration: number
+    p95_duration: number
+}
+
 interface DurationChartProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any[]
+    data: DurationData[]
 }
 
 export function DurationChart({ data }: DurationChartProps) {

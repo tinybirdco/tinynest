@@ -2,7 +2,7 @@ import { BarChart, Bar, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartConfig } from '@/components/ui/chart'
 import { format } from 'date-fns'
 
-interface DeploymentsData {
+export interface DeploymentsData {
     period: string
     event_type: string
     count: number
@@ -19,13 +19,8 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function DeploymentsChart({ data, isLoading, className }: {
-    data: DeploymentsData[]
-    isLoading: boolean
-    className?: string
-}) {
-    if (isLoading) return <div className={`flex items-center justify-center ${className}`}>Loading...</div>
-    if (!data.length) return <div className={`flex items-center justify-center ${className}`}>No data available</div>
+export function DeploymentsChart({ data }: { data: DeploymentsData[] }) {
+    if (!data.length) return <div className={`flex items-center justify-center`}>No data available</div>
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const chartData = data.reduce((acc: any[], curr: DeploymentsData) => {
@@ -42,7 +37,7 @@ export function DeploymentsChart({ data, isLoading, className }: {
     }, [])
 
     return (
-        <ChartContainer config={chartConfig} className={`w-full ${className}`}>
+        <ChartContainer config={chartConfig} className={`w-full`}>
             <BarChart
                 data={chartData}
                 margin={{ left: 24, right: 24, top: 24, bottom: 24 }}
@@ -57,7 +52,7 @@ export function DeploymentsChart({ data, isLoading, className }: {
                     tickLine={false}
                     axisLine={false}
                 />
-                <ChartTooltip 
+                <ChartTooltip
                     content={({ active, payload }) => {
                         if (!active || !payload?.length) return null
                         const data = payload[0].payload
@@ -67,12 +62,12 @@ export function DeploymentsChart({ data, isLoading, className }: {
                                     {format(new Date(data.period), 'd HH:mm')}
                                 </div>
                                 {
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                payload.map((p: any) => (
-                                    <div key={p.dataKey} className="font-bold">
-                                        {chartConfig[p.dataKey as keyof typeof chartConfig].label}: {p.value}
-                                    </div>
-                                ))}
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    payload.map((p: any) => (
+                                        <div key={p.dataKey} className="font-bold">
+                                            {chartConfig[p.dataKey as keyof typeof chartConfig].label}: {p.value}
+                                        </div>
+                                    ))}
                             </div>
                         )
                     }}
