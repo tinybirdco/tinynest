@@ -28,7 +28,6 @@ export default function VercelDashboard() {
     })
 
     const [, setIsLoading] = useState(true)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [metrics, setMetrics] = useState<any>()
     const [deploymentsData, setDeploymentsData] = useState<DeploymentsData[]>([])
     const [durationData, setDurationData] = useState<DurationData[]>([])
