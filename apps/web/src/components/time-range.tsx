@@ -3,9 +3,17 @@ import { cn } from '@/lib/utils'
 import { DateRange } from 'react-day-picker'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 
+const timeRanges = {
+    hourly: 'hourly',
+    daily: 'daily',
+    weekly: 'weekly',
+    monthly: 'monthly',
+} as const;
+export type TimeRange = typeof timeRanges[keyof typeof timeRanges]
+
 interface TimeRangeProps {
-    timeRange: string
-    onTimeRangeChange: (range: string) => void
+    timeRange: TimeRange
+    onTimeRangeChange: (range: TimeRange) => void
     dateRange: DateRange | undefined
     onDateRangeChange: (range: DateRange | undefined) => void
     className?: string
@@ -22,7 +30,7 @@ export function TimeRange({
         <div className={cn("flex items-center gap-2", className)}>
             <div className="flex gap-1">
                 <Button
-                    variant={timeRange === 'hourly' ? 'default' : 'outline'}
+                    variant={timeRange == 'hourly' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => onTimeRangeChange('hourly')}
                 >
