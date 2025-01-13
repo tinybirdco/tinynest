@@ -127,6 +127,15 @@ export const TOOLS: Record<string, AppGridItem> = {
         icon: '👀',
         icon_url: '/sentry_favicon.ico'
     },
+    // Links
+    dub: {
+        id: 'dub',
+        ds: 'dub',
+        name: 'Dub',
+        description: 'Link infrastructure',
+        icon: '👀',
+        icon_url: '/dub_favicon.png'
+    },
 };
 
 export const TOOL_IMPORTS = {
@@ -181,6 +190,10 @@ export const TOOL_IMPORTS = {
     pagerduty: {
         Dashboard: dynamic(() => import('@/components/tools/pagerduty/dashboard')),
         Readme: dynamic(() => import('@/components/tools/pagerduty/readme')),
+    },
+    dub: {
+        Dashboard: dynamic(() => import('@/components/tools/dub/dashboard')),
+        Readme: dynamic(() => import('@/components/tools/dub/readme')),
     },
 } as const;
 
