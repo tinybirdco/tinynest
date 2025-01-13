@@ -1,7 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartConfig } from '@/components/ui/chart'
 
-interface ProjectData {
+export interface ProjectData {
     project_name: string
     total_deployments: number
     error_rate: number
@@ -25,32 +25,27 @@ function transformData(data: ProjectData[]): (ProjectData & { fill: string })[] 
     }));
 }
 
-export function ProjectsChart({ data, isLoading, className }: {
-    data: ProjectData[]
-    isLoading: boolean
-    className?: string
-}) {
-    if (isLoading) return <div className={`flex items-center justify-center ${className}`}>Loading...</div>
-    if (!data.length) return <div className={`flex items-center justify-center ${className}`}>No data available</div>
+export function ProjectsChart({ data }: { data: ProjectData[] }) {
+    if (!data.length) return <div className={`flex items-center justify-center`}>No data available</div>
 
     data = transformData(data)
 
     return (
-        <ChartContainer config={chartConfig} className={`w-full ${className}`}>
+        <ChartContainer config={chartConfig} className={`w-full`}>
             <BarChart
                 data={data}
                 margin={{ left: 24, right: 24, top: 24, bottom: 24 }}
                 layout="vertical"
             >
                 <XAxis type="number" tickLine={false} axisLine={false} />
-                <YAxis 
-                    type="category" 
-                    dataKey="project_name" 
-                    tickLine={false} 
-                    axisLine={false} 
+                <YAxis
+                    type="category"
+                    dataKey="project_name"
+                    tickLine={false}
+                    axisLine={false}
                     width={150}
                 />
-                <ChartTooltip 
+                <ChartTooltip
                     content={({ active, payload }) => {
                         if (!active || !payload?.length) return null
                         const data = payload[0].payload
