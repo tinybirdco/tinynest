@@ -9,7 +9,7 @@ import { CacheStatsChart } from './cache-stats-chart'
 import { ResponseTimesChart } from './response-times-chart'
 import { TopPathsTable } from './top-paths-table'
 import { VercelFilters } from './filters'
-import { TimeRange } from '@/components/time-range'
+import { TimeRange, type TimeRange as TR } from '@/components/time-range'
 import { format } from 'date-fns'
 import { addDays } from 'date-fns'
 import { DateRange } from 'react-day-picker'
@@ -34,7 +34,7 @@ export default function VercelLogsDashboard() {
     const [cacheStatsData, setCacheStatsData] = useState<any[]>([])
     const [topPathsPage, setTopPathsPage] = useState(0)
     const [topPathsLoading, setTopPathsLoading] = useState(false)
-    const [timeRange, setTimeRange] = useState('daily')
+    const [timeRange, setTimeRange] = useState<TR>('daily')
     const [dateRange, setDateRange] = useState<DateRange>({
         from: addDays(new Date(), -7),
         to: new Date()

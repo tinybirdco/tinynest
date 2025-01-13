@@ -1,6 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartConfig } from '@/components/ui/chart'
 import { format } from 'date-fns'
+import { type TimeRange } from '@/components/time-range'
 
 export interface DeploymentsData {
     period: string
@@ -19,8 +20,19 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function DeploymentsChart({ data }: { data: DeploymentsData[] }) {
+export function DeploymentsChart({ data, timeRange }: { data: DeploymentsData[]; timeRange: TimeRange }) {
     if (!data.length) return <div className={`flex items-center justify-center`}>No data available</div>
+
+    let dateFormat = 'yyyy-MM-dd HH:mm'
+    if (timeRange === 'hourly') {
+        dateFormat = 'yyyy-MM-dd HH:mm'
+    } else if (timeRange === 'daily') {
+        dateFormat = 'd MMMM'
+    } else if (timeRange === 'weekly') {
+        dateFormat = 'd MMMM'
+    } else if (timeRange === 'monthly') {
+        dateFormat = 'MMMM'
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const chartData = data.reduce((acc: any[], curr: DeploymentsData) => {
@@ -46,7 +58,7 @@ export function DeploymentsChart({ data }: { data: DeploymentsData[] }) {
                     dataKey="period"
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(value) => format(new Date(value), 'd HH:mm')}
+                    tickFormatter={(value) => format(new Date(value), dateFormat)}
                 />
                 <YAxis
                     tickLine={false}
@@ -59,7 +71,7 @@ export function DeploymentsChart({ data }: { data: DeploymentsData[] }) {
                         return (
                             <div className="rounded-lg border bg-background p-2 shadow-sm">
                                 <div className="text-xs text-muted-foreground">
-                                    {format(new Date(data.period), 'd HH:mm')}
+                                    {format(new Date(data.period), dateFormat)}
                                 </div>
                                 {
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any

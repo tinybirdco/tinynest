@@ -6,7 +6,7 @@ import { addDays, format } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 import { pipe } from '@/lib/tinybird'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { TimeRange } from '@/components/time-range'
+import { TimeRange, type TimeRange as TR } from '@/components/time-range'
 import MetricCard from '@/components/metric-card'
 import { DeploymentsChart, DeploymentsData } from './deployments-chart'
 import { DurationChart, DurationData } from './duration-chart'
@@ -21,7 +21,7 @@ interface VercelMetrics {
 
 export default function VercelDashboard() {
     const [token] = useQueryState('token')
-    const [timeRange, setTimeRange] = useState('daily')
+    const [timeRange, setTimeRange] = useState<TR>('daily')
     const [dateRange, setDateRange] = useState<DateRange>({
         from: addDays(new Date(), -7),
         to: new Date()
@@ -115,6 +115,7 @@ export default function VercelDashboard() {
                     <CardContent>
                         <DeploymentsChart
                             data={deploymentsData}
+                            timeRange={timeRange}
                         />
                     </CardContent>
                 </Card>
@@ -124,7 +125,9 @@ export default function VercelDashboard() {
                         <CardTitle>Deploy Duration</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <DurationChart data={durationData} />
+                        <DurationChart
+                            data={durationData}
+                            timeRange={timeRange} />
                     </CardContent>
                 </Card>
             </div>
