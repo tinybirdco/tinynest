@@ -13,6 +13,12 @@ import { DurationChart, DurationData } from './duration-chart'
 import { ProjectsChart, ProjectData } from './projects-chart'
 import { GitAnalyticsChart, GitData } from './git-analytics-chart'
 
+interface VercelMetrics {
+    total_deployments: number
+    success_rate: number
+    error_rate: number
+}
+
 export default function VercelDashboard() {
     const [token] = useQueryState('token')
     const [timeRange, setTimeRange] = useState('daily')
@@ -21,7 +27,7 @@ export default function VercelDashboard() {
         to: new Date()
     })
 
-    const [isLoading, setIsLoading] = useState(true)
+    const [, setIsLoading] = useState(true)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [metrics, setMetrics] = useState<any>()
     const [deploymentsData, setDeploymentsData] = useState<DeploymentsData[]>([])
@@ -49,7 +55,7 @@ export default function VercelDashboard() {
                     gitAnalyticsResult,
 
                 ] = await Promise.all([
-                    pipe(token, 'vercel_deployment_metrics', params),
+                    pipe<{ data: VercelMetrics[] }>(token, 'vercel_deployment_metrics', params),
                     pipe<{ data: DeploymentsData[] }>(token, 'vercel_deployments_over_time', params),
                     pipe<{ data: DurationData[] }>(token, 'vercel_deployment_duration', params),
                     pipe<{ data: ProjectData[] }>(token, 'vercel_project_stats', params),
