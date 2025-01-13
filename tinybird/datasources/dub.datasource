@@ -6,7 +6,7 @@ TAGS "dub"
 SCHEMA >
     `event_time` DateTime64(3) `json:$.tinybirdIngestTime` DEFAULT now(),
     `event_type` String `json:$.event` DEFAULT 'unknown',
-    `event` JSON `json:$` DEFAULT '{}'
+    `event` JSON(max_dynamic_types=2, max_dynamic_paths=16) `json:$` DEFAULT '{}'
 
 ENGINE "MergeTree"
 ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
