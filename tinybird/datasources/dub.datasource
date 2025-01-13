@@ -5,7 +5,7 @@ TAGS "dub"
 
 SCHEMA >
     `event_time` DateTime64(3) `json:$.tinybirdIngestTime` DEFAULT now(),
-    `event_type` String `json:$.type` DEFAULT 'unknown',
+    `event_type` String `json:$.event` DEFAULT 'unknown',
     `event` JSON `json:$` DEFAULT '{}'
 
 ENGINE "MergeTree"
