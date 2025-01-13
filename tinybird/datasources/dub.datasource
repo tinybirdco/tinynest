@@ -1,0 +1,13 @@
+TOKEN "append" APPEND
+TOKEN "read" READ
+
+TAGS "dub"
+
+SCHEMA >
+    `event_time` DateTime64(3) `json:$.tinybirdIngestTime` DEFAULT now(),
+    `event_type` String `json:$.type` DEFAULT 'unknown',
+    `event` JSON `json:$` DEFAULT '{}'
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(event_time)"
+ENGINE_SORTING_KEY "event_time"
