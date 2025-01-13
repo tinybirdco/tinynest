@@ -3,13 +3,7 @@ import { cn } from '@/lib/utils'
 import { DateRange } from 'react-day-picker'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 
-const timeRanges = {
-    hourly: 'hourly',
-    daily: 'daily',
-    weekly: 'weekly',
-    monthly: 'monthly',
-} as const;
-export type TimeRange = typeof timeRanges[keyof typeof timeRanges]
+export type TimeRange = 'hourly' | 'daily' | 'weekly' | 'monthly';
 
 interface TimeRangeProps {
     timeRange: TimeRange
