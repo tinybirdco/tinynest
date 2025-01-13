@@ -131,7 +131,7 @@ export const TOOLS: Record<string, AppGridItem> = {
     dub: {
         id: 'dub',
         ds: 'dub',
-        name: 'dub',
+        name: 'Dub',
         description: 'Link infrastructure',
         icon: '👀',
         icon_url: '/dub_favicon.png'
