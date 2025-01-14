@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic';
 export const baseURL = (() => {
     // Preview deployments
     if (process.env.VERCEL_ENV === 'preview') {
-        return 'http://localhost:3000';
         return `https://${process.env.VERCEL_BRANCH_URL}`;
     }
 
