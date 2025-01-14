@@ -1,0 +1,42 @@
+NODE extract_browser
+SQL >
+
+    %
+        SELECT 
+            case
+                when match(event.data.user_agent::String, '(?i)firefox')
+                then 'Firefox'
+                when match(event.data.user_agent::String, '(?i)chrome|crios')
+                then 'Chrome'
+                when match(event.data.user_agent::String, '(?i)opera')
+                then 'Opera'
+                when match(event.data.user_agent::String, '(?i)msie|trident')
+                then 'Internet Explorer'
+                when match(event.data.user_agent::String, '(?i)iphone|ipad|safari')
+                then 'Safari'
+                else 'Unknown'
+            END as browser,
+            count(*) as request_count
+        FROM auth0
+        WHERE 1
+            AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
+            AND event_time <= {{DateTime(date_to, '2026-01-01 23:59:59')}}
+            AND event.data.user_agent IS NOT NULL
+            {% if defined(event_type) %}
+                AND event_type = {{String(event_type)}}
+            {% end %}
+            {% if defined(client_name) %}
+                AND event.data.client_name::String = {{String(client_name)}}
+            {% end %}
+            {% if defined(connection_id) %}
+                AND event.data.connection_id::String = {{String(connection_id)}}
+            {% end %}
+            {% if defined(tenant_name) %}
+                AND event.data.tenant_name::String = {{String(tenant_name)}}
+            {% end %}
+            AND browser != 'Unknown'
+        GROUP BY browser
+        ORDER BY request_count DESC
+        LIMIT 10
+
+TYPE endpoint

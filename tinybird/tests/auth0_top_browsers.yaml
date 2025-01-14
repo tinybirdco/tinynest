@@ -1,0 +1,68 @@
+
+- name: all_time_top_browsers
+  description: Get top browsers for all time with no filters
+  parameters: ''
+  expected_result: |
+    {"browser":"Chrome","request_count":7844}
+    {"browser":"Firefox","request_count":623}
+    {"browser":"Safari","request_count":584}
+    {"browser":"Opera","request_count":3}
+    {"browser":"Internet Explorer","request_count":3}
+
+- name: filtered_by_client_and_event
+  description: Get top browsers filtered by client name and event type
+  parameters: date_from=2024-01-01%2000:00:00&date_to=2026-01-01%2023:59:59&client_name=Tinybird%20UI%20login&event_type=s
+  expected_result: |
+    {"browser":"Chrome","request_count":5195}
+    {"browser":"Firefox","request_count":382}
+    {"browser":"Safari","request_count":280}
+
+- name: specific_tenant_connection
+  description: Get top browsers for a specific tenant and connection ID
+  parameters: date_from=2024-01-01%2000:00:00&date_to=2025-12-31%2023:59:59&tenant_name=tinybird-prod&connection_id=con_44Dbx1tiicQTA5zj
+  expected_result: |
+    {"browser":"Chrome","request_count":13}
+    {"browser":"Firefox","request_count":1}
+
+- name: custom_date_range
+  description: Get top browsers for a specific date range
+  parameters: date_from=2025-01-01%2000:00:00&date_to=2025-01-01%2023:59:59
+  expected_result: |
+    {"browser":"Chrome","request_count":155}
+    {"browser":"Safari","request_count":15}
+    {"browser":"Firefox","request_count":9}
+    {"browser":"Opera","request_count":1}
+    {"browser":"Internet Explorer","request_count":1}
+
+- name: default_date_range
+  description: Test with default date range and no filters
+  parameters: tb pipe data auth0_top_browsers
+  expected_result: |
+    {"browser":"Chrome","request_count":7844}
+    {"browser":"Firefox","request_count":623}
+    {"browser":"Safari","request_count":584}
+    {"browser":"Opera","request_count":3}
+    {"browser":"Internet Explorer","request_count":3}
+
+- name: filtered_by_client_name
+  description: Test filtering by specific client name
+  parameters: client_name=Tinybird%20UI%20login
+  expected_result: |
+    {"browser":"Chrome","request_count":6302}
+    {"browser":"Firefox","request_count":471}
+    {"browser":"Safari","request_count":340}
+
+- name: filtered_by_date_range
+  description: Test with custom date range
+  parameters: date_from=2025-01-02%2000:00:00&date_to=2025-01-02%2023:59:59
+  expected_result: |
+    {"browser":"Chrome","request_count":513}
+    {"browser":"Firefox","request_count":46}
+    {"browser":"Safari","request_count":22}
+
+- name: connection_specific
+  description: Test filtering by connection ID
+  parameters: connection_id=con_44Dbx1tiicQTA5zj&client_name=Tinybird%20UI%20login
+  expected_result: |
+    {"browser":"Chrome","request_count":12}
+    {"browser":"Firefox","request_count":1}
