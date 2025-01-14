@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const TINYBIRD_API_URL = "https://api.tinybird.co/v0/pipes";
+const TINYBIRD_API_URL = `${process.env.NEXT_PUBLIC_TINYBIRD_API_HOST}/v0/pipes`;
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
