@@ -9,7 +9,7 @@ SQL >
         SELECT 0 AS number
         UNION ALL
         SELECT number + 1
-        FROM system.numbers
+        FROM numbers(100)
         WHERE number < dateDiff('hour', toStartOfHour(toDateTime({{DateTime(date_from, '2024-01-01 00:00:00')}})), toStartOfHour(toDateTime({{DateTime(date_to, '2024-12-31 23:59:59')}})))
     )
     SELECT addHours(toStartOfHour(toDateTime({{DateTime(date_from, '2024-01-01 00:00:00')}})), number) as hour
