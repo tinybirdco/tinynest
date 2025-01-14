@@ -2,3 +2,6 @@
 .venv
 .tinyb
 .tmp
+.tb_error*
+tinybird/fixtures
+
