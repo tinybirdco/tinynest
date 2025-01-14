@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 
-export const baseURL = process.env.NEXT_PUBLIC_VERCEL_URL;
+export const baseURL = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
 
 export type ToolState = 'available' | 'installed' | 'configured';
 
