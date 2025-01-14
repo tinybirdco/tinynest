@@ -1,14 +1,14 @@
 import dynamic from 'next/dynamic';
 
 export const baseURL = (() => {
-    // Production URL
-    if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-        return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
-    }
-    
     // Preview deployments
     if (process.env.VERCEL_ENV === 'preview') {
         return `https://${process.env.VERCEL_URL}`;
+    }
+
+    // Production URL
+    if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+        return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
     }
     
     // Local development
