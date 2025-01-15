@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Card } from '@/components/ui/card'
+import { type TimeRange } from '@/components/time-range'
 
 export interface DurationData {
     period: string
@@ -10,19 +11,32 @@ export interface DurationData {
 
 interface DurationChartProps {
     data: DurationData[]
+    timeRange: TimeRange
 }
 
-export function DurationChart({ data }: DurationChartProps) {
+export function DurationChart({ data, timeRange }: DurationChartProps) {
+
+    let dateFormat = 'yyyy-MM-dd HH:mm'
+    if (timeRange === 'hourly') {
+        dateFormat = 'yyyy-MM-dd HH:mm'
+    } else if (timeRange === 'daily') {
+        dateFormat = 'd MMMM'
+    } else if (timeRange === 'weekly') {
+        dateFormat = 'd MMMM'
+    } else if (timeRange === 'monthly') {
+        dateFormat = 'MMMM'
+    }
+
     return (
         <ResponsiveContainer width="100%" height={350}>
             <LineChart data={data}>
-                <XAxis 
-                    dataKey="period" 
+                <XAxis
+                    dataKey="period"
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(value) => format(new Date(value), 'd MMM HH:mm')}
+                    tickFormatter={(value) => format(new Date(value), dateFormat)}
                 />
-                <YAxis 
+                <YAxis
                     tickLine={false}
                     axisLine={false}
                     tickFormatter={(value) => `${value}s`}
@@ -33,7 +47,7 @@ export function DurationChart({ data }: DurationChartProps) {
                         return (
                             <Card className="p-2">
                                 <div className="text-sm text-muted-foreground">
-                                    {format(new Date(payload[0].payload.period), 'd MMM HH:mm')}
+                                    {format(new Date(payload[0].payload.period), dateFormat)}
                                 </div>
                                 <div className="font-bold">
                                     Avg: {payload[0].payload.avg_duration}s

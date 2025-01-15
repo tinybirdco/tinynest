@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Token and query are required' }, { status: 400 });
   }
 
-  const url = new URL('https://api.tinybird.co/v0/sql');
+  const url = new URL(`${process.env.NEXT_PUBLIC_TINYBIRD_API_HOST}/v0/sql`);
   url.searchParams.set('q', query);
 
   const response = await fetch(url.toString(), {

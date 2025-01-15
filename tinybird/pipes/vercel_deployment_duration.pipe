@@ -31,6 +31,6 @@ SQL >
         HAVING count(DISTINCT event_type) = 2
     )
     GROUP BY period
-    ORDER BY period DESC 
+    ORDER BY period ASC 
 
 TYPE ENDPOINT
