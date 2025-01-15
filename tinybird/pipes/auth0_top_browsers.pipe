@@ -40,3 +40,5 @@ SQL >
     GROUP BY browser
     ORDER BY request_count DESC
     LIMIT 10 
+
+TYPE ENDPOINT

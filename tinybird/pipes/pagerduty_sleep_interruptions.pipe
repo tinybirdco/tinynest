@@ -61,3 +61,5 @@ SQL >
     {% end %}
     GROUP BY responder
     ORDER BY interruptions DESC
+
+TYPE ENDPOINT

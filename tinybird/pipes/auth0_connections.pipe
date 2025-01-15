@@ -34,3 +34,5 @@ SQL >
         failed_attempts > 0
     ORDER BY 
         total_events DESC
+
+TYPE ENDPOINT

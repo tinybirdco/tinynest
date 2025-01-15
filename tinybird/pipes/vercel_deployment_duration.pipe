@@ -32,3 +32,5 @@ SQL >
     )
     GROUP BY period
     ORDER BY period DESC 
+
+TYPE ENDPOINT

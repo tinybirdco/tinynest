@@ -30,4 +30,4 @@ SQL >
     group by day 
     order by day asc
 
-
+TYPE ENDPOINT

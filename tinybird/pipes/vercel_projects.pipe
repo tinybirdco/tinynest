@@ -8,3 +8,5 @@ SQL >
     FROM vercel_logs
     WHERE event.projectName::String != ''
     ORDER BY value::String ASC
+
+TYPE ENDPOINT

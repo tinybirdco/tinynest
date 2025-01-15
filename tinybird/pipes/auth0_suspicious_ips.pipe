@@ -38,4 +38,7 @@ SQL >
     GROUP BY ip
     HAVING failed_attempts >= {{Int16(min_failures, 5)}}
     ORDER BY failed_attempts DESC
-    LIMIT {{Int32(limit, 100)}} 
+    LIMIT {{Int32(limit, 100)}}
+    
+TYPE ENDPOINT
+ 

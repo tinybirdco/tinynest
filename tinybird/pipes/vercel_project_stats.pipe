@@ -16,3 +16,5 @@ SQL >
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
     GROUP BY project_id, project_name
     ORDER BY total_deployments DESC 
+
+TYPE ENDPOINT

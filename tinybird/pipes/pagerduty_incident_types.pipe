@@ -32,3 +32,5 @@ SQL >
     ORDER BY total_incidents DESC
     LIMIT {{Int32(page_size, 100)}}
     OFFSET {{Int32(page, 0) * Int32(page_size, 100)}}
+
+TYPE ENDPOINT

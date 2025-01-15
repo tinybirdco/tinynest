@@ -17,4 +17,7 @@ SQL >
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
     GROUP BY branch
     ORDER BY deployments DESC
-    LIMIT 10 
+    LIMIT 10
+
+TYPE ENDPOINT
+ 

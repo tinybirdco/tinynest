@@ -9,4 +9,4 @@ SQL >
     where event_type == 'subscription.ended'
     and event_time >= now() - interval 30 day
 
-
+TYPE ENDPOINT
