@@ -1,4 +1,5 @@
 .DS_Store
 .venv
 .tinyb
+.tb_error.txt
 .tmp
