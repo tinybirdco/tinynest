@@ -23,3 +23,5 @@ SQL >
         GROUP BY day
     )
 ORDER BY day ASC
+
+TYPE ENDPOINT

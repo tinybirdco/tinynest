@@ -45,3 +45,5 @@ SQL >
 
     GROUP BY responder
     ORDER BY hours DESC
+
+TYPE ENDPOINT

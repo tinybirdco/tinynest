@@ -28,3 +28,5 @@ SQL >
         AND event.event.data.service.id::String = {{String(service_id)}}
         {% end %}
         ) as incident_ends ON incident_starts.incident_id = incident_ends.incident_id
+
+TYPE ENDPOINT

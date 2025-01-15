@@ -11,4 +11,4 @@ SQL >
     group by day, plan
     order by day, subs asc
 
-
+TYPE ENDPOINT

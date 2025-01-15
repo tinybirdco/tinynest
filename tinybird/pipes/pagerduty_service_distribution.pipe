@@ -18,3 +18,5 @@ SQL >
     {% end %}
     GROUP BY service
     ORDER BY incidents DESC 
+
+TYPE ENDPOINT

@@ -34,3 +34,5 @@ SQL >
     GROUP BY domain
     ORDER BY unique_emails DESC
     LIMIT 10 
+
+TYPE ENDPOINT

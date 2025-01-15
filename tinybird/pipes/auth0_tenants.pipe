@@ -15,3 +15,5 @@ SQL >
         {% end %}
     GROUP BY tenant_name
     ORDER BY tenant_name
+
+TYPE ENDPOINT

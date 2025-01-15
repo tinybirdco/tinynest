@@ -9,4 +9,4 @@ SQL >
     where event_type == 'invoice.issued'
     and event_time >= now() - interval 30 day
 
-
+TYPE ENDPOINT

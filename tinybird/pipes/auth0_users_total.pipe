@@ -25,3 +25,5 @@ SQL >
     {% if defined(tenant_name) and tenant_name != 'all' %}
         AND event.data.tenant_name::String = {{String(tenant_name)}}
     {% end %}
+
+TYPE ENDPOINT

@@ -30,3 +30,5 @@ SQL >
     {% end %}
     GROUP BY status
     ORDER BY count DESC 
+
+TYPE ENDPOINT

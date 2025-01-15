@@ -36,3 +36,5 @@ SQL >
     GROUP BY device
     ORDER BY request_count DESC
     LIMIT 10 
+
+TYPE ENDPOINT

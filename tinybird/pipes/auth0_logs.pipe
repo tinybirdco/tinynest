@@ -31,3 +31,5 @@ SQL >
         order by event_time desc
         LIMIT {{Int32(page_size, 30)}}
         OFFSET {{Int32(page, 0) * Int32(page_size, 30)}} 
+
+TYPE ENDPOINT

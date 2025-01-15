@@ -26,3 +26,5 @@ SQL >
         event.data.client_name::String
     ORDER BY 
         total_events DESC
+
+TYPE ENDPOINT
