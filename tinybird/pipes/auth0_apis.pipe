@@ -27,3 +27,5 @@ SQL >
         event.data.audience::String
     ORDER BY 
         total_events DESC
+
+TYPE endpoint
