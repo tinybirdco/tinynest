@@ -10,3 +10,5 @@ SQL >
     WHERE event.event.data.service.summary::String IS NOT NULL
     AND event_time >= now() - interval 30 day
     ORDER BY service_name ASC 
+
+TYPE ENDPOINT

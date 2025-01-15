@@ -24,3 +24,5 @@ SQL >
     AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
     GROUP BY period, event_type
     ORDER BY period ASC 
+
+TYPE ENDPOINT

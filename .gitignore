@@ -3,3 +3,6 @@
 .tinyb
 .tb_error.txt
 .tmp
+.tb_error*
+tinybird/fixtures
+

@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Token is required' }, { status: 400 });
   }
 
-  const response = await fetch('https://api.tinybird.co/v0/datasources', {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_TINYBIRD_API_HOST}/v0/datasources`, {
     headers: {
       'Authorization': `Bearer ${token}`,
     },

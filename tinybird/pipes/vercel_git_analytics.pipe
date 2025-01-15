@@ -17,3 +17,5 @@ SQL >
     AND author != ''
     GROUP BY author
     ORDER BY commits DESC
+
+TYPE ENDPOINT

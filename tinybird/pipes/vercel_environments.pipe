@@ -9,3 +9,5 @@ SQL >
     FROM vercel_logs
     WHERE event.environment::String != ''
     ORDER BY value::String ASC
+
+TYPE ENDPOINT

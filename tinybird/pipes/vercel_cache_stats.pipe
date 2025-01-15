@@ -42,3 +42,5 @@ SQL >
     {% end %}
     GROUP BY hour
     ORDER BY hour ASC
+
+TYPE ENDPOINT

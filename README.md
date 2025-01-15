@@ -1,5 +1,5 @@
-# Dev stack analytics template
-The dev stack analytics template is an open source utility built with love by Tinybird. Capture and analyze data from over a dozen common dev tools, from Vercel to Stripe to Auth0 and more, with just a few lines of code.
+# The Dev Stack Analytics Template
+The Dev Stack Analytics Template is an open source utility built with love by Tinybird. Capture and analyze data from over a dozen common dev tools, from Vercel to Stripe to Auth0 and more, with just a few lines of code.
 
 ![image](https://github.com/user-attachments/assets/32f24c18-a815-44f5-8a37-40e2d899e866)
 

@@ -86,3 +86,5 @@ SQL >
     LEFT JOIN interruptions i ON dr.day = i.date
     GROUP BY dr.day
     ORDER BY day ASC 
+
+TYPE ENDPOINT

@@ -16,4 +16,4 @@ SQL >
         AND event.data.tenant_name::String = {{String(tenant_name)}}
     {% end %}
 
-
+TYPE ENDPOINT

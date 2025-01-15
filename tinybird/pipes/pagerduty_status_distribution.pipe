@@ -20,4 +20,4 @@ SQL >
         GROUP BY event_type
         ORDER BY count DESC
 
-
+TYPE ENDPOINT

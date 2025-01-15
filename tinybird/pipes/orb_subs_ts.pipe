@@ -11,4 +11,4 @@ SQL >
     group by day
     order by day
 
-
+TYPE ENDPOINT

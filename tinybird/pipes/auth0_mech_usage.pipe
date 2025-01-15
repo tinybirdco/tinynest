@@ -22,4 +22,4 @@ SQL >
     group by mech
     order by logins desc
 
-
+TYPE ENDPOINT

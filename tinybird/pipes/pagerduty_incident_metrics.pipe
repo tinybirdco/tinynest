@@ -41,3 +41,5 @@ SQL >
         ) p
         ON triggered.incident_id::String = p.incident_id::String
     WHERE p.event_time >= triggered.triggered_at
+
+TYPE ENDPOINT

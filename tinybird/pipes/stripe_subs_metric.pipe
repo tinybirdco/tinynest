@@ -11,4 +11,4 @@ SQL >
     FROM stripe
     where event_type = 'customer.subscription.created' or event_type = 'customer.subscription.deleted'
 
-
+TYPE ENDPOINT
