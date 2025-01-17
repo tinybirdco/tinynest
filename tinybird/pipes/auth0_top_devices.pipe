@@ -21,18 +21,16 @@ SQL >
         AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
         AND event_time <= {{DateTime(date_to, '2024-01-01 23:59:59')}}
         AND event.data.user_agent IS NOT NULL
-        {% if defined(event_type) %}
-            AND event_type = {{String(event_type)}}
-        {% end %}
-        {% if defined(client_name) %}
+        {% if defined(client_name) and client_name != 'all' %}
             AND event.data.client_name::String = {{String(client_name)}}
         {% end %}
-        {% if defined(connection_id) %}
+        {% if defined(connection_id) and connection_id != 'all' %}
             AND event.data.connection_id::String = {{String(connection_id)}}
         {% end %}
-        {% if defined(tenant_name) %}
+        {% if defined(tenant_name) and tenant_name != 'all' %}
             AND event.data.tenant_name::String = {{String(tenant_name)}}
         {% end %}
+        AND device != 'Bot'
     GROUP BY device
     ORDER BY request_count DESC
     LIMIT 10 

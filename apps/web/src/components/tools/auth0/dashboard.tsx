@@ -4,10 +4,12 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useState, useCallback } from 'react'
 import { pipe } from '@/lib/tinybird'
 import MetricCard from '@/components/metric-card'
-import { DauChart, DauDataPoint } from './dau-chart'
-import { AuthMechChart, AuthMechDataPoint } from './auth-mech-chart'
-import { DailySignupsChart, DailySignupsDataPoint } from './daily-signups-chart'
-import { DailyLoginFailsChart, DailyLoginFailsDataPoint } from './daily-login-fails-chart'
+import { Auth0Dau } from './dau-chart'
+import { Auth0TopAuth } from './auth-mech-chart'
+import { Auth0TopBrowsers } from './top-browsers-chart'
+import { Auth0TopDevices } from './top-devices-chart'
+import { Auth0DailySignups } from './daily-signups-chart'
+import { Auth0DailyLoginFails } from './daily-login-fails-chart'
 import { DateRangePicker, DateRange } from '@/components/ui/date-range-picker'
 import { startOfDay, endOfDay, format } from 'date-fns'
 import {
@@ -20,18 +22,16 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { UserRetentionChart, UserRetentionDataPoint } from './user-retention-chart'
+import { Auth0UserRetention } from './user-retention-chart'
 import { LogsTable } from './logs-table'
-import { TopBrowsersChart } from './top-browsers-chart'
-import { TopDevicesChart } from './top-devices-chart'
-import { TopDomainsChart } from './top-domains-chart'
+import { Auth0TopDomains } from './top-domains-chart'
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { ChevronDown, ChevronUp } from "lucide-react"
-import { CumulativeSignupsChart } from './cumulative-signups-chart'
+import { Auth0CumulativeSignups } from './cumulative-signups-chart'
 
 interface SummaryMetrics {
     total_users: number
@@ -55,7 +55,7 @@ interface LogEntry {
 export default function Auth0Dashboard() {
     const [token] = useQueryState('token')
     const [dateRange, setDateRange] = useState<DateRange>({
-        from: startOfDay(new Date(new Date().setDate(new Date().getDate() - 7))),
+        from: startOfDay(new Date(new Date().setDate(new Date().getDate() - 30))),
         to: endOfDay(new Date())
     })
     const [summaryMetrics, setSummaryMetrics] = useState<SummaryMetrics>({
@@ -67,16 +67,11 @@ export default function Auth0Dashboard() {
         monthly_active_users: 0,
         conversion_rate: 0
     })
-    const [dauData, setDauData] = useState<DauDataPoint[]>([])
-    const [authMechData, setAuthMechData] = useState<AuthMechDataPoint[]>([])
-    const [dailySignupsData, setDailySignupsData] = useState<DailySignupsDataPoint[]>([])
-    const [dailyLoginFailsData, setDailyLoginFailsData] = useState<DailyLoginFailsDataPoint[]>([])
     const [selectedApp, setSelectedApp] = useState<string>('all')
     const [selectedConnection, setSelectedConnection] = useState<string>('all')
     const [applications, setApplications] = useState<Array<{ client_id: string, client_name: string }>>([])
     const [connections, setConnections] = useState<Array<{ connection_id: string, connection_name: string }>>([])
     const [timeRange, setTimeRange] = useState<'hourly' | 'daily' | 'monthly'>('daily')
-    const [userRetentionData, setUserRetentionData] = useState<UserRetentionDataPoint[]>([])
     const [logs, setLogs] = useState<LogEntry[]>([])
     const [logsPage, setLogsPage] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
@@ -92,21 +87,7 @@ export default function Auth0Dashboard() {
     })
     const [selectedTenant, setSelectedTenant] = useState<string>('all')
     const [tenants, setTenants] = useState<Array<{ tenant_name: string }>>([])
-    const [topBrowsers, setTopBrowsers] = useState<Array<{
-        browser: string
-        request_count: number
-    }>>([])
-    const [topDevices, setTopDevices] = useState<Array<{
-        device: string
-        request_count: number
-    }>>([])
-    const [topDomains, setTopDomains] = useState<Array<{
-        domain: string
-        request_count: number
-        unique_emails: number
-    }>>([])
     const [isDomainsOpen, setIsDomainsOpen] = useState(false)
-    const [cumulativeSignupsData, setCumulativeSignupsData] = useState<Array<{ day: string; new_users: number; cumulative_users: number }>>([])
 
     useEffect(() => {
         async function fetchInitialData() {
@@ -164,14 +145,6 @@ export default function Auth0Dashboard() {
                 monthlySignupsResult,
                 monthlyActiveUsersResult,
                 conversionRateResult,
-                userRetentionTimeSeriesResult,
-                dauResult,
-                authMechResult,
-                dailySignupsResult,
-                dailyLoginFailsResult,
-                topBrowsersResult,
-                topDevicesResult,
-                topDomainsResult,
                 logsResult
             ] = await Promise.all([
                 pipe(token, 'auth0_users_total', baseParams),
@@ -181,14 +154,6 @@ export default function Auth0Dashboard() {
                 pipe(token, 'auth0_signups', baseParams),
                 pipe(token, 'auth0_mau', baseParams),
                 pipe(token, 'auth0_conversion_rate', baseParams),
-                pipe<{ data: UserRetentionDataPoint[] }>(token, 'auth0_user_retention_ts', baseParams),
-                pipe<{ data: DauDataPoint[] }>(token, 'auth0_dau_ts', baseParams),
-                pipe<{ data: AuthMechDataPoint[] }>(token, 'auth0_mech_usage', baseParams),
-                pipe<{ data: DailySignupsDataPoint[] }>(token, 'auth0_daily_signups', baseParams),
-                pipe<{ data: DailyLoginFailsDataPoint[] }>(token, 'auth0_daily_login_fails', baseParams),
-                pipe(token, 'auth0_top_browsers', baseParams),
-                pipe(token, 'auth0_top_devices', baseParams),
-                pipe(token, 'auth0_top_domains', baseParams),
                 pipe<{ data: LogEntry[] }>(token, 'auth0_logs', {
                     ...baseParams,
                     page: logsPage,
@@ -208,29 +173,7 @@ export default function Auth0Dashboard() {
                 monthly_active_users: monthlyActiveUsersResult?.data?.[0]?.active ?? 0,
                 conversion_rate: conversionRateResult?.data?.[0]?.conversion_rate ?? 0
             })
-
-            setDauData(dauResult?.data ?? [])
-            setAuthMechData(authMechResult?.data ?? [])
-            setDailySignupsData(dailySignupsResult?.data ?? [])
-            setDailyLoginFailsData(dailyLoginFailsResult?.data ?? [])
-            setUserRetentionData(userRetentionTimeSeriesResult?.data as UserRetentionDataPoint[] ?? [])
-            setTopBrowsers(topBrowsersResult?.data as Array<{
-                browser: string
-                request_count: number
-            }> ?? [])
-            setTopDevices(topDevicesResult?.data as Array<{
-                device: string
-                request_count: number
-            }> ?? [])
-            setTopDomains(topDomainsResult?.data as Array<{
-                domain: string
-                request_count: number
-                unique_emails: number
-            }> ?? [])
             setLogs(logsResult?.data ?? [])
-
-            const cumulativeSignupsResult = await pipe<{ data: Array<{ day: string; new_users: number; cumulative_users: number }> }>(token, 'auth0_cumulative_users', baseParams)
-            setCumulativeSignupsData(cumulativeSignupsResult?.data ?? [])
         } catch (error) {
             console.error('Failed to fetch metrics:', error)
         } finally {
@@ -359,10 +302,13 @@ export default function Auth0Dashboard() {
                     <CardTitle>Cumulative Signups</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <CumulativeSignupsChart 
-                        data={cumulativeSignupsData ?? []}
-                        isLoading={isLoading}
-                        className="h-[150px]"
+                    <Auth0CumulativeSignups 
+                        client_id={selectedApp}
+                        connection_id={selectedConnection}
+                        tenant_name={selectedTenant}
+                        token={token ?? ''}
+                        date_from={dateRange.from ? format(dateRange.from, "yyyy-MM-dd HH:mm:ss") : undefined}
+                        date_to={dateRange.to ? format(dateRange.to, "yyyy-MM-dd HH:mm:ss") : undefined}
                     />
                 </CardContent>
             </Card>
@@ -401,38 +347,85 @@ export default function Auth0Dashboard() {
 
             {/* Charts Grid */}
             <div className="grid gap-4 grid-cols-1">
-                <DauChart 
-                    data={dauData} 
-                    timeRange={timeRange}
-                    className="h-[300px]"
-                />
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Active Users</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Auth0Dau 
+                            client_id={selectedApp}
+                            connection_id={selectedConnection}
+                            tenant_name={selectedTenant}
+                            token={token ?? ''}
+                            date_from={dateRange.from ? format(dateRange.from, "yyyy-MM-dd HH:mm:ss") : undefined}
+                            date_to={dateRange.to ? format(dateRange.to, "yyyy-MM-dd HH:mm:ss") : undefined}
+                            time_range={timeRange}
+                        />
+                    </CardContent>
+                </Card>
             </div>
             <div className="grid gap-4 md:grid-cols-1 xl:grid-cols-2">
-                <UserRetentionChart 
-                    data={userRetentionData}
-                    timeRange={timeRange}
-                    className="h-[300px]"
-                />
-                <DailySignupsChart 
-                    data={dailySignupsData}
-                    timeRange={timeRange}
-                    className="h-[300px]"
-                />
+                <Card>
+                    <CardHeader>
+                        <CardTitle>User Retention</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Auth0UserRetention 
+                            token={token ?? ''}
+                            date_from={dateRange.from ? format(dateRange.from, "yyyy-MM-dd HH:mm:ss") : undefined}
+                            date_to={dateRange.to ? format(dateRange.to, "yyyy-MM-dd HH:mm:ss") : undefined}
+                            time_range={timeRange}
+                            client_id={selectedApp}
+                            connection_id={selectedConnection}
+                            tenant_name={selectedTenant}
+                        />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Daily Signups</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Auth0DailySignups 
+                            client_id={selectedApp}
+                            connection_id={selectedConnection}
+                            tenant_name={selectedTenant}
+                            token={token ?? ''}
+                            date_from={dateRange.from ? format(dateRange.from, "yyyy-MM-dd HH:mm:ss") : undefined}
+                            date_to={dateRange.to ? format(dateRange.to, "yyyy-MM-dd HH:mm:ss") : undefined}
+                            time_range={timeRange}
+                        />
+                    </CardContent>
+                </Card>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <AuthMechChart 
-                    data={authMechData}
-                    className="h-[300px]"
-                />
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Top Auth Methods</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Auth0TopAuth 
+                            client_id={selectedApp}
+                            connection_id={selectedConnection}
+                            tenant_name={selectedTenant}
+                            token={token ?? ''}
+                            date_from={dateRange.from ? format(dateRange.from, "yyyy-MM-dd HH:mm:ss") : undefined}
+                            date_to={dateRange.to ? format(dateRange.to, "yyyy-MM-dd HH:mm:ss") : undefined}
+                        />
+                    </CardContent>
+                </Card>
                 <Card>
                     <CardHeader>
                         <CardTitle>Top Browsers</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <TopBrowsersChart 
-                            data={topBrowsers}
-                            isLoading={isLoading}
-                            className="h-[300px]"
+                        <Auth0TopBrowsers 
+                            client_id={selectedApp}
+                            connection_id={selectedConnection}
+                            tenant_name={selectedTenant}
+                            token={token ?? ''}
+                            date_from={dateRange.from ? format(dateRange.from, "yyyy-MM-dd HH:mm:ss") : undefined}
+                            date_to={dateRange.to ? format(dateRange.to, "yyyy-MM-dd HH:mm:ss") : undefined}
                         />
                     </CardContent>
                 </Card>
@@ -441,10 +434,13 @@ export default function Auth0Dashboard() {
                         <CardTitle>Top Devices</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <TopDevicesChart 
-                            data={topDevices}
-                            isLoading={isLoading}
-                            className="h-[300px]"
+                        <Auth0TopDevices 
+                            client_id={selectedApp}
+                            connection_id={selectedConnection}
+                            tenant_name={selectedTenant}
+                            token={token ?? ''}
+                            date_from={dateRange.from ? format(dateRange.from, "yyyy-MM-dd HH:mm:ss") : undefined}
+                            date_to={dateRange.to ? format(dateRange.to, "yyyy-MM-dd HH:mm:ss") : undefined}
                         />
                     </CardContent>
                 </Card>
@@ -463,21 +459,35 @@ export default function Auth0Dashboard() {
                     </CardHeader>
                     <CollapsibleContent>
                         <CardContent>
-                            <TopDomainsChart 
-                                data={topDomains}
-                                isLoading={isLoading}
+                            <Auth0TopDomains 
+                                client_id={selectedApp}
+                                connection_id={selectedConnection}
+                                tenant_name={selectedTenant}
+                                token={token ?? ''}
+                                date_from={dateRange.from ? format(dateRange.from, "yyyy-MM-dd HH:mm:ss") : undefined}
+                                date_to={dateRange.to ? format(dateRange.to, "yyyy-MM-dd HH:mm:ss") : undefined}
                             />
                         </CardContent>
                     </CollapsibleContent>
                 </Card>
             </Collapsible>
             <div className="grid gap-4 md:grid-cols-1 xl:grid-cols-1">
-                <DailyLoginFailsChart 
-                    data={dailyLoginFailsData}
-                    timeRange={timeRange}
-                    className="h-[300px]"
-                />
-                
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Daily Login Fails</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Auth0DailyLoginFails 
+                            client_id={selectedApp}
+                            connection_id={selectedConnection}
+                            tenant_name={selectedTenant}
+                            token={token ?? ''}
+                            date_from={dateRange.from ? format(dateRange.from, "yyyy-MM-dd HH:mm:ss") : undefined}
+                            date_to={dateRange.to ? format(dateRange.to, "yyyy-MM-dd HH:mm:ss") : undefined}
+                            time_range={timeRange}
+                        />
+                    </CardContent>
+                </Card>
             </div>
             <Separator className="my-6" />
             <Card>

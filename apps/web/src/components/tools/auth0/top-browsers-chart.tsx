@@ -1,72 +1,33 @@
-import { BarChart, Bar, XAxis, YAxis } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartConfig, ChartTooltipContent } from '@/components/ui/chart'
+'use client'
 
-interface Browser {
-    browser: string
-    request_count: number
+import { BarList } from '@tinybirdco/charts'
+
+export function Auth0TopBrowsers(params: {
+  client_id?: string
+  connection_id?: string
+  tenant_name?: string
+  token?: string
+  date_from?: string
+  date_to?: string
+}) {
+  return <BarList 
+    endpoint={`${process.env.NEXT_PUBLIC_TINYBIRD_API_HOST}/v0/pipes/auth0_top_browsers.json`}
+    token={params.token ?? ''}
+    index="browser"
+    categories={['request_count']}
+    colorPalette={['#000000']}
+    height="250px"
+    params={params}
+    indexConfig={{
+        label: 'BROWSER',
+        renderBarContent: ({ label }) => (
+        <span className="font-normal text-white [text-shadow:2px_1px_0px_#000]">{label}</span>
+        )
+    }}
+    categoryConfig={{
+        request_count: {
+              label: <span>Requests</span>
+        }
+    }}
+  />
 }
-
-interface TopBrowsersChartProps {
-    data: Browser[]
-    isLoading: boolean
-    className?: string
-}
-
-const chartConfig = {
-    request_count: {
-        color: "hsl(var(--primary))",
-        label: "Requests",
-    },
-} satisfies ChartConfig
-
-function transformData(data: Browser[]): (Browser & { fill: string })[] {
-    return data.map((item, index) => ({
-        ...item,
-        fill: `hsl(var(--chart-${(index % 12) + 1}))`
-    }));
-}
-
-export function TopBrowsersChart({ data, isLoading, className }: TopBrowsersChartProps) {
-    if (isLoading) return <div className={`flex items-center justify-center ${className}`}>Loading...</div>
-    if (!data.length) return <div className={`flex items-center justify-center ${className}`}>No data available</div>
-
-    data = transformData(data)
-
-    return (
-        <ChartContainer config={chartConfig} className={`w-full ${className}`}>
-            <BarChart 
-                data={data.slice(0, 5)} 
-                layout="vertical" 
-                margin={{
-                    left: 24,
-                    right: 12,
-                    top: 12,
-                    bottom: 12,
-                }}
-            >
-                <XAxis 
-                    type="number"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                />
-                <YAxis 
-                    type="category"
-                    dataKey="browser"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    width={70}
-                />
-                <ChartTooltip
-                    content={<ChartTooltipContent />}
-                    cursor={{ fill: "hsl(var(--muted))", opacity: 0.2 }}
-                />
-                <Bar 
-                    dataKey="request_count" 
-                    radius={[4, 4, 4, 4]}
-                />
-            </BarChart>
-        </ChartContainer>
-    )
-} 

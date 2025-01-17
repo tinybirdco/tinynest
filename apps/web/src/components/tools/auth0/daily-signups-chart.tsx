@@ -1,106 +1,23 @@
 "use client"
 
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import {
-    ChartContainer,
-    ChartTooltip,
-    ChartConfig,
-    ChartTooltipContent
-} from "@/components/ui/chart"
-import { Line, LineChart, XAxis, YAxis, CartesianGrid } from "recharts"
-import { format } from "date-fns"
+import { AreaChart } from '@tinybirdco/charts'
 
-export interface DailySignupsDataPoint {
-    day: string
-    signups: number
-}
-
-export interface DailySignupsChartData {
-    data: DailySignupsDataPoint[]
-    timeRange: 'hourly' | 'daily' | 'monthly'
-    className?: string
-}
-
-const chartConfig = {
-    signups: {
-        color: "hsl(var(--chart-1))",
-        label: "Signups",
-    },
-} satisfies ChartConfig
-
-export function DailySignupsChart({ data, timeRange, className }: DailySignupsChartData) {
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Signups</CardTitle>
-            </CardHeader>
-            <CardContent className="">
-                <ChartContainer config={chartConfig} className={`w-full ${className}`}>
-                    <LineChart
-                        data={data}
-                        margin={{
-                            left: 48,
-                            right: 12,
-                            top: 12,
-                            bottom: 32
-                        }}
-                    >
-                        <CartesianGrid 
-                            horizontal={true}
-                            vertical={false}
-                            className="stroke-muted"
-                        />
-                        <XAxis
-                            dataKey="day"
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            interval="equidistantPreserveStart"
-                            tickFormatter={(value) => {
-                                const date = new Date(value)
-                                return timeRange === 'monthly' 
-                                    ? format(date, 'MMM yyyy')
-                                    : value.split('-')[2]
-                            }}
-                            label={{
-                                value: timeRange === 'monthly' ? "Month of Year" : "Day of Month",
-                                position: "bottom",
-                                offset: 20
-                            }}
-                        />
-                        <YAxis
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            label={{
-                                value: "Signups",
-                                angle: -90,
-                                position: "left",
-                                offset: 32
-                            }}
-                        />
-                        <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent indicator="dot" />}
-                        />
-                        <Line
-                            type="monotone"
-                            dataKey="signups"
-                            strokeWidth={2}
-                            dot={true}
-                            style={{
-                                stroke: chartConfig.signups.color,
-                            }}
-                            activeDot={{ fill: chartConfig.signups.color, stroke: chartConfig.signups.color }}
-                        />
-                    </LineChart>
-                </ChartContainer>
-            </CardContent>
-        </Card>
-    )
+export function Auth0DailySignups(params: {
+  client_id?: string
+  connection_id?: string
+  tenant_name?: string
+  token?: string
+  date_from?: string
+  date_to?: string
+  time_range?: string
+}) {
+  return <AreaChart
+    endpoint={`${process.env.NEXT_PUBLIC_TINYBIRD_API_HOST}/v0/pipes/auth0_daily_signups.json`}
+    token={params.token ?? ''}
+    index="day"
+    categories={['signups']}
+    height="200px"
+    params={params}
+    colorPalette={['#000000']}
+  />
 }

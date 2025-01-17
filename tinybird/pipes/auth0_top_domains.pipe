@@ -9,26 +9,20 @@ SQL >
         splitByChar('@', event.data.user_name::String)[2] as domain
     SELECT 
         domain,
-        count(*) as request_count,
-        countDistinct(event.data.user_name) as unique_emails,
-        min(event_time) as first_seen,
-        max(event_time) as last_seen
+        countDistinct(event.data.user_name) as unique_emails
     FROM auth0
     WHERE 1
         AND event.data.user_name::String like '%@%'
         AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}}
         AND event_time <= {{DateTime(date_to, '2024-01-01 23:59:59')}}
         AND event.data.user_name IS NOT NULL
-        {% if defined(event_type) %}
-            AND event_type = {{String(event_type)}}
+        {% if defined(client_id) and client_id != 'all' %}
+            AND event.data.client_id::String = {{String(client_id)}}
         {% end %}
-        {% if defined(client_name) %}
-            AND event.data.client_name::String = {{String(client_name)}}
-        {% end %}
-        {% if defined(connection_id) %}
+        {% if defined(connection_id) and connection_id != 'all' %}
             AND event.data.connection_id::String = {{String(connection_id)}}
         {% end %}
-        {% if defined(tenant_name) %}
+        {% if defined(tenant_name) and tenant_name != 'all' %}
             AND event.data.tenant_name::String = {{String(tenant_name)}}
         {% end %}
     GROUP BY domain
