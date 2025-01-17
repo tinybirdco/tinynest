@@ -14,10 +14,10 @@ SQL >
         {% else %}
             toStartOfDay(event_time)::Date as day,
         {% end %}
-        uniqIf(event.data.user_id, event_type = 's' AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}} AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}) as new_signups,
+        uniqIf(event.data.user_id, event_type = 's' AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}} AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}) as uniq_logins,
         total_users,
         ROUND(
-            new_signups / total_users * 100, 1
+            uniq_logins / total_users * 100, 1
         ) as user_retention
     FROM auth0
     WHERE 1
@@ -30,6 +30,7 @@ SQL >
         {% if defined(tenant_name) and tenant_name != 'all' %}
             AND event.data.tenant_name::String = {{String(tenant_name)}}
         {% end %}
+        AND event_time >= {{DateTime(date_from, '2024-01-01 00:00:00')}} AND event_time <= {{DateTime(date_to, '2024-12-31 23:59:59')}}
     GROUP BY day
     ORDER BY day
 
